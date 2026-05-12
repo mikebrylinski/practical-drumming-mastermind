@@ -1,0 +1,65 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-bebas: 'Bebas Neue', ui-sans-serif, system-ui, sans-serif;
+  --font-garamond: 'EB Garamond', ui-serif, Georgia, serif;
+
+  --color-void: #050505;
+  --color-charcoal: #0f0e0c;
+  --color-smoke: #1a1816;
+  --color-gold: #c9a55c;
+  --color-gold-dim: #8a7544;
+  --color-mist: #e8e4dc;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-void text-mist/90 min-h-svh;
+  }
+  ::selection {
+    @apply bg-gold/25 text-mist;
+  }
+}
+
+@keyframes ken-burns {
+  0% {
+    transform: scale(1) translate(0%, 0%);
+  }
+  100% {
+    transform: scale(1.09) translate(-1.5%, -1%);
+  }
+}
+
+@keyframes ambient-glow {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 0.75;
+  }
+}
+
+.hero-kenburns {
+  animation: ken-burns 32s ease-in-out infinite alternate;
+}
+
+.hero-glow-pulse {
+  animation: ambient-glow 8s ease-in-out infinite;
+}
+
+.grain {
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+}
+
+.gold-line {
+  @apply h-px flex-1 max-w-[4rem] bg-gradient-to-r from-transparent via-gold/60 to-gold/20;
+}
+
+.gold-line-r {
+  @apply h-px flex-1 max-w-[4rem] bg-gradient-to-l from-transparent via-gold/60 to-gold/20;
+}
