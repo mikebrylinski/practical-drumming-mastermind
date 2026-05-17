@@ -1,100 +1,306 @@
+import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { Reveal } from '../components/Reveal'
 
-const pillars = [
-  {
-    title: 'Band-ready musicianship',
-    body: 'Geared toward adult drum set players mastering the art of performing in band situations—ideas that focus on musicality and confidence, not isolation exercises.',
-  },
-  {
-    title: 'Performance over drill fatigue',
-    body: 'Focuses on what helps you master performing on drum set instead of endless technique-only work with no practical application.',
-  },
-  {
-    title: 'Songs, parts, people, poise',
-    body: 'Methods for approaching a song, composing parts, performing with others, and building confidence so you command the instrument in real rooms.',
-  },
-  {
-    title: 'The mindset of great band drummers',
-    body: 'Trains members to understand how successful drummers think in band situations—and how to apply that mindset to their own playing.',
-  },
-  {
-    title: 'Led by Mike Malinin',
-    body: 'Mike shares decades of knowledge from 30+ years of recording and touring the world with the Goo Goo Dolls, Tanya Tucker, and others—on some of the biggest and most prestigious stages for live music.',
-  },
-  {
-    title: 'Grow with your peers',
-    body: 'Learn from other members on the same journey and grow together as drummers—a fun group with no egos or attitudes, just players helping each other become experts at the craft.',
-  },
-]
+const designedToHelp = [
+  'Play with more confidence and control',
+  'Break through frustrating plateaus',
+  'Build real musicality — not just chops',
+  'Develop professional habits and mindset',
+  'Learn how great drummers actually think',
+  'Stay motivated and consistent',
+  'Get feedback, direction, and support from a real mentor',
+  'Become the drummer other musicians want to play with',
+] as const
 
-const phases = [
+const mikeCredentials = [
+  'Toured arenas worldwide',
+  'Performed in front of millions',
+  'Recorded platinum-selling music',
+  'Worked inside the real music industry',
+  'Spent decades developing practical drumming skills that actually matter on stage and in the studio',
+] as const
+
+const differentiators = [
+  'Real mentorship',
+  'Real accountability',
+  'Real community',
+  'Real musical growth',
+] as const
+
+const stopFeeling = [
+  'overwhelmed',
+  'inconsistent',
+  'uninspired',
+  'stuck in the same patterns',
+] as const
+
+const startFeeling = [
+  'focused',
+  'motivated',
+  'creative',
+  'confident behind the kit',
+] as const
+
+const insideClub = [
   {
-    n: '01',
-    title: 'Essential Basics',
-    subtitle: 'Phase 1',
-    body: 'Understand the process of making musical decisions and actually function as a drummer—not just hit drums.',
+    title: 'Weekly Mentorship & Coaching',
+    body: 'Get ongoing guidance, mindset shifts, and practical drumming strategies directly from Mike.',
   },
   {
-    n: '02',
-    title: 'Technique and Tone',
-    subtitle: 'Phase 2',
-    body: 'Produce a controlled, professional sound without relying only on volume or force.',
+    title: 'Exclusive Training Content',
+    body: 'Lessons focused on groove, musicality, creativity, performance, feel, and professional-level drumming concepts.',
   },
   {
-    n: '03',
-    title: 'Mental Confidence',
-    subtitle: 'Phase 3',
-    body: 'Play with certainty, stay locked in, and stop second-guessing yourself.',
+    title: 'Community of Serious Drummers',
+    body: 'Surround yourself with motivated drummers who actually want to improve and push each other forward.',
   },
   {
-    n: '04',
-    title: 'Objective Listening and Thinking',
-    subtitle: 'Phase 4',
-    body: 'Identify what works, fix what doesn’t, and improve your playing with direction and clarity—consistently.',
+    title: 'Accountability & Growth',
+    body: 'Stay consistent with a system designed to keep you progressing week after week.',
   },
-]
+  {
+    title: 'Real-World Drumming Knowledge',
+    body: 'Learn the things most drum lessons never teach:',
+    subItems: [
+      'playing for the song',
+      'musical maturity',
+      'live performance mindset',
+      'industry professionalism',
+      'creative decision making',
+    ],
+  },
+] as const
+
+const forYouIf = [
+  'You feel stuck in your playing',
+  'You’ve lost motivation practicing alone',
+  'You want direction instead of random exercises',
+  'You want mentorship from a top-level drummer',
+  'You’re serious about improving',
+  'You want to sound musical — not robotic',
+  'You want to finally become confident behind the kit',
+] as const
+
+function SectionHeading({
+  eyebrow,
+  title,
+  className = '',
+}: {
+  eyebrow?: string
+  title: string
+  className?: string
+}) {
+  return (
+    <div className={className}>
+      {eyebrow ? (
+        <p className="font-garamond text-xs tracking-[0.32em] uppercase text-gold-dim">{eyebrow}</p>
+      ) : null}
+      <h2
+        className={`font-bebas text-3xl tracking-wide text-mist md:text-4xl ${eyebrow ? 'mt-3' : ''}`}
+      >
+        {title}
+      </h2>
+    </div>
+  )
+}
+
+function BulletList({ items, className = '' }: { items: readonly string[]; className?: string }) {
+  return (
+    <ul className={`space-y-4 ${className}`}>
+      {items.map((item) => (
+        <li key={item} className="flex gap-4">
+          <span className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-gold/80" />
+          <p className="font-garamond text-base leading-relaxed text-mist/75 md:text-lg">{item}</p>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+function Prose({ children, className = '' }: { children: ReactNode; className?: string }) {
+  return (
+    <p className={`font-garamond text-base leading-relaxed text-mist/75 md:text-lg ${className}`}>
+      {children}
+    </p>
+  )
+}
 
 export function ClubPage() {
   return (
-    <article className="relative">
-      <section className="border-b border-white/[0.06] px-5 pb-20 pt-16 md:px-8 md:pb-28 md:pt-20">
-        <div className="mx-auto w-full max-w-5xl">
+    <article className="relative bg-void">
+      {/* Hero */}
+      <section className="relative min-h-[32rem] overflow-hidden border-b border-white/[0.06] px-5 pb-16 pt-16 md:min-h-[38rem] md:px-8 md:pb-24 md:pt-24">
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: "url('/club-hero-bg.png')" }}
+          aria-hidden
+        />
+        <div className="absolute inset-0 bg-void/55" aria-hidden />
+        <div
+          className="absolute inset-0 bg-gradient-to-b from-void/90 via-void/65 to-void/88"
+          aria-hidden
+        />
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              'radial-gradient(ellipse 90% 75% at 50% 55%, rgba(5,5,5,0.25) 0%, rgba(5,5,5,0.72) 100%)',
+          }}
+          aria-hidden
+        />
+        <div className="relative z-10 mx-auto w-full max-w-5xl">
           <Reveal>
-            <p className="font-garamond text-xs tracking-[0.35em] uppercase text-gold-dim">
-              Practical Drumming
-            </p>
-            <h1 className="mt-4 font-bebas text-[clamp(2.25rem,7vw,4rem)] leading-[0.95] tracking-wide text-mist md:text-5xl">
-              A mastermind club for
+            <p className="font-garamond text-xs tracking-[0.35em] uppercase text-gold">The Club</p>
+            <h1 className="mt-4 font-bebas text-4xl leading-[0.95] tracking-wide text-mist md:text-5xl lg:text-6xl">
+              Stop Practicing Alone.
               <br />
-              serious band drummers
+              Start Playing Like a Real Drummer.
             </h1>
           </Reveal>
-          <Reveal delay={0.06} className="mt-8">
-            <p className="font-garamond text-lg leading-relaxed text-mist/75 md:text-xl">
-              Adult drum set players, mastering musicality and confidence in real band situations—not
-              another technique treadmill.
-            </p>
+          <Reveal delay={0.06} className="mt-10 space-y-6">
+            <Prose className="text-mist/80">
+              Join an elite drumming community built for drummers who want more than random YouTube
+              lessons and scattered practice routines.
+            </Prose>
+            <Prose className="text-mist/80">
+              Inside The Club, you&apos;ll get direct mentorship, real-world guidance, accountability,
+              and a proven roadmap from a professional touring drummer who&apos;s performed on some of
+              the biggest stages in the world.
+            </Prose>
+            <Prose className="text-mist/90">
+              This isn&apos;t just another drum lesson membership.
+            </Prose>
           </Reveal>
         </div>
       </section>
 
-      <section className="border-b border-white/[0.06] bg-charcoal/40 px-5 py-20 md:px-8 md:py-28">
-        <div className="mx-auto w-full max-w-5xl space-y-12">
+      {/* Designed to help */}
+      <section className="border-b border-white/[0.06] bg-charcoal/40 px-5 py-16 md:px-8 md:py-24">
+        <div className="mx-auto w-full max-w-5xl">
           <Reveal>
-            <h2 className="font-bebas text-3xl tracking-wide text-mist md:text-4xl">What this is</h2>
-            <p className="mt-4 font-garamond text-base text-mist/55 md:text-lg">
-              Six commitments define the circle.
+            <h2 className="font-bebas text-2xl tracking-wide text-mist md:text-3xl">
+              It&apos;s a mentorship experience designed to help you:
+            </h2>
+          </Reveal>
+          <Reveal delay={0.06} className="mt-10">
+            <BulletList items={designedToHelp} />
+          </Reveal>
+        </div>
+      </section>
+
+      {/* Guidance */}
+      <section className="border-b border-white/[0.06] px-5 py-16 md:px-8 md:py-24">
+        <div className="mx-auto w-full max-w-5xl space-y-8">
+          <Reveal>
+            <Prose className="text-lg text-mist/85 md:text-xl">
+              The difference between drummers who stay stuck… and drummers who level up… is guidance.
+            </Prose>
+          </Reveal>
+          <Reveal delay={0.04}>
+            <Prose>Most drummers spend years guessing.</Prose>
+          </Reveal>
+          <Reveal delay={0.08}>
+            <Prose>
+              Inside The Club, you&apos;ll know exactly what to work on, why it matters, and how to
+              improve faster.
+            </Prose>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* Mike */}
+      <section className="border-b border-white/[0.06] bg-charcoal/40 px-5 py-16 md:px-8 md:py-24">
+        <div className="mx-auto w-full max-w-5xl">
+          <Reveal>
+            <SectionHeading title="Learn From Someone Who's Actually Done It" />
+            <p className="mt-6 font-garamond text-xl tracking-[0.12em] text-gold md:text-2xl">
+              Mike Malinin
             </p>
           </Reveal>
-          <div className="space-y-10">
-            {pillars.map((p, i) => (
-              <Reveal key={p.title} delay={i * 0.04}>
-                <div className="border-l border-gold/35 pl-8 md:pl-10">
-                  <h3 className="font-garamond text-lg text-gold md:text-xl">{p.title}</h3>
+          <Reveal delay={0.06} className="mt-8 space-y-6">
+            <Prose>
+              When you join The Club, you&apos;re not learning from a random internet instructor.
+            </Prose>
+            <Prose>
+              You&apos;re getting mentorship from a professional drummer who has:
+            </Prose>
+          </Reveal>
+          <Reveal delay={0.1} className="mt-8">
+            <BulletList items={mikeCredentials} />
+          </Reveal>
+          <Reveal delay={0.14} className="mt-8">
+            <Prose>
+              You&apos;ll gain insights most drummers never get access to — from groove, feel,
+              dynamics, creativity, professionalism, touring, recording, mindset, and musical
+              decision-making.
+            </Prose>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* What makes different */}
+      <section className="border-b border-white/[0.06] px-5 py-16 md:px-8 md:py-24">
+        <div className="mx-auto w-full max-w-5xl">
+          <Reveal>
+            <SectionHeading title="What Makes This Different?" />
+          </Reveal>
+          <Reveal delay={0.06} className="mt-8 space-y-6">
+            <Prose className="text-lg text-mist/85 md:text-xl">
+              Most online drum programs give you information.
+            </Prose>
+            <Prose className="text-lg text-gold/90 md:text-xl">The Club gives you transformation.</Prose>
+            <Prose>This is built around:</Prose>
+          </Reveal>
+          <Reveal delay={0.1} className="mt-8">
+            <BulletList items={differentiators} />
+          </Reveal>
+          <Reveal delay={0.14} className="mt-10 space-y-6">
+            <Prose>
+              Instead of endlessly consuming videos and hoping you improve, you&apos;ll follow a
+              structured path designed to create measurable progress.
+            </Prose>
+            <Prose>You&apos;ll finally stop feeling:</Prose>
+          </Reveal>
+          <Reveal delay={0.18} className="mt-6">
+            <BulletList items={stopFeeling} />
+          </Reveal>
+          <Reveal delay={0.22} className="mt-8">
+            <Prose>And start feeling:</Prose>
+          </Reveal>
+          <Reveal delay={0.26} className="mt-6">
+            <BulletList items={startFeeling} />
+          </Reveal>
+        </div>
+      </section>
+
+      {/* Inside The Club */}
+      <section className="border-b border-white/[0.06] bg-smoke/30 px-5 py-16 md:px-8 md:py-24">
+        <div className="mx-auto w-full max-w-5xl">
+          <Reveal>
+            <SectionHeading title="Inside The Club" />
+          </Reveal>
+          <div className="mt-12 space-y-10">
+            {insideClub.map((item, i) => (
+              <Reveal key={item.title} delay={i * 0.04}>
+                <div className="border-l border-gold/35 pl-6 md:pl-8">
+                  <h3 className="font-garamond text-lg text-gold md:text-xl">{item.title}</h3>
                   <p className="mt-3 font-garamond text-base leading-relaxed text-mist/70 md:text-lg">
-                    {p.body}
+                    {item.body}
                   </p>
+                  {'subItems' in item && item.subItems ? (
+                    <ul className="mt-4 space-y-2 pl-1">
+                      {item.subItems.map((sub) => (
+                        <li
+                          key={sub}
+                          className="flex gap-3 font-garamond text-base text-mist/65 md:text-lg"
+                        >
+                          <span className="text-gold/60">—</span>
+                          {sub}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
                 </div>
               </Reveal>
             ))}
@@ -102,81 +308,36 @@ export function ClubPage() {
         </div>
       </section>
 
-      <section className="border-b border-white/[0.06] px-5 py-20 md:px-8 md:py-28">
+      {/* For you if */}
+      <section className="border-b border-white/[0.06] px-5 py-16 md:px-8 md:py-24">
         <div className="mx-auto w-full max-w-5xl">
           <Reveal>
-            <h2 className="font-bebas text-3xl tracking-wide text-mist md:text-4xl">
-              Here’s how it works
-            </h2>
-            <p className="mt-4 font-garamond text-base text-mist/60 md:text-lg">
-              A clear arc from musical decisions to tone, confidence, and ongoing improvement.
-            </p>
+            <SectionHeading title="This Is For You If…" />
           </Reveal>
-          <ol className="mt-16 space-y-0">
-            {phases.map((phase, i) => (
-              <Reveal key={phase.n} delay={i * 0.06}>
-                <li className="grid gap-6 border-t border-white/[0.08] py-10 md:grid-cols-[auto_1fr] md:gap-12 md:py-12">
-                  <div className="font-bebas text-4xl leading-none text-gold/50 md:text-5xl">
-                    {phase.n}
-                  </div>
-                  <div>
-                    <p className="font-garamond text-xs tracking-[0.3em] uppercase text-gold-dim">
-                      {phase.subtitle}
-                    </p>
-                    <h3 className="mt-2 font-bebas text-2xl tracking-wide text-mist md:text-3xl">
-                      {phase.title}
-                    </h3>
-                    <p className="mt-4 font-garamond text-base leading-relaxed text-mist/70 md:text-lg">
-                      {phase.body}
-                    </p>
-                  </div>
-                </li>
-              </Reveal>
-            ))}
-          </ol>
+          <Reveal delay={0.06} className="mt-10">
+            <BulletList items={forYouIf} />
+          </Reveal>
         </div>
       </section>
 
-      <section className="border-b border-white/[0.06] bg-smoke/30 px-5 py-20 md:px-8 md:py-28">
-        <div className="mx-auto w-full max-w-5xl">
-          <Reveal>
-            <h2 className="font-bebas text-3xl tracking-wide text-mist md:text-4xl">
-              Community & rhythm of the week
-            </h2>
-          </Reveal>
-          <ul className="mt-12 space-y-8">
-            <Reveal delay={0.04}>
-              <li className="flex gap-4">
-                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-gold" />
-                <p className="font-garamond text-base leading-relaxed text-mist/75 md:text-lg">
-                  A supportive community of dedicated, driven, like-minded drummers—all working
-                  toward the same goals.
-                </p>
-              </li>
-            </Reveal>
-            <Reveal delay={0.08}>
-              <li className="flex gap-4">
-                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-gold" />
-                <p className="font-garamond text-base leading-relaxed text-mist/75 md:text-lg">
-                  Two collaboration calls each week to work together, get feedback, and stay clear
-                  on how to improve your playing.
-                </p>
-              </li>
-            </Reveal>
-          </ul>
-        </div>
-      </section>
-
-      <section className="px-5 py-20 md:px-8 md:py-28">
+      {/* CTA */}
+      <section className="px-5 py-16 md:px-8 md:py-24">
         <div className="mx-auto w-full max-w-5xl text-center">
           <Reveal>
-            <p className="font-garamond text-xs tracking-[0.35em] uppercase text-gold">Member cap</p>
-            <p className="mt-6 font-bebas text-3xl tracking-wide text-mist md:text-4xl">
-              Initial limit: 20 drummers
-            </p>
-            <p className="mt-6 font-garamond text-base text-mist/60 md:text-lg">
-              A curated size so every member gets room to grow—and real attention.
-            </p>
+            <SectionHeading title="Your Next Level Starts Here" className="text-center" />
+            <div className="mt-8 space-y-6 text-left md:text-center">
+              <Prose>
+                The fastest way to grow as a drummer is to learn from someone who&apos;s already walked
+                the path.
+              </Prose>
+              <Prose>
+                The Club gives you the structure, mentorship, accountability, and community to become
+                the drummer you know you can be.
+              </Prose>
+              <Prose className="text-mist/90">
+                Join today and start building real confidence, real groove, and real musicianship.
+              </Prose>
+            </div>
           </Reveal>
           <Reveal delay={0.1} className="mt-12 flex justify-center">
             <Link
