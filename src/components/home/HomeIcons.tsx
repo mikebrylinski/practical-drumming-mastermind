@@ -45,6 +45,45 @@ function IconFrame({
   )
 }
 
+export function StreamsIcon(props: IconProps) {
+  return (
+    <IconFrame {...props} render={(s, fill) => (
+        <>
+          <path d="M8 26c4-6 8-6 12 0s8 6 12 0 4-6 8-6" {...s} />
+          <path d="M8 32c4-4 8-4 12 0s8 4 12 0" {...s} opacity={0.55} />
+          <circle cx="24" cy="14" r="6" {...s} />
+          <path
+            d="M21 12h6v1.5h-1.5V18H21v-1.5h1.5v-3H21V12z"
+            fill={fill}
+            fillOpacity={0.35}
+            stroke={fill}
+            strokeWidth={0.75}
+          />
+        </>
+      )}
+    />
+  )
+}
+
+export function RecordsIcon(props: IconProps) {
+  return (
+    <IconFrame {...props} render={(s, fill) => (
+        <>
+          <path
+            d="M24 8l5.2 3v10L24 24l-5.2-3V11L24 8z"
+            fill={fill}
+            fillOpacity={0.2}
+            {...s}
+          />
+          <path d="M24 11v13M18.8 13.5v7M29.2 13.5v7" {...s} opacity={0.6} />
+          <circle cx="24" cy="32" r="8" {...s} />
+          <circle cx="24" cy="32" r="3" {...s} opacity={0.85} />
+        </>
+      )}
+    />
+  )
+}
+
 export function CatalogIcon(props: IconProps) {
   return (
     <IconFrame {...props} render={(s, fill) => (
@@ -259,6 +298,8 @@ export function TouringWideIcon({ className = '', ...props }: SVGProps<SVGSVGEle
 
 export type HomeIconName =
   | 'catalog'
+  | 'streams'
+  | 'records'
   | 'arena'
   | 'mentorship'
   | 'feel'
@@ -276,6 +317,8 @@ const tileIcons: Record<
   (props: IconProps) => React.ReactElement
 > = {
   catalog: CatalogIcon,
+  streams: StreamsIcon,
+  records: RecordsIcon,
   arena: ArenaIcon,
   mentorship: MentorshipIcon,
   feel: FeelIcon,

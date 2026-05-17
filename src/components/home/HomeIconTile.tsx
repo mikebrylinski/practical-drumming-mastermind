@@ -15,25 +15,48 @@ type HomeIconTileProps = {
   className?: string
   /** Fills grid cell width (use in multi-column icon rows). */
   fill?: boolean
+  /** Larger centered icon for highlight rows (e.g. credibility). */
+  large?: boolean
 }
 
-export function HomeIconTile({ icon, label, className = '', fill = false }: HomeIconTileProps) {
-  const tileSize = fill ? 'w-full max-w-none' : 'mx-auto w-full max-w-[7rem]'
+export function HomeIconTile({
+  icon,
+  label,
+  className = '',
+  fill = false,
+  large = false,
+}: HomeIconTileProps) {
+  const tileSize = fill || large ? 'w-full max-w-none' : 'mx-auto w-full max-w-[7rem]'
+  const tileShape = large ? 'aspect-[4/5] min-h-[14rem] sm:min-h-[15rem]' : 'aspect-square'
+  const iconPx = large ? 72 : 44
+  const iconClass = large
+    ? 'h-[4.25rem] w-[4.25rem] sm:h-[4.75rem] sm:w-[4.75rem] md:h-20 md:w-20 drop-shadow-[0_0_20px_rgba(201,165,92,0.45)]'
+    : 'h-11 w-11 drop-shadow-[0_0_12px_rgba(201,165,92,0.35)]'
+  const labelClass = large
+    ? 'font-garamond text-sm leading-relaxed text-mist/85 sm:text-[0.95rem] md:text-base'
+    : 'font-garamond text-[0.6rem] leading-tight tracking-[0.22em] uppercase text-mist/50 md:text-[0.65rem]'
+  const innerPad = large ? 'gap-4 p-5 sm:gap-5 sm:p-6' : 'gap-3 p-4 md:gap-4 md:p-5'
 
   return (
     <figure className={className}>
-      <div className={`group relative aspect-square overflow-hidden border border-white/[0.1] bg-charcoal shadow-[inset_0_1px_0_rgba(201,165,92,0.12)] transition-colors duration-300 hover:border-gold/30 ${tileSize}`}>
+      <div
+        className={`group relative overflow-hidden border border-white/[0.1] bg-charcoal shadow-[inset_0_1px_0_rgba(201,165,92,0.12)] transition-colors duration-300 hover:border-gold/30 ${tileShape} ${tileSize}`}
+      >
         <div className="absolute inset-0 opacity-40" style={gridPattern} aria-hidden />
         <div
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,rgba(201,165,92,0.18),transparent_65%)]"
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_42%,rgba(201,165,92,0.2),transparent_65%)]"
           aria-hidden
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-void/70 via-transparent to-void/20" aria-hidden />
-        <div className="relative flex h-full flex-col items-center justify-center gap-2.5 p-4">
-          <div className="transition-transform duration-300 group-hover:scale-105">
-            <HomeIcon name={icon} size={44} className="h-11 w-11 drop-shadow-[0_0_12px_rgba(201,165,92,0.35)]" />
+        <div className="absolute inset-0 bg-gradient-to-t from-void/80 via-void/15 to-transparent" aria-hidden />
+        <div
+          className={`relative flex h-full flex-col items-center justify-between text-center ${innerPad}`}
+        >
+          <div className="flex flex-1 items-center justify-center pt-1 transition-transform duration-300 group-hover:scale-105">
+            <HomeIcon name={icon} size={iconPx} className={iconClass} />
           </div>
-          <span className="font-garamond text-[0.6rem] leading-tight tracking-[0.22em] uppercase text-mist/50 transition-colors group-hover:text-gold/70 md:text-[0.65rem]">
+          <span
+            className={`w-full shrink-0 px-0.5 transition-colors group-hover:text-gold/90 ${labelClass}`}
+          >
             {label}
           </span>
         </div>

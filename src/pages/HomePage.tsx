@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { HomeIconBanner, HomeIconTile } from '../components/home/HomeIconTile'
+import { HomeIconTile } from '../components/home/HomeIconTile'
 import { Reveal } from '../components/Reveal'
 
 const heroOutcomes = [
@@ -92,23 +92,17 @@ const differencePoints = [
   'how to build a decades-long career in music',
 ] as const
 
-const applyBtnClass =
-  'inline-flex min-h-12 items-center justify-center border border-gold/50 bg-gold/10 px-8 font-garamond text-xs tracking-[0.22em] uppercase text-gold backdrop-blur-sm transition hover:border-gold hover:bg-gold/20'
+const primaryBtnClass =
+  'inline-flex min-h-11 items-center justify-center rounded-full bg-gold px-7 font-garamond text-xs tracking-[0.18em] uppercase text-void transition hover:bg-gold/90'
+
+const ghostBtnClass =
+  'inline-flex min-h-11 items-center justify-center rounded-full px-6 font-garamond text-xs tracking-[0.16em] uppercase text-gold ring-1 ring-gold/30 transition hover:bg-gold/10 hover:text-mist'
 
 function Prose({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
-    <p className={`font-garamond text-base leading-relaxed text-mist/75 md:text-lg ${className}`}>
+    <p className={`font-garamond text-base leading-relaxed text-mist/70 md:text-[1.05rem] ${className}`}>
       {children}
     </p>
-  )
-}
-
-function GoldDivider({ className = '' }: { className?: string }) {
-  return (
-    <span
-      className={`mx-auto block h-px w-20 bg-gradient-to-r from-transparent via-gold/55 to-transparent md:w-28 ${className}`}
-      aria-hidden
-    />
   )
 }
 
@@ -123,50 +117,101 @@ function SectionShell({
 }) {
   return (
     <section
-      className={`border-t border-white/[0.06] px-5 py-16 md:px-8 md:py-24 ${
-        alt ? 'bg-charcoal/40' : 'bg-void'
+      className={`border-t border-white/[0.06] px-5 py-14 md:px-8 md:py-16 lg:py-20 ${
+        alt ? 'bg-charcoal/35' : 'bg-void'
       } ${className}`}
     >
-      <div className="mx-auto w-full max-w-5xl">{children}</div>
+      <div className="mx-auto w-full max-w-7xl">{children}</div>
     </section>
   )
 }
 
-function SectionHeading({ eyebrow, title }: { eyebrow?: string; title: string }) {
+function SectionHeading({
+  eyebrow,
+  title,
+  subtitle,
+  align = 'left',
+}: {
+  eyebrow?: string
+  title: string
+  subtitle?: string
+  align?: 'left' | 'center'
+}) {
+  const alignClass = align === 'center' ? 'mx-auto max-w-3xl text-center' : 'text-center lg:max-w-2xl lg:text-left'
+
   return (
-    <Reveal>
+    <Reveal className={alignClass}>
       {eyebrow ? (
-        <p className="font-garamond text-xs tracking-[0.35em] uppercase text-gold-dim">{eyebrow}</p>
+        <p className="font-garamond text-[0.7rem] tracking-[0.32em] uppercase text-gold/75 md:text-xs">
+          {eyebrow}
+        </p>
       ) : null}
       <h2
-        className={`font-bebas text-3xl leading-tight tracking-wide text-mist md:text-4xl lg:text-5xl ${
-          eyebrow ? 'mt-3' : ''
+        className={`font-bebas text-[clamp(2rem,5vw,3.25rem)] leading-[0.95] tracking-[0.03em] text-mist ${
+          eyebrow ? 'mt-2' : ''
         }`}
       >
         {title}
       </h2>
+      {subtitle ? (
+        <p className="mt-3 font-garamond text-lg leading-snug text-mist/65 md:text-xl">{subtitle}</p>
+      ) : null}
     </Reveal>
   )
 }
 
-function BulletList({ items }: { items: readonly string[] }) {
+function BulletList({ items, compact = false }: { items: readonly string[]; compact?: boolean }) {
   return (
-    <ul className="space-y-4">
+    <ul className={compact ? 'space-y-2.5' : 'space-y-3'}>
       {items.map((item) => (
-        <li key={item} className="flex gap-4">
-          <span className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-gold/80" />
-          <p className="font-garamond text-base leading-relaxed text-mist/75 md:text-lg">{item}</p>
+        <li key={item} className="flex items-start gap-3">
+          <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-gold/90" aria-hidden />
+          <p className="font-garamond text-sm leading-relaxed text-mist/75 md:text-base">{item}</p>
         </li>
       ))}
     </ul>
   )
 }
 
-function FeatureCard({ title, body }: { title: string; body: string }) {
+function PosterPanel({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
-    <div className="border-l border-gold/35 pl-6 md:pl-8">
-      <h3 className="font-garamond text-lg text-gold md:text-xl">{title}</h3>
-      <p className="mt-3 font-garamond text-base leading-relaxed text-mist/70 md:text-lg">{body}</p>
+    <div
+      className={`relative flex h-full min-h-[16rem] flex-col justify-center overflow-hidden border border-gold/25 bg-charcoal/55 p-8 md:min-h-[18rem] md:p-10 ${className}`}
+    >
+      <div
+        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-gold/[0.06] to-transparent"
+        aria-hidden
+      />
+      <div className="relative">{children}</div>
+    </div>
+  )
+}
+
+function FeatureCard({
+  title,
+  body,
+  className = '',
+  bebasTitle = false,
+}: {
+  title: string
+  body: string
+  className?: string
+  bebasTitle?: boolean
+}) {
+  return (
+    <div
+      className={`rounded-2xl border border-white/[0.08] bg-charcoal/40 p-6 ring-1 ring-white/[0.04] md:p-7 ${className}`}
+    >
+      <h3
+        className={
+          bebasTitle
+            ? 'font-bebas text-xl tracking-wide text-gold md:text-2xl'
+            : 'font-garamond text-lg text-mist md:text-xl'
+        }
+      >
+        {title}
+      </h3>
+      <p className="mt-2.5 font-garamond text-sm leading-relaxed text-mist/65 md:text-base">{body}</p>
     </div>
   )
 }
@@ -175,211 +220,223 @@ export function HomePage() {
   return (
     <div className="bg-void">
       {/* Hero */}
-      <section className="relative min-h-[100svh] overflow-hidden">
+      <section className="relative overflow-hidden border-b border-white/[0.06] bg-void">
         <div
           className="absolute inset-0 bg-cover bg-[center_42%] hero-kenburns"
           style={{ backgroundImage: "url('/hero-arena.png')" }}
           aria-hidden
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-void/92 via-void/55 to-void" />
-        <motion.div className="absolute inset-0 bg-gradient-to-r from-void/95 via-void/70 to-void/95 md:from-void/85 md:via-void/45 md:to-void/85" />
+        <div className="absolute inset-0 bg-gradient-to-r from-void/95 via-void/82 to-void/55 lg:via-void/78 lg:to-void/35" aria-hidden />
+        <div className="absolute inset-0 bg-gradient-to-b from-void/70 via-void/25 to-void/92" aria-hidden />
         <div
-          className="pointer-events-none absolute inset-0"
-          style={{
-            background:
-              'radial-gradient(720px 480px at 50% 28%, rgba(201,165,92,0.2), transparent 58%)',
-          }}
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_55%_at_15%_40%,rgba(201,165,92,0.12),transparent_60%)]"
           aria-hidden
         />
-        <div
-          className="pointer-events-none absolute inset-0"
-          style={{
-            boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.04), inset 0 -180px 220px rgba(5,5,5,0.92)',
-          }}
-          aria-hidden
-        />
+        <div className="pointer-events-none absolute inset-0 grain opacity-25" aria-hidden />
 
-        <div className="relative z-10 mx-auto flex min-h-[100svh] max-w-6xl flex-col justify-center px-5 py-24 md:px-8">
-          <div className="mx-auto w-full max-w-3xl text-center">
+        <div className="relative z-10 mx-auto max-w-7xl px-5 py-14 md:px-8 md:py-16 lg:py-20">
+          <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.92fr)] lg:gap-12 xl:gap-16">
             <motion.div
-              initial={{ opacity: 0, y: 18 }}
+              initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1, duration: 0.65 }}
+              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              className="order-2 text-center lg:order-1 lg:text-left"
             >
-              <p
-                className="font-bebas text-[clamp(2.5rem,10vw,5.5rem)] leading-none tracking-[0.06em] text-mist"
-                style={{ textShadow: '0 0 80px rgba(201,165,92,0.12)' }}
-              >
+              <p className="font-garamond text-[0.7rem] tracking-[0.32em] uppercase text-gold/80 md:text-xs">
+                Mentorship with Mike Malinin
+              </p>
+              <h1 className="mt-3 font-bebas text-[clamp(2.75rem,7vw,4.5rem)] leading-[0.95] tracking-[0.04em] text-mist">
                 Practical Drumming
+              </h1>
+              <p className="mx-auto mt-4 max-w-md font-garamond text-lg leading-snug text-mist/70 md:text-xl lg:mx-0 lg:max-w-lg">
+                Built for drummers who want more than chops — and ready to perform at a higher level.
               </p>
-              <p className="mt-6 font-garamond text-sm tracking-[0.28em] uppercase text-mist/55 md:text-base">
-                Mentorship by
-              </p>
-              <GoldDivider className="mt-4" />
-              <p className="mt-4 font-garamond text-xl tracking-[0.2em] uppercase text-gold md:text-2xl">
-                Mike Malinin
-              </p>
-            </motion.div>
 
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.22, duration: 0.55 }}
-              className="mx-auto mt-10 max-w-xl font-garamond text-lg text-mist/80 md:text-xl"
-            >
-              Built for drummers who want more than chops.
-            </motion.p>
+              <ul className="mx-auto mt-8 grid max-w-sm grid-cols-1 gap-x-3 gap-y-3 text-left sm:max-w-lg sm:grid-cols-2 lg:mx-0 lg:max-w-xl">
+                {heroOutcomes.map((line) => (
+                  <li
+                    key={line}
+                    className="flex items-center gap-2.5 font-garamond text-base text-mist/75 md:text-lg"
+                  >
+                    <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-gold/90" aria-hidden />
+                    {line}
+                  </li>
+                ))}
+              </ul>
 
-            <motion.ul
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3, duration: 0.55 }}
-              className="mx-auto mt-8 max-w-md space-y-2"
-            >
-              {heroOutcomes.map((line) => (
-                <li key={line} className="font-bebas text-lg tracking-wide text-mist/90 md:text-xl">
-                  {line}
-                </li>
-              ))}
-            </motion.ul>
-
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.38, duration: 0.55 }}
-              className="mx-auto mt-10 max-w-2xl space-y-6"
-            >
-              <Prose className="text-mist/75">
-                This is a curated mentorship experience designed to help serious drummers close the
-                gap between practicing… and performing at a higher level.
-              </Prose>
-              <p className="font-garamond text-sm tracking-[0.22em] uppercase text-gold/90 md:text-base">
-                Twenty members.
-                <br />
-                Direct access.
-                <br />
-                Real-world musicianship.
+              <p className="mt-6 font-bebas text-lg tracking-wide text-gold md:text-xl">
+                Twenty members · Direct access · Real-world musicianship
               </p>
+
+              <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center lg:justify-start">
+                <Link to="/apply" className={primaryBtnClass}>
+                  Apply for Membership
+                </Link>
+                <Link to="/club" className={ghostBtnClass}>
+                  Explore the Club
+                </Link>
+              </div>
             </motion.div>
 
             <motion.div
-              initial={{ opacity: 0, y: 12 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.48, duration: 0.55 }}
-              className="mt-12 flex flex-col items-center gap-6"
+              transition={{ delay: 0.08, duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+              className="order-1 lg:order-2"
             >
-              <GoldDivider />
-              <Link to="/apply" className={applyBtnClass}>
-                Apply for Membership
-              </Link>
+              <div className="hero-visual relative mx-auto w-full max-w-sm lg:ml-auto lg:max-w-md">
+                <div className="relative aspect-[4/5] overflow-hidden rounded-[1.75rem] bg-charcoal/80 shadow-[0_24px_80px_-20px_rgba(0,0,0,0.9)] ring-1 ring-white/10 backdrop-blur-[2px] sm:aspect-[5/6]">
+                  <img
+                    src="/about-mike.png"
+                    alt="Mike Malinin performing live on drums"
+                    className="absolute inset-0 h-full w-full object-cover object-center"
+                    fetchPriority="high"
+                    decoding="async"
+                  />
+                  <div
+                    className="pointer-events-none absolute inset-0 bg-gradient-to-t from-void/50 via-transparent to-void/10"
+                    aria-hidden
+                  />
+                </div>
+                <p className="mt-4 text-center font-garamond text-xs tracking-[0.22em] uppercase text-mist/50 lg:text-right">
+                  Mike Malinin
+                </p>
+              </div>
             </motion.div>
           </div>
         </div>
       </section>
 
-      {/* Social proof */}
-      <section className="border-t border-white/[0.06] bg-charcoal/40 px-5 py-14 md:px-8 md:py-20">
-        <div className="mx-auto max-w-5xl text-center">
-          <Reveal>
-            <div className="space-y-3 font-bebas text-xl tracking-wide text-mist/90 md:text-2xl">
-              <p>Billion-stream catalog.</p>
-              <p>Multi-platinum recordings.</p>
-              <p>Decades of arena touring.</p>
-            </div>
-            <p className="mt-8 font-garamond text-base tracking-[0.18em] uppercase text-gold/85 md:text-lg">
-              One direct line into the mindset behind it.
-            </p>
-            <GoldDivider className="mt-8" />
-            <div className="mt-8 space-y-3">
-              <p className="font-garamond text-lg text-mist/75 md:text-xl">
-                Former drummer of Goo Goo Dolls.
-              </p>
-              <p className="font-garamond text-lg text-mist/75 md:text-xl">
-                Now mentoring a small private group of committed drummers.
-              </p>
-            </div>
-            <div className="mx-auto mt-12 grid max-w-lg grid-cols-3 gap-6 md:gap-10">
-              <Reveal delay={0.06}>
-                <HomeIconTile icon="catalog" label="Catalog" />
+      {/* Credibility */}
+      <section className="relative overflow-hidden border-t border-white/[0.06]">
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: "url('/credibility-bg.png')" }}
+          aria-hidden
+        />
+        <div className="absolute inset-0 bg-void/45" aria-hidden />
+        <div className="absolute inset-0 bg-gradient-to-r from-void/75 via-void/50 to-void/25" aria-hidden />
+        <div className="absolute inset-0 bg-gradient-to-b from-void/25 via-transparent to-void/55" aria-hidden />
+
+        <div className="relative z-10 mx-auto max-w-7xl px-6 py-20 md:px-10 md:py-24 lg:py-28">
+          <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)] lg:items-start lg:gap-12 xl:gap-16">
+            <SectionHeading
+              eyebrow="Credibility"
+              title="5 billion streams. Diamond & platinum records. Arena stages."
+              subtitle="Former Goo Goo Dolls drummer — now mentoring a private group of twenty committed drummers."
+            />
+            <div className="mt-10 grid grid-cols-1 gap-8 sm:grid-cols-3 sm:gap-6 lg:mt-0 lg:gap-8 xl:gap-10">
+              <Reveal delay={0.05} className="min-w-0">
+                <HomeIconTile
+                  large
+                  fill
+                  icon="streams"
+                  label="Nearly 5 billion streams across the catalog"
+                />
               </Reveal>
-              <Reveal delay={0.1}>
-                <HomeIconTile icon="arena" label="Arena tours" />
+              <Reveal delay={0.08} className="min-w-0">
+                <HomeIconTile
+                  large
+                  fill
+                  icon="records"
+                  label="Diamond and multi-platinum recordings"
+                />
               </Reveal>
-              <Reveal delay={0.14}>
-                <HomeIconTile icon="mentorship" label="Mentorship" />
+              <Reveal delay={0.11} className="min-w-0">
+                <HomeIconTile
+                  large
+                  fill
+                  icon="arena"
+                  label="Decades of arena and festival touring"
+                />
               </Reveal>
             </div>
-          </Reveal>
+          </div>
         </div>
       </section>
 
       {/* Transformation */}
       <SectionShell>
-        <SectionHeading title="Stop sounding like you’re practicing." />
-        <Reveal delay={0.04} className="mt-4">
-          <p className="font-bebas text-2xl tracking-wide text-gold md:text-3xl">
+        <Reveal className="text-center lg:max-w-none lg:text-left">
+          <h2 className="font-bebas text-[clamp(1.5rem,4.2vw,3.25rem)] leading-none tracking-[0.03em] text-mist whitespace-nowrap">
+            Stop sounding like you&apos;re practicing.
+          </h2>
+          <p className="mt-3 font-bebas text-2xl tracking-wide text-gold md:text-3xl">
             Start sounding intentional.
           </p>
         </Reveal>
-        <Reveal delay={0.08} className="mt-10 space-y-6">
-          <Prose>
-            Most drummers spend years collecting techniques without ever developing:
-          </Prose>
-          <BulletList items={lackingQualities} />
-          <Prose className="text-mist/85">
-            Practical Drumming helps members develop the qualities that actually make people want to
-            play with you.
-          </Prose>
-        </Reveal>
-        <Reveal delay={0.1} className="my-12">
-          <HomeIconBanner icon="groove" label="Groove & feel" />
-        </Reveal>
-        <Reveal delay={0.12} className="mt-12">
-          <p className="font-garamond text-base text-gold/90 md:text-lg">
-            Inside the mentorship, you&apos;ll learn how to:
-          </p>
-          <div className="mt-6">
-            <BulletList items={mentorshipSkills} />
-          </div>
-        </Reveal>
+        <div className="mt-10 grid gap-6 lg:mt-12 lg:grid-cols-2 lg:items-center lg:gap-8 xl:gap-10">
+          <Reveal delay={0.04} className="h-full">
+            <PosterPanel>
+              <div className="space-y-6">
+                <Prose>Most drummers collect techniques for years without developing:</Prose>
+                <BulletList items={lackingQualities} />
+                <Prose className="text-mist/80">
+                  Practical Drumming builds the qualities that make people want to play with you.
+                </Prose>
+              </div>
+            </PosterPanel>
+          </Reveal>
+          <Reveal delay={0.08} className="mt-0 h-full">
+            <PosterPanel>
+              <div className="space-y-5">
+                <p className="font-bebas text-xl tracking-wide text-mist md:text-2xl">
+                  Inside the mentorship
+                </p>
+                <BulletList items={mentorshipSkills} compact />
+              </div>
+            </PosterPanel>
+          </Reveal>
+        </div>
       </SectionShell>
 
       {/* What members gain */}
-      <SectionShell alt>
-        <SectionHeading eyebrow="What members gain" title="The difference people hear immediately." />
-        <div className="mt-12 grid gap-10 md:grid-cols-2">
-          {membersGain.map((item, i) => (
-            <Reveal key={item.title} delay={i * 0.04}>
-              <FeatureCard title={item.title} body={item.body} />
-            </Reveal>
-          ))}
+      <section className="relative overflow-hidden border-t border-white/[0.06]">
+        <div
+          className="absolute inset-0 bg-cover bg-[center_35%] bg-no-repeat"
+          style={{ backgroundImage: "url('/members-gain-bg.png')" }}
+          aria-hidden
+        />
+        <div className="absolute inset-0 bg-void/70" aria-hidden />
+        <div className="absolute inset-0 bg-gradient-to-r from-void/95 via-void/85 to-void/60" aria-hidden />
+        <div className="absolute inset-0 bg-gradient-to-b from-void/55 via-void/30 to-void/85" aria-hidden />
+
+        <div className="relative z-10 mx-auto max-w-7xl px-6 py-20 md:px-10 md:py-24 lg:py-28">
+          <Reveal className="text-center lg:max-w-none lg:text-left">
+            <p className="font-garamond text-[0.7rem] tracking-[0.32em] uppercase text-gold/75 md:text-xs">
+              What members gain
+            </p>
+            <h2 className="mt-2 font-bebas text-[clamp(1.5rem,4.2vw,3.25rem)] leading-none tracking-[0.03em] text-mist">
+              The difference
+            </h2>
+            <p className="mt-3 font-bebas text-2xl tracking-wide text-gold md:text-3xl">people hear immediately.</p>
+          </Reveal>
+          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:mt-12 lg:gap-5">
+            {membersGain.map((item, i) => (
+              <Reveal key={item.title} delay={i * 0.04}>
+                <FeatureCard
+                  title={item.title}
+                  body={item.body}
+                  bebasTitle
+                  className="border-white/10 bg-charcoal/75 backdrop-blur-sm"
+                />
+              </Reveal>
+            ))}
+          </div>
         </div>
-        <div className="mt-14 grid grid-cols-2 gap-4 sm:gap-5 md:mt-16 md:grid-cols-4 md:gap-6">
-          <Reveal delay={0.08}>
-            <HomeIconTile fill icon="feel" label="Feel" />
-          </Reveal>
-          <Reveal delay={0.12}>
-            <HomeIconTile fill icon="confidence" label="Confidence" />
-          </Reveal>
-          <Reveal delay={0.16}>
-            <HomeIconTile fill icon="live" label="Live performance" />
-          </Reveal>
-          <Reveal delay={0.2}>
-            <HomeIconTile fill icon="musicianship" label="Musicianship" />
-          </Reveal>
-        </div>
-      </SectionShell>
+      </section>
 
       {/* Experience */}
       <SectionShell>
-        <SectionHeading eyebrow="The experience" title="A private mentorship experience." />
-        <Reveal delay={0.04} className="mt-10">
-          <HomeIconBanner icon="session" label="Mentorship session" aspect="landscape" />
-        </Reveal>
-        <div className="mt-12 space-y-10">
+        <SectionHeading
+          eyebrow="The experience"
+          title="A private mentorship experience."
+          subtitle="Live sessions, performance reviews, and studio insight — not passive content."
+        />
+        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:mt-12 lg:gap-5">
           {experienceItems.map((item, i) => (
-            <Reveal key={item.title} delay={i * 0.05}>
-              <FeatureCard title={item.title} body={item.body} />
+            <Reveal key={item.title} delay={i * 0.04}>
+              <FeatureCard title={item.title} body={item.body} bebasTitle />
             </Reveal>
           ))}
         </div>
@@ -387,126 +444,67 @@ export function HomePage() {
 
       {/* Who this is for */}
       <SectionShell alt>
-        <SectionHeading eyebrow="Who this is for" title="Built for drummers ready to level up." />
-        <Reveal delay={0.06} className="mt-10 space-y-8">
-          <Prose>This mentorship is for musicians who:</Prose>
-          <BulletList items={whoFor} />
-          <Prose className="text-mist/85">This is not passive content consumption.</Prose>
-          <p className="font-bebas text-2xl tracking-wide text-gold md:text-3xl">
-            It&apos;s active development.
-          </p>
-        </Reveal>
-        <div className="mx-auto mt-12 flex max-w-md justify-center gap-10 md:gap-14">
-          <Reveal delay={0.1}>
-            <HomeIconTile icon="practice" label="Practice" />
-          </Reveal>
-          <Reveal delay={0.14}>
-            <HomeIconTile icon="performance" label="Performance" />
+        <div className="lg:grid lg:grid-cols-2 lg:items-center lg:gap-14 xl:gap-20">
+          <div>
+            <SectionHeading eyebrow="Who this is for" title="Built for drummers ready to level up." />
+            <Reveal delay={0.06} className="mt-8 space-y-6">
+              <Prose>This mentorship is for musicians who:</Prose>
+              <BulletList items={whoFor} />
+            </Reveal>
+          </div>
+          <Reveal delay={0.1} className="mt-10 lg:mt-0">
+            <PosterPanel>
+              <div className="space-y-5">
+                <p className="font-garamond text-[0.7rem] tracking-[0.32em] uppercase text-gold/75 md:text-xs">
+                  The difference
+                </p>
+                <h3 className="font-bebas text-2xl leading-[0.95] tracking-[0.03em] text-mist md:text-3xl">
+                  Information is everywhere.
+                </h3>
+                <p className="font-bebas text-xl tracking-wide text-gold md:text-2xl">Experience is not.</p>
+                <Prose>You can learn rudiments anywhere. Very few drummers can teach:</Prose>
+                <BulletList items={differencePoints} />
+                <p className="font-garamond text-base italic text-mist/80 md:text-lg">
+                  That level of perspective changes how you play forever.
+                </p>
+              </div>
+            </PosterPanel>
           </Reveal>
         </div>
-      </SectionShell>
-
-      {/* Difference */}
-      <SectionShell>
-        <SectionHeading eyebrow="The difference" title="Information is everywhere." />
-        <Reveal delay={0.04} className="mt-4">
-          <p className="font-bebas text-2xl tracking-wide text-mist md:text-3xl">Experience is not.</p>
-        </Reveal>
-        <Reveal delay={0.08} className="mt-10 space-y-6">
-          <Prose>You can learn rudiments anywhere.</Prose>
-          <Prose>But very few drummers can teach:</Prose>
-          <BulletList items={differencePoints} />
-          <p className="font-garamond text-lg italic text-mist/80 md:text-xl">
-            That level of perspective changes how you play forever.
-          </p>
-        </Reveal>
-        <Reveal delay={0.12} className="mt-12">
-          <HomeIconBanner icon="touring" label="Touring perspective" />
-        </Reveal>
       </SectionShell>
 
       {/* Limited membership */}
-      <section className="relative flex min-h-[32rem] items-center justify-center overflow-hidden border-t border-gold/20 px-5 py-28 md:min-h-[36rem] md:px-8 md:py-36">
+      <section className="relative overflow-hidden border-t border-gold/15 px-5 py-16 md:px-8 md:py-20">
         <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: "url('/limited-seating-bg.png')" }}
           aria-hidden
         />
-        <div className="absolute inset-0 bg-void/85" aria-hidden />
-        <div className="absolute inset-0 bg-gradient-to-b from-void via-void/70 to-void/90" aria-hidden />
-        <div
-          className="pointer-events-none absolute inset-0"
-          style={{
-            background:
-              'radial-gradient(900px 480px at 50% 50%, rgba(201,165,92,0.12), transparent 60%)',
-          }}
-          aria-hidden
-        />
-        <div className="relative z-10 mx-auto w-full max-w-4xl text-center">
+        <div className="absolute inset-0 bg-void/88" aria-hidden />
+        <div className="absolute inset-0 bg-gradient-to-r from-void/95 via-void/80 to-void/70" aria-hidden />
+
+        <div className="relative z-10 mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-2 lg:gap-16">
           <Reveal>
-            <p className="font-garamond text-xs tracking-[0.4em] uppercase text-gold">
+            <p className="font-garamond text-[0.7rem] tracking-[0.32em] uppercase text-gold/85 md:text-xs">
               Limited membership
             </p>
-            <h2 className="mt-6 font-bebas text-4xl leading-none tracking-wide text-mist md:text-5xl lg:text-6xl">
+            <h2 className="mt-2 font-bebas text-[clamp(2.25rem,5vw,3.5rem)] leading-[0.95] tracking-[0.03em] text-mist">
               Only 20 memberships available.
             </h2>
-            <GoldDivider className="mt-8" />
-          </Reveal>
-          <Reveal delay={0.08} className="mt-8 space-y-2 font-garamond text-lg tracking-[0.12em] text-mist/80 md:text-xl">
-            <p>Small by design.</p>
-            <p>Personal by design.</p>
-            <p>Focused by design.</p>
-          </Reveal>
-          <Reveal delay={0.12} className="mt-8">
-            <Prose className="text-mist/70">
-              Applications are reviewed carefully to preserve the quality of the mentorship
-              experience.
+            <p className="mt-4 font-bebas text-lg tracking-wide text-gold md:text-xl">
+              Small by design · Personal · Focused
+            </p>
+            <Prose className="mt-6 max-w-md text-mist/65">
+              Applications are reviewed carefully to preserve the quality of the mentorship experience.
             </Prose>
           </Reveal>
-          <Reveal delay={0.16} className="mt-12 flex justify-center">
+          <Reveal delay={0.08} className="flex items-center justify-center">
             <Link
               to="/apply"
-              className="inline-flex min-h-12 items-center justify-center border border-gold bg-gold/15 px-12 font-garamond text-xs tracking-[0.28em] uppercase text-gold transition hover:bg-gold/25"
+              className={`${primaryBtnClass} min-h-14 px-10 text-sm md:min-h-16 md:px-14 md:text-base`}
             >
               Apply for Membership
             </Link>
-          </Reveal>
-        </div>
-      </section>
-
-      {/* Final */}
-      <section className="border-t border-white/[0.06] bg-charcoal/40 px-5 py-20 md:px-8 md:py-28">
-        <div className="mx-auto max-w-3xl text-center">
-          <Reveal className="space-y-8">
-            <Prose className="text-lg text-mist/85 md:text-xl">
-              Becoming a better drummer changes more than your playing.
-            </Prose>
-            <motion.div className="space-y-2 font-garamond text-lg text-mist/75 md:text-xl">
-              <p>You perform differently.</p>
-              <p>You listen differently.</p>
-              <p>You carry yourself differently.</p>
-            </motion.div>
-            <p className="font-bebas text-2xl tracking-wide text-gold md:text-3xl">And people notice.</p>
-            <GoldDivider />
-            <div className="pt-4">
-              <p className="font-bebas text-3xl tracking-[0.06em] text-mist md:text-4xl">
-                Practical Drumming
-              </p>
-              <p className="mt-3 font-garamond text-sm tracking-[0.32em] uppercase text-mist/50">
-                With
-              </p>
-              <p className="mt-2 font-garamond text-xl tracking-[0.16em] uppercase text-gold md:text-2xl">
-                Mike Malinin
-              </p>
-            </div>
-            <p className="font-garamond text-base tracking-[0.2em] uppercase text-mist/60 md:text-lg">
-              For drummers ready to raise their standard.
-            </p>
-            <div className="pt-4">
-              <Link to="/club" className="font-garamond text-xs tracking-[0.22em] uppercase text-mist/50 transition hover:text-gold">
-                Explore The Club →
-              </Link>
-            </div>
           </Reveal>
         </div>
       </section>

@@ -45,6 +45,18 @@
 
 .hero-kenburns {
   animation: ken-burns 32s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+.hero-visual {
+  perspective: 1200px;
+}
+
+@media (min-width: 1024px) {
+  .hero-visual > div:first-child {
+    transform: rotateY(-4deg) rotateX(2deg);
+    transform-origin: center right;
+  }
 }
 
 .hero-glow-pulse {

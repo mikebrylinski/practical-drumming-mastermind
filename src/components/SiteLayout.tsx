@@ -161,8 +161,8 @@ export function SiteLayout() {
         <p className="font-garamond text-xs tracking-[0.28em] uppercase text-mist/40">
           Practical Drumming · Mastermind Club
         </p>
-        <p className="mt-3 font-garamond text-sm text-mist/50">
-          Mentorship led by Mike Malinin
+        <p className="mt-3 font-bebas text-sm tracking-wide text-mist md:text-base">
+          Copyright 2026 Mike Malinin. All Rights Reserved.
         </p>
       </footer>
     </div>
