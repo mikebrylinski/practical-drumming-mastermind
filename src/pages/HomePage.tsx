@@ -132,20 +132,10 @@ export function HomePage() {
 
         <div className="relative z-10 mx-auto flex h-full max-w-6xl flex-col justify-end px-5 pb-12 pt-20 md:justify-center md:px-8 md:pb-0 md:pt-0">
           <div className="mx-auto w-full max-w-6xl text-center">
-            <motion.p
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1, duration: 0.6 }}
-              className="font-garamond text-[0.7rem] tracking-[0.45em] uppercase text-mist/55 md:text-xs"
-            >
-              30+ years. Thousands of shows. Millions of fans. The biggest stages in the world.
-            </motion.p>
-
             <motion.div
               initial={{ opacity: 0, y: 18 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.18, duration: 0.65 }}
-              className="mt-6"
+              transition={{ delay: 0.1, duration: 0.65 }}
             >
               <p
                 className="whitespace-nowrap font-bebas text-[clamp(1.15rem,9.5vw,6.5rem)] leading-none tracking-[0.06em] text-mist"
@@ -213,6 +203,11 @@ export function HomePage() {
             Mike Malinin
           </p>
         </Reveal>
+        <Reveal className="mx-auto mb-8 max-w-3xl text-center md:mb-10">
+          <p className="font-garamond text-[0.7rem] tracking-[0.45em] uppercase text-mist/55 md:text-xs">
+            30+ years. Thousands of shows. Millions of fans. The biggest stages in the world.
+          </p>
+        </Reveal>
         <div className="mx-auto grid max-w-6xl grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 xl:gap-5">
           {stats.map((s, i) => (
             <motion.div
@@ -243,7 +238,7 @@ export function HomePage() {
           <Reveal>
             <div className="relative overflow-hidden border border-gold/25 bg-charcoal/55 p-8">
               <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-gold/[0.06] to-transparent" />
-              <p className="relative font-garamond text-xs uppercase tracking-[0.32em] text-gold-dim">
+              <p className="relative font-bebas text-lg leading-tight tracking-wide text-mist md:text-xl lg:text-2xl">
                 Practical Drumming is a mastermind club that
               </p>
               <ul className="relative mt-8 space-y-5">
@@ -268,7 +263,7 @@ export function HomePage() {
           <Reveal delay={0.06}>
             <div className="relative overflow-hidden border border-gold/25 bg-charcoal/55 p-8">
               <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-gold/[0.06] to-transparent" />
-              <p className="relative font-garamond text-xs uppercase tracking-[0.32em] text-gold-dim">
+              <p className="relative font-bebas text-lg leading-tight tracking-wide text-mist md:text-xl lg:text-2xl">
                 The 4 phases of your development
               </p>
               <ol className="relative mt-8 space-y-7">
