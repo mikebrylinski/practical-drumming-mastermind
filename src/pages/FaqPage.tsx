@@ -25,10 +25,10 @@ const faqs = [
 
 export function FaqPage() {
   return (
-    <article className="mx-auto max-w-3xl px-5 py-20 md:px-8 md:py-28">
+    <article className="mx-auto w-full max-w-6xl px-5 py-20 md:px-8 md:py-28">
       <Reveal>
         <p className="font-garamond text-xs tracking-[0.35em] uppercase text-gold-dim">FAQ</p>
-        <h1 className="mt-4 font-bebas text-5xl text-mist md:text-6xl lg:text-7xl">
+        <h1 className="mt-4 font-bebas text-4xl text-mist md:text-5xl lg:text-6xl">
           Questions
         </h1>
       </Reveal>
@@ -36,8 +36,8 @@ export function FaqPage() {
         {faqs.map(({ q, a }, i) => (
           <Reveal key={q} delay={i * 0.05}>
             <div>
-              <dt className="font-garamond text-xl text-gold md:text-2xl">{q}</dt>
-              <dd className="mt-4 font-garamond text-lg leading-relaxed text-mist/70 md:text-xl">
+              <dt className="font-garamond text-lg text-gold md:text-xl">{q}</dt>
+              <dd className="mt-3 font-garamond text-base leading-relaxed text-mist/70 md:text-lg">
                 {a}
               </dd>
             </div>

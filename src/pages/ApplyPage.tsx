@@ -50,23 +50,23 @@ export function ApplyPage() {
   }
 
   const inputClass =
-    'mt-2 w-full border border-white/10 bg-charcoal/80 px-4 py-3 font-garamond text-base text-mist placeholder:text-mist/30 outline-none transition focus:border-gold/50 focus:ring-1 focus:ring-gold/30'
+    'mt-2 w-full border border-white/10 bg-charcoal/80 px-4 py-3 font-garamond text-sm text-mist placeholder:text-mist/30 outline-none transition focus:border-gold/50 focus:ring-1 focus:ring-gold/30'
 
   return (
-    <article className="mx-auto max-w-2xl px-5 py-20 md:px-8 md:py-28">
+    <article className="mx-auto w-full max-w-6xl px-5 py-20 md:px-8 md:py-28">
       <Reveal>
         <p className="font-garamond text-xs tracking-[0.35em] uppercase text-gold-dim">
           Application
         </p>
-        <h1 className="mt-4 font-bebas text-5xl text-mist md:text-6xl">Apply for Membership</h1>
-        <p className="mt-6 font-garamond text-lg leading-relaxed text-mist/65">
+        <h1 className="mt-4 font-bebas text-4xl text-mist md:text-5xl">Apply for Membership</h1>
+        <p className="mt-6 font-garamond text-base leading-relaxed text-mist/65 md:text-lg">
           This is a limited mentorship experience. Only 20 drummers will be accepted.
         </p>
       </Reveal>
 
       {status === 'success' ? (
         <Reveal className="mt-14 border border-gold/30 bg-gold/5 p-10 text-center">
-          <p className="font-garamond text-xl leading-relaxed text-mist">
+          <p className="font-garamond text-base leading-relaxed text-mist md:text-lg">
             Your application has been received. If selected, you will be contacted directly.
           </p>
         </Reveal>

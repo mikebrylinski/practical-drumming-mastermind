@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, useLocation, Outlet } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
+import { ScrollToTop } from './components/ScrollToTop'
 import { SiteLayout } from './components/SiteLayout'
 import { HomePage } from './pages/HomePage'
 import { AboutPage } from './pages/AboutPage'
@@ -29,6 +30,7 @@ function AnimatedOutlet() {
 export default function App() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <Routes>
         <Route element={<SiteLayout />}>
           <Route element={<AnimatedOutlet />}>

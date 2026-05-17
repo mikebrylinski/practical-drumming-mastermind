@@ -35,7 +35,6 @@ function HamburgerIcon({ open }: { open: boolean }) {
 
 export function SiteLayout() {
   const { pathname } = useLocation()
-  const isHome = pathname === '/'
   const [menuOpen, setMenuOpen] = useState(false)
 
   useEffect(() => {
@@ -65,9 +64,9 @@ export function SiteLayout() {
       />
 
       <header
-        className={`relative border-b border-white/[0.06] ${
+        className={`relative border-b border-white/[0.06] bg-black ${
           menuOpen ? 'z-[110]' : 'z-20'
-        } ${isHome ? 'bg-transparent' : 'bg-void/80 backdrop-blur-md'}`}
+        }`}
       >
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-4 md:gap-6 md:px-8 md:py-5">
           <TextLogo className="min-w-0 shrink pr-2" />

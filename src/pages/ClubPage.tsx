@@ -59,19 +59,19 @@ export function ClubPage() {
   return (
     <article className="relative">
       <section className="border-b border-white/[0.06] px-5 pb-20 pt-16 md:px-8 md:pb-28 md:pt-20">
-        <div className="mx-auto max-w-4xl">
+        <div className="mx-auto w-full max-w-5xl">
           <Reveal>
             <p className="font-garamond text-xs tracking-[0.35em] uppercase text-gold-dim">
               Practical Drumming
             </p>
-            <h1 className="mt-4 font-bebas text-[clamp(2.75rem,8vw,5rem)] leading-[0.95] tracking-wide text-mist md:text-7xl">
+            <h1 className="mt-4 font-bebas text-[clamp(2.25rem,7vw,4rem)] leading-[0.95] tracking-wide text-mist md:text-5xl">
               A mastermind club for
               <br />
               serious band drummers
             </h1>
           </Reveal>
-          <Reveal delay={0.06} className="mt-8 max-w-3xl">
-            <p className="font-garamond text-xl leading-relaxed text-mist/75 md:text-2xl">
+          <Reveal delay={0.06} className="mt-8">
+            <p className="font-garamond text-lg leading-relaxed text-mist/75 md:text-xl">
               Adult drum set players, mastering musicality and confidence in real band situations—not
               another technique treadmill.
             </p>
@@ -80,10 +80,10 @@ export function ClubPage() {
       </section>
 
       <section className="border-b border-white/[0.06] bg-charcoal/40 px-5 py-20 md:px-8 md:py-28">
-        <div className="mx-auto max-w-4xl space-y-12">
+        <div className="mx-auto w-full max-w-5xl space-y-12">
           <Reveal>
-            <h2 className="font-bebas text-4xl tracking-wide text-mist md:text-5xl">What this is</h2>
-            <p className="mt-4 font-garamond text-lg text-mist/55 md:text-xl">
+            <h2 className="font-bebas text-3xl tracking-wide text-mist md:text-4xl">What this is</h2>
+            <p className="mt-4 font-garamond text-base text-mist/55 md:text-lg">
               Six commitments define the circle.
             </p>
           </Reveal>
@@ -91,8 +91,8 @@ export function ClubPage() {
             {pillars.map((p, i) => (
               <Reveal key={p.title} delay={i * 0.04}>
                 <div className="border-l border-gold/35 pl-8 md:pl-10">
-                  <h3 className="font-garamond text-xl text-gold md:text-2xl">{p.title}</h3>
-                  <p className="mt-3 font-garamond text-lg leading-relaxed text-mist/70 md:text-xl">
+                  <h3 className="font-garamond text-lg text-gold md:text-xl">{p.title}</h3>
+                  <p className="mt-3 font-garamond text-base leading-relaxed text-mist/70 md:text-lg">
                     {p.body}
                   </p>
                 </div>
@@ -103,12 +103,12 @@ export function ClubPage() {
       </section>
 
       <section className="border-b border-white/[0.06] px-5 py-20 md:px-8 md:py-28">
-        <div className="mx-auto max-w-4xl">
+        <div className="mx-auto w-full max-w-5xl">
           <Reveal>
-            <h2 className="font-bebas text-4xl tracking-wide text-mist md:text-5xl">
+            <h2 className="font-bebas text-3xl tracking-wide text-mist md:text-4xl">
               Here’s how it works
             </h2>
-            <p className="mt-4 max-w-2xl font-garamond text-lg text-mist/60 md:text-xl">
+            <p className="mt-4 font-garamond text-base text-mist/60 md:text-lg">
               A clear arc from musical decisions to tone, confidence, and ongoing improvement.
             </p>
           </Reveal>
@@ -116,17 +116,17 @@ export function ClubPage() {
             {phases.map((phase, i) => (
               <Reveal key={phase.n} delay={i * 0.06}>
                 <li className="grid gap-6 border-t border-white/[0.08] py-10 md:grid-cols-[auto_1fr] md:gap-12 md:py-12">
-                  <div className="font-bebas text-5xl leading-none text-gold/50 md:text-6xl">
+                  <div className="font-bebas text-4xl leading-none text-gold/50 md:text-5xl">
                     {phase.n}
                   </div>
                   <div>
                     <p className="font-garamond text-xs tracking-[0.3em] uppercase text-gold-dim">
                       {phase.subtitle}
                     </p>
-                    <h3 className="mt-2 font-bebas text-3xl tracking-wide text-mist md:text-4xl">
+                    <h3 className="mt-2 font-bebas text-2xl tracking-wide text-mist md:text-3xl">
                       {phase.title}
                     </h3>
-                    <p className="mt-4 font-garamond text-lg leading-relaxed text-mist/70 md:text-xl">
+                    <p className="mt-4 font-garamond text-base leading-relaxed text-mist/70 md:text-lg">
                       {phase.body}
                     </p>
                   </div>
@@ -138,9 +138,9 @@ export function ClubPage() {
       </section>
 
       <section className="border-b border-white/[0.06] bg-smoke/30 px-5 py-20 md:px-8 md:py-28">
-        <div className="mx-auto max-w-4xl">
+        <div className="mx-auto w-full max-w-5xl">
           <Reveal>
-            <h2 className="font-bebas text-4xl tracking-wide text-mist md:text-5xl">
+            <h2 className="font-bebas text-3xl tracking-wide text-mist md:text-4xl">
               Community & rhythm of the week
             </h2>
           </Reveal>
@@ -148,7 +148,7 @@ export function ClubPage() {
             <Reveal delay={0.04}>
               <li className="flex gap-4">
                 <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-gold" />
-                <p className="font-garamond text-lg leading-relaxed text-mist/75 md:text-xl">
+                <p className="font-garamond text-base leading-relaxed text-mist/75 md:text-lg">
                   A supportive community of dedicated, driven, like-minded drummers—all working
                   toward the same goals.
                 </p>
@@ -157,7 +157,7 @@ export function ClubPage() {
             <Reveal delay={0.08}>
               <li className="flex gap-4">
                 <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-gold" />
-                <p className="font-garamond text-lg leading-relaxed text-mist/75 md:text-xl">
+                <p className="font-garamond text-base leading-relaxed text-mist/75 md:text-lg">
                   Two collaboration calls each week to work together, get feedback, and stay clear
                   on how to improve your playing.
                 </p>
@@ -168,17 +168,17 @@ export function ClubPage() {
       </section>
 
       <section className="px-5 py-20 md:px-8 md:py-28">
-        <div className="mx-auto max-w-3xl text-center">
+        <div className="mx-auto w-full max-w-5xl text-center">
           <Reveal>
             <p className="font-garamond text-xs tracking-[0.35em] uppercase text-gold">Member cap</p>
-            <p className="mt-6 font-bebas text-4xl tracking-wide text-mist md:text-5xl">
+            <p className="mt-6 font-bebas text-3xl tracking-wide text-mist md:text-4xl">
               Initial limit: 20 drummers
             </p>
-            <p className="mt-6 font-garamond text-lg text-mist/60 md:text-xl">
+            <p className="mt-6 font-garamond text-base text-mist/60 md:text-lg">
               A curated size so every member gets room to grow—and real attention.
             </p>
           </Reveal>
-          <Reveal delay={0.1} className="mt-12">
+          <Reveal delay={0.1} className="mt-12 flex justify-center">
             <Link
               to="/apply"
               className="inline-flex min-h-12 items-center justify-center border border-gold/50 bg-gold/10 px-10 font-garamond text-xs tracking-[0.22em] uppercase text-gold transition hover:border-gold hover:bg-gold/20"
