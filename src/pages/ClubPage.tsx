@@ -2,6 +2,39 @@ import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { Reveal } from '../components/Reveal'
 
+const mastermindBullets = [
+  'Geared towards adult drum set players mastering the art of performing in band situations using ideas focusing on musicality and confidence.',
+  'Focuses on elements to help master performing on drum set instead of endless exercises focused solely on technique with no practical applications.',
+  'Teaches methods on how to approach playing a song, composing parts, performing with others, and having confidence leading to full command of the instrument.',
+  'Trains members to understand the mindset of great drummers who have had success playing in band situations and learning to apply that knowledge.',
+  'Run by Mike Malinin, sharing knowledge gained from 30+ years of recording and touring the world with The Goo Goo Dolls, Tanya Tucker and others.',
+  'Focuses on learning from other members who are on the same journey and growing together as drummers.',
+  'A fun group of fellow drummers. No egos or attitudes. Just players helping each other improve and become experts at their craft.',
+] as const
+
+const phases = [
+  {
+    n: '1',
+    title: 'Essential Basics',
+    body: 'Understand the process of making musical decisions and actually function as a drummer, not just hit drums.',
+  },
+  {
+    n: '2',
+    title: 'Technique & Tone',
+    body: 'Produce a controlled, professional sound without relying only on volume or force.',
+  },
+  {
+    n: '3',
+    title: 'Mental Confidence',
+    body: 'Play with certainty, stay locked in, and stop second-guessing yourself.',
+  },
+  {
+    n: '4',
+    title: 'Objective Listening & Thinking',
+    body: 'Identify what works, fix what doesn’t, and consistently improve with direction and clarity.',
+  },
+] as const
+
 const designedToHelp = [
   'Play with more confidence and control',
   'Break through frustrating plateaus',
@@ -189,8 +222,62 @@ export function ClubPage() {
         </div>
       </section>
 
-      {/* Guidance */}
+      {/* Mastermind + phases */}
       <section className="border-b border-white/[0.06] px-5 py-16 md:px-8 md:py-24">
+        <div className="mx-auto grid max-w-5xl gap-6 lg:grid-cols-2">
+          <Reveal>
+            <div className="relative overflow-hidden border border-gold/25 bg-charcoal/55 p-8">
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-gold/[0.06] to-transparent" />
+              <p className="relative font-bebas text-lg leading-tight tracking-wide text-mist md:text-xl lg:text-2xl">
+                Practical Drumming is a mastermind club that
+              </p>
+              <ul className="relative mt-8 space-y-5">
+                {mastermindBullets.map((b) => (
+                  <li key={b} className="flex gap-4">
+                    <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-gold/80" />
+                    <p className="font-garamond text-base leading-relaxed text-mist/75 md:text-lg">
+                      {b}
+                    </p>
+                  </li>
+                ))}
+                <li className="flex gap-4">
+                  <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-gold/80" />
+                  <p className="font-garamond text-base leading-relaxed text-mist/75 md:text-lg">
+                    Includes 2x weekly collaboration calls for feedback, clarity, and progress.
+                  </p>
+                </li>
+              </ul>
+            </div>
+          </Reveal>
+
+          <Reveal delay={0.06}>
+            <div className="relative overflow-hidden border border-gold/25 bg-charcoal/55 p-8">
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-gold/[0.06] to-transparent" />
+              <p className="relative font-bebas text-lg leading-tight tracking-wide text-mist md:text-xl lg:text-2xl">
+                The 4 phases of your development
+              </p>
+              <ol className="relative mt-8 space-y-7">
+                {phases.map((p) => (
+                  <li key={p.n} className="flex gap-5">
+                    <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-gold/35 bg-gold/5 font-garamond text-lg text-gold">
+                      {p.n}
+                    </div>
+                    <div className="border-b border-white/[0.06] pb-6">
+                      <p className="font-bebas text-2xl tracking-[0.12em] text-mist">{p.title}</p>
+                      <p className="mt-2 font-garamond text-base leading-relaxed text-mist/70 md:text-lg">
+                        {p.body}
+                      </p>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* Guidance */}
+      <section className="border-b border-white/[0.06] bg-charcoal/40 px-5 py-16 md:px-8 md:py-24">
         <div className="mx-auto w-full max-w-5xl space-y-8">
           <Reveal>
             <Prose className="text-lg text-mist/85 md:text-xl">

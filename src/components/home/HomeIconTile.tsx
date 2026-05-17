@@ -1,0 +1,104 @@
+import type { ReactNode } from 'react'
+import { HomeIcon, type HomeIconName } from './HomeIcons'
+
+type HomeTileIcon = Exclude<HomeIconName, 'groove' | 'session' | 'touring'>
+
+const gridPattern = {
+  backgroundImage:
+    'linear-gradient(rgba(201,165,92,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(201,165,92,0.07) 1px, transparent 1px)',
+  backgroundSize: '24px 24px',
+}
+
+type HomeIconTileProps = {
+  icon: HomeTileIcon
+  label: string
+  className?: string
+  /** Fills grid cell width (use in multi-column icon rows). */
+  fill?: boolean
+}
+
+export function HomeIconTile({ icon, label, className = '', fill = false }: HomeIconTileProps) {
+  const tileSize = fill ? 'w-full max-w-none' : 'mx-auto w-full max-w-[7rem]'
+
+  return (
+    <figure className={className}>
+      <div className={`group relative aspect-square overflow-hidden border border-white/[0.1] bg-charcoal shadow-[inset_0_1px_0_rgba(201,165,92,0.12)] transition-colors duration-300 hover:border-gold/30 ${tileSize}`}>
+        <div className="absolute inset-0 opacity-40" style={gridPattern} aria-hidden />
+        <div
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,rgba(201,165,92,0.18),transparent_65%)]"
+          aria-hidden
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-void/70 via-transparent to-void/20" aria-hidden />
+        <div className="relative flex h-full flex-col items-center justify-center gap-2.5 p-4">
+          <div className="transition-transform duration-300 group-hover:scale-105">
+            <HomeIcon name={icon} size={44} className="h-11 w-11 drop-shadow-[0_0_12px_rgba(201,165,92,0.35)]" />
+          </div>
+          <span className="font-garamond text-[0.6rem] leading-tight tracking-[0.22em] uppercase text-mist/50 transition-colors group-hover:text-gold/70 md:text-[0.65rem]">
+            {label}
+          </span>
+        </div>
+      </div>
+    </figure>
+  )
+}
+
+type HomeIconBannerProps = {
+  icon: Extract<HomeIconName, 'groove' | 'session' | 'touring'>
+  label: string
+  caption?: string
+  aspect?: 'wide' | 'landscape'
+  className?: string
+}
+
+const aspectClasses = {
+  wide: 'aspect-[21/9]',
+  landscape: 'aspect-[16/10]',
+}
+
+export function HomeIconBanner({
+  icon,
+  label,
+  caption,
+  aspect = 'wide',
+  className = '',
+}: HomeIconBannerProps) {
+  const iconClass = aspect === 'wide' ? 'h-10 w-auto max-w-[85%] md:h-12' : 'h-12 w-auto max-w-[80%] md:h-14'
+
+  return (
+    <figure className={className}>
+      <BannerShell aspect={aspect}>
+        <HomeIcon name={icon} className={`${iconClass} drop-shadow-[0_0_16px_rgba(201,165,92,0.3)]`} />
+        <span className="mt-3 font-garamond text-[0.65rem] tracking-[0.28em] uppercase text-mist/45 md:text-xs">
+          {label}
+        </span>
+      </BannerShell>
+      {caption ? (
+        <figcaption className="mt-3 text-center font-garamond text-sm italic text-mist/40">{caption}</figcaption>
+      ) : null}
+    </figure>
+  )
+}
+
+function BannerShell({
+  aspect,
+  children,
+}: {
+  aspect: 'wide' | 'landscape'
+  children: ReactNode
+}) {
+  return (
+    <div
+      className={`group relative w-full overflow-hidden border border-white/[0.08] bg-charcoal shadow-[inset_0_1px_0_rgba(201,165,92,0.1)] transition-colors hover:border-gold/25 ${aspectClasses[aspect]}`}
+    >
+      <div className="absolute inset-0 opacity-35" style={gridPattern} aria-hidden />
+      <div
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_50%,rgba(201,165,92,0.14),transparent)]"
+        aria-hidden
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-void/75 via-void/20 to-void/40" aria-hidden />
+      <div className="relative flex h-full flex-col items-center justify-center px-6 py-8 md:px-10">
+        {children}
+      </div>
+    </div>
+  )
+}
