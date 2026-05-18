@@ -220,22 +220,22 @@ export function HomePage() {
   return (
     <div className="bg-void">
       {/* Hero */}
-      <section className="relative overflow-hidden border-b border-white/[0.06] bg-void">
+      <section className="relative flex min-h-[calc(100svh-4.5rem)] flex-col overflow-hidden border-b border-white/[0.06] bg-void md:min-h-[calc(100svh-5rem)]">
         <div
-          className="absolute inset-0 bg-cover bg-[center_42%] hero-kenburns"
+          className="absolute inset-0 bg-cover bg-center hero-kenburns"
           style={{ backgroundImage: "url('/hero-arena.png')" }}
           aria-hidden
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-void/95 via-void/82 to-void/55 lg:via-void/78 lg:to-void/35" aria-hidden />
-        <div className="absolute inset-0 bg-gradient-to-b from-void/70 via-void/25 to-void/92" aria-hidden />
+        <div className="absolute inset-0 bg-gradient-to-r from-void/92 via-void/75 to-void/40 lg:via-void/65 lg:to-void/30" aria-hidden />
+        <div className="absolute inset-0 bg-gradient-to-b from-void/60 via-void/20 to-void/88" aria-hidden />
         <div
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_55%_at_15%_40%,rgba(201,165,92,0.12),transparent_60%)]"
           aria-hidden
         />
         <div className="pointer-events-none absolute inset-0 grain opacity-25" aria-hidden />
 
-        <div className="relative z-10 mx-auto max-w-7xl px-5 py-14 md:px-8 md:py-16 lg:py-20">
-          <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.92fr)] lg:gap-12 xl:gap-16">
+        <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-1 flex-col justify-center px-5 py-10 md:px-8 md:py-12 lg:py-14">
+          <div className="grid w-full items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.92fr)] lg:gap-12 xl:gap-16">
             <motion.div
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
