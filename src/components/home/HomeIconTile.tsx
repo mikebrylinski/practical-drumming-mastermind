@@ -10,17 +10,20 @@ const gridPattern = {
 }
 
 type HomeIconTileProps = {
-  icon: HomeTileIcon
   label: string
   className?: string
   /** Fills grid cell width (use in multi-column icon rows). */
   fill?: boolean
   /** Larger centered icon for highlight rows (e.g. credibility). */
   large?: boolean
-}
+} & (
+  | { icon: HomeTileIcon; imageSrc?: never }
+  | { imageSrc: string; icon?: never }
+)
 
 export function HomeIconTile({
   icon,
+  imageSrc,
   label,
   className = '',
   fill = false,
@@ -52,7 +55,11 @@ export function HomeIconTile({
           className={`relative flex h-full flex-col items-center justify-between text-center ${innerPad}`}
         >
           <div className="flex flex-1 items-center justify-center pt-1 transition-transform duration-300 group-hover:scale-105">
-            <HomeIcon name={icon} size={iconPx} className={iconClass} />
+            {imageSrc ? (
+              <img src={imageSrc} alt="" className={`${iconClass} object-contain`} />
+            ) : (
+              <HomeIcon name={icon!} size={iconPx} className={iconClass} />
+            )}
           </div>
           <span
             className={`w-full shrink-0 px-0.5 transition-colors group-hover:text-gold/90 ${labelClass}`}

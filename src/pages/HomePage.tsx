@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { HomeIconTile } from '../components/home/HomeIconTile'
+import { CredibilityIconRow } from '../components/home/CredibilityIconRow'
 import { Reveal } from '../components/Reveal'
 
 const heroOutcomes = [
@@ -160,12 +160,32 @@ function SectionHeading({
   )
 }
 
-function BulletList({ items, compact = false }: { items: readonly string[]; compact?: boolean }) {
+function BulletList({
+  items,
+  compact = false,
+  centered = false,
+}: {
+  items: readonly string[]
+  compact?: boolean
+  centered?: boolean
+}) {
   return (
-    <ul className={compact ? 'space-y-2.5' : 'space-y-3'}>
+    <ul
+      className={`${compact ? 'space-y-2.5' : 'space-y-3'} ${centered ? 'mx-auto w-full max-w-sm' : ''}`}
+    >
       {items.map((item) => (
-        <li key={item} className="flex items-start gap-3">
-          <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-gold/90" aria-hidden />
+        <li
+          key={item}
+          className={
+            centered
+              ? 'flex max-w-xs flex-col items-center gap-2 text-center'
+              : 'flex items-start gap-3'
+          }
+        >
+          <span
+            className={`shrink-0 rounded-full bg-gold/90 ${centered ? 'h-1.5 w-1.5' : 'mt-2 h-1 w-1'}`}
+            aria-hidden
+          />
           <p className="font-garamond text-sm leading-relaxed text-mist/75 md:text-base">{item}</p>
         </li>
       ))}
@@ -226,8 +246,9 @@ export function HomePage() {
           style={{ backgroundImage: "url('/hero-arena.png')" }}
           aria-hidden
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-void/92 via-void/75 to-void/40 lg:via-void/65 lg:to-void/30" aria-hidden />
-        <div className="absolute inset-0 bg-gradient-to-b from-void/60 via-void/20 to-void/88" aria-hidden />
+        <div className="absolute inset-0 bg-void/35" aria-hidden />
+        <div className="absolute inset-0 bg-gradient-to-r from-void/95 via-void/88 to-void/60 lg:via-void/80 lg:to-void/50" aria-hidden />
+        <div className="absolute inset-0 bg-gradient-to-b from-void/75 via-void/40 to-void/95" aria-hidden />
         <div
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_55%_at_15%_40%,rgba(201,165,92,0.12),transparent_60%)]"
           aria-hidden
@@ -252,11 +273,11 @@ export function HomePage() {
                 Built for drummers who want more than chops — and ready to perform at a higher level.
               </p>
 
-              <ul className="mx-auto mt-8 grid max-w-sm grid-cols-1 gap-x-3 gap-y-3 text-left sm:max-w-lg sm:grid-cols-2 lg:mx-0 lg:max-w-xl">
+              <ul className="mx-auto mt-8 grid max-w-sm grid-cols-1 gap-x-3 gap-y-3 sm:max-w-lg sm:grid-cols-2 lg:mx-0 lg:max-w-xl">
                 {heroOutcomes.map((line) => (
                   <li
                     key={line}
-                    className="flex items-center gap-2.5 font-garamond text-base text-mist/75 md:text-lg"
+                    className="flex items-center justify-center gap-2.5 font-garamond text-base text-mist/75 sm:justify-start md:text-lg lg:justify-start"
                   >
                     <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-gold/90" aria-hidden />
                     {line}
@@ -325,45 +346,22 @@ export function HomePage() {
               title="5 billion streams. Diamond & platinum records. Arena stages."
               subtitle="Former Goo Goo Dolls drummer — now mentoring a private group of twenty committed drummers."
             />
-            <div className="mt-10 grid grid-cols-1 gap-8 sm:grid-cols-3 sm:gap-6 lg:mt-0 lg:gap-8 xl:gap-10">
-              <Reveal delay={0.05} className="min-w-0">
-                <HomeIconTile
-                  large
-                  fill
-                  icon="streams"
-                  label="Nearly 5 billion streams across the catalog"
-                />
-              </Reveal>
-              <Reveal delay={0.08} className="min-w-0">
-                <HomeIconTile
-                  large
-                  fill
-                  icon="records"
-                  label="Diamond and multi-platinum recordings"
-                />
-              </Reveal>
-              <Reveal delay={0.11} className="min-w-0">
-                <HomeIconTile
-                  large
-                  fill
-                  icon="arena"
-                  label="Decades of arena and festival touring"
-                />
-              </Reveal>
-            </div>
+            <CredibilityIconRow />
           </div>
         </div>
       </section>
 
       {/* Transformation */}
       <SectionShell>
-        <Reveal className="text-center lg:max-w-none lg:text-left">
-          <h2 className="font-bebas text-[clamp(1.5rem,4.2vw,3.25rem)] leading-none tracking-[0.03em] text-mist whitespace-nowrap">
-            Stop sounding like you&apos;re practicing.
-          </h2>
-          <p className="mt-3 font-bebas text-2xl tracking-wide text-gold md:text-3xl">
-            Start sounding intentional.
-          </p>
+        <Reveal className="flex w-full flex-col items-center">
+          <header className="flex w-full max-w-4xl flex-col items-center gap-3 text-center">
+            <h2 className="w-full text-balance font-bebas text-[clamp(1.5rem,4.2vw,3.25rem)] leading-none tracking-[0.03em] text-mist">
+              Stop sounding like you&apos;re practicing.
+            </h2>
+            <p className="w-full font-bebas text-2xl tracking-wide text-gold md:text-3xl">
+              Start sounding intentional.
+            </p>
+          </header>
         </Reveal>
         <div className="mt-10 grid gap-6 lg:mt-12 lg:grid-cols-2 lg:items-center lg:gap-8 xl:gap-10">
           <Reveal delay={0.04} className="h-full">
@@ -483,8 +481,8 @@ export function HomePage() {
         <div className="absolute inset-0 bg-void/88" aria-hidden />
         <div className="absolute inset-0 bg-gradient-to-r from-void/95 via-void/80 to-void/70" aria-hidden />
 
-        <div className="relative z-10 mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-2 lg:gap-16">
-          <Reveal>
+        <div className="relative z-10 mx-auto flex max-w-2xl flex-col items-center gap-8 px-2 text-center md:gap-10">
+          <Reveal className="flex w-full flex-col items-center">
             <p className="font-garamond text-[0.7rem] tracking-[0.32em] uppercase text-gold/85 md:text-xs">
               Limited membership
             </p>
@@ -494,11 +492,11 @@ export function HomePage() {
             <p className="mt-4 font-bebas text-lg tracking-wide text-gold md:text-xl">
               Small by design · Personal · Focused
             </p>
-            <Prose className="mt-6 max-w-md text-mist/65">
+            <Prose className="mt-6 text-mist/65">
               Applications are reviewed carefully to preserve the quality of the mentorship experience.
             </Prose>
           </Reveal>
-          <Reveal delay={0.08} className="flex items-center justify-center">
+          <Reveal delay={0.08}>
             <Link
               to="/apply"
               className={`${primaryBtnClass} min-h-14 px-10 text-sm md:min-h-16 md:px-14 md:text-base`}

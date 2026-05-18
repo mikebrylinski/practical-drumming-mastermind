@@ -68,8 +68,8 @@ export function SiteLayout() {
           menuOpen ? 'z-[110]' : 'z-20'
         }`}
       >
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-4 md:gap-6 md:px-8 md:py-5">
-          <TextLogo className="min-w-0 shrink pr-2" />
+        <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-5 py-4 md:gap-6 md:px-8 md:py-5">
+          <TextLogo className="mr-auto min-w-0 shrink-0" />
 
           <nav
             className="hidden items-center gap-x-6 md:flex lg:gap-x-7"
@@ -161,7 +161,7 @@ export function SiteLayout() {
         <p className="font-garamond text-xs tracking-[0.28em] uppercase text-mist/40">
           Practical Drumming · Mastermind Club
         </p>
-        <p className="mt-3 font-bebas text-sm tracking-wide text-mist md:text-base">
+        <p className="mt-3 font-garamond text-[0.65rem] uppercase tracking-[0.28em] text-mist/60 md:text-xs">
           Copyright 2026 Mike Malinin. All Rights Reserved.
         </p>
       </footer>
