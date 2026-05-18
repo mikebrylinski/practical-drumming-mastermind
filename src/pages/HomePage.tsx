@@ -98,6 +98,11 @@ const primaryBtnClass =
 const ghostBtnClass =
   'inline-flex min-h-11 items-center justify-center rounded-full px-6 font-garamond text-xs tracking-[0.16em] uppercase text-gold ring-1 ring-gold/30 transition hover:bg-gold/10 hover:text-mist'
 
+const pageWrapClass = 'mx-auto w-full max-w-7xl px-5 md:px-8'
+
+const twoColClass =
+  'flex flex-col items-center gap-8 lg:grid lg:grid-cols-2 lg:items-center lg:gap-10 xl:gap-12'
+
 function Prose({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
     <p className={`font-garamond text-base leading-relaxed text-mist/70 md:text-[1.05rem] ${className}`}>
@@ -117,11 +122,11 @@ function SectionShell({
 }) {
   return (
     <section
-      className={`border-t border-white/[0.06] px-5 py-14 md:px-8 md:py-16 lg:py-20 ${
+      className={`border-t border-white/[0.06] py-14 md:py-16 lg:py-20 ${
         alt ? 'bg-charcoal/35' : 'bg-void'
       } ${className}`}
     >
-      <div className="mx-auto w-full max-w-7xl">{children}</div>
+      <div className={pageWrapClass}>{children}</div>
     </section>
   )
 }
@@ -133,11 +138,11 @@ function SectionHeading({
   align = 'left',
 }: {
   eyebrow?: string
-  title: string
+  title: ReactNode
   subtitle?: string
   align?: 'left' | 'center'
 }) {
-  const alignClass = align === 'center' ? 'mx-auto max-w-3xl text-center' : 'text-center lg:max-w-2xl lg:text-left'
+  const alignClass = align === 'center' ? 'w-full text-center' : 'w-full text-center lg:text-left'
 
   return (
     <Reveal className={alignClass}>
@@ -147,7 +152,7 @@ function SectionHeading({
         </p>
       ) : null}
       <h2
-        className={`font-bebas text-[clamp(2rem,5vw,3.25rem)] leading-[0.95] tracking-[0.03em] text-mist ${
+        className={`font-bebas text-[clamp(2rem,5vw,3.25rem)] leading-[0.95] tracking-[0.03em] ${
           eyebrow ? 'mt-2' : ''
         }`}
       >
@@ -255,7 +260,7 @@ export function HomePage() {
         />
         <div className="pointer-events-none absolute inset-0 grain opacity-25" aria-hidden />
 
-        <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-1 flex-col justify-center px-5 py-10 md:px-8 md:py-12 lg:py-14">
+        <div className={`relative z-10 ${pageWrapClass} flex flex-1 flex-col justify-center py-10 md:py-12 lg:py-14`}>
           <div className="grid w-full items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.92fr)] lg:gap-12 xl:gap-16">
             <motion.div
               initial={{ opacity: 0, y: 16 }}
@@ -339,7 +344,7 @@ export function HomePage() {
         <div className="absolute inset-0 bg-gradient-to-r from-void/75 via-void/50 to-void/25" aria-hidden />
         <div className="absolute inset-0 bg-gradient-to-b from-void/25 via-transparent to-void/55" aria-hidden />
 
-        <div className="relative z-10 mx-auto max-w-7xl px-6 py-20 md:px-10 md:py-24 lg:py-28">
+        <div className={`relative z-10 ${pageWrapClass} py-14 md:py-16 lg:py-20`}>
           <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)] lg:items-start lg:gap-12 xl:gap-16">
             <SectionHeading
               eyebrow="Credibility"
@@ -354,13 +359,11 @@ export function HomePage() {
       {/* Transformation */}
       <SectionShell>
         <Reveal className="flex w-full flex-col items-center">
-          <header className="flex w-full max-w-4xl flex-col items-center gap-3 text-center">
-            <h2 className="w-full text-balance font-bebas text-[clamp(1.5rem,4.2vw,3.25rem)] leading-none tracking-[0.03em] text-mist">
-              Stop sounding like you&apos;re practicing.
+          <header className="flex w-full flex-col items-center text-center">
+            <h2 className="w-full text-balance font-bebas text-[clamp(2.35rem,6.5vw,3.25rem)] leading-[0.95] tracking-[0.03em]">
+              <span className="block text-mist">Stop sounding like you&apos;re practicing.</span>
+              <span className="mt-0.5 block text-gold">Start sounding intentional.</span>
             </h2>
-            <p className="w-full font-bebas text-2xl tracking-wide text-gold md:text-3xl">
-              Start sounding intentional.
-            </p>
           </header>
         </Reveal>
         <div className="mt-10 grid gap-6 lg:mt-12 lg:grid-cols-2 lg:items-center lg:gap-8 xl:gap-10">
@@ -395,19 +398,19 @@ export function HomePage() {
           style={{ backgroundImage: "url('/members-gain-bg.png')" }}
           aria-hidden
         />
-        <div className="absolute inset-0 bg-void/70" aria-hidden />
-        <div className="absolute inset-0 bg-gradient-to-r from-void/95 via-void/85 to-void/60" aria-hidden />
-        <div className="absolute inset-0 bg-gradient-to-b from-void/55 via-void/30 to-void/85" aria-hidden />
+        <div className="absolute inset-0 bg-void/45" aria-hidden />
+        <div className="absolute inset-0 bg-gradient-to-r from-void/75 via-void/55 to-void/35" aria-hidden />
+        <div className="absolute inset-0 bg-gradient-to-b from-void/35 via-void/15 to-void/55" aria-hidden />
 
-        <div className="relative z-10 mx-auto max-w-7xl px-6 py-20 md:px-10 md:py-24 lg:py-28">
-          <Reveal className="text-center lg:max-w-none lg:text-left">
+        <div className={`relative z-10 ${pageWrapClass} py-14 md:py-16 lg:py-20`}>
+          <Reveal className="w-full text-center lg:text-left">
             <p className="font-garamond text-[0.7rem] tracking-[0.32em] uppercase text-gold/75 md:text-xs">
               What members gain
             </p>
-            <h2 className="mt-2 font-bebas text-[clamp(1.5rem,4.2vw,3.25rem)] leading-none tracking-[0.03em] text-mist">
-              The difference
+            <h2 className="mt-2 font-bebas text-[clamp(2.35rem,6.5vw,3.25rem)] leading-[0.95] tracking-[0.03em]">
+              <span className="text-mist">The difference </span>
+              <span className="text-gold">people hear immediately.</span>
             </h2>
-            <p className="mt-3 font-bebas text-2xl tracking-wide text-gold md:text-3xl">people hear immediately.</p>
           </Reveal>
           <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:mt-12 lg:gap-5">
             {membersGain.map((item, i) => (
@@ -428,7 +431,13 @@ export function HomePage() {
       <SectionShell>
         <SectionHeading
           eyebrow="The experience"
-          title="A private mentorship experience."
+          title={
+            <>
+              <span className="text-mist">A private </span>
+              <span className="text-gold">mentorship</span>
+              <span className="text-mist">.</span>
+            </>
+          }
           subtitle="Live sessions, performance reviews, and studio insight — not passive content."
         />
         <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:mt-12 lg:gap-5">
@@ -438,12 +447,32 @@ export function HomePage() {
             </Reveal>
           ))}
         </div>
+        <Reveal delay={0.12} className="mt-12 lg:mt-14">
+          <figure>
+            <div className="relative overflow-hidden rounded-2xl border border-white/[0.08] shadow-[inset_0_1px_0_rgba(201,165,92,0.08)] ring-1 ring-white/[0.04]">
+              <img
+                src="/mentorship-session.png"
+                alt="Mike Malinin mentoring a drummer one-on-one in the studio"
+                className="aspect-[16/10] w-full object-cover object-center sm:aspect-[2/1]"
+                loading="lazy"
+                decoding="async"
+              />
+              <div
+                className="pointer-events-none absolute inset-0 bg-gradient-to-t from-void/45 via-transparent to-void/10"
+                aria-hidden
+              />
+            </div>
+            <figcaption className="mt-3 text-center font-garamond text-sm italic text-mist/45">
+              One-on-one mentorship in the studio
+            </figcaption>
+          </figure>
+        </Reveal>
       </SectionShell>
 
       {/* Who this is for */}
       <SectionShell alt>
-        <div className="lg:grid lg:grid-cols-2 lg:items-center lg:gap-14 xl:gap-20">
-          <div>
+        <div className={twoColClass}>
+          <div className="w-full">
             <SectionHeading eyebrow="Who this is for" title="Built for drummers ready to level up." />
             <Reveal delay={0.06} className="mt-8 space-y-6">
               <Prose>This mentorship is for musicians who:</Prose>
@@ -472,38 +501,60 @@ export function HomePage() {
       </SectionShell>
 
       {/* Limited membership */}
-      <section className="relative overflow-hidden border-t border-gold/15 px-5 py-16 md:px-8 md:py-20">
+      <section className="relative overflow-hidden border-t border-gold/15 bg-charcoal/25 py-14 md:py-16 lg:py-20">
         <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: "url('/limited-seating-bg.png')" }}
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_20%_50%,rgba(201,165,92,0.08),transparent_65%)]"
           aria-hidden
         />
-        <div className="absolute inset-0 bg-void/88" aria-hidden />
-        <div className="absolute inset-0 bg-gradient-to-r from-void/95 via-void/80 to-void/70" aria-hidden />
+        <div className={`relative z-10 ${pageWrapClass}`}>
+          <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-14 xl:gap-20">
+            <Reveal className="order-2 lg:order-1">
+              <figure className="mx-auto w-full">
+                <div className="relative overflow-hidden rounded-2xl border border-white/10 shadow-[0_24px_80px_-24px_rgba(0,0,0,0.85)] ring-1 ring-gold/15">
+                  <img
+                    src="/cta-poster.png"
+                    alt="Practical Drumming poster in a backstage hallway leading to the arena"
+                    className="aspect-[4/3] w-full object-cover object-[center_42%] sm:aspect-[5/4]"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                  <div
+                    className="pointer-events-none absolute inset-0 bg-gradient-to-t from-void/40 via-transparent to-void/15"
+                    aria-hidden
+                  />
+                </div>
+                <figcaption className="mt-4 text-center font-garamond text-xs tracking-[0.22em] uppercase text-mist/45">
+                  Practical. Playable. Real-world drumming.
+                </figcaption>
+              </figure>
+            </Reveal>
 
-        <div className="relative z-10 mx-auto flex max-w-2xl flex-col items-center gap-8 px-2 text-center md:gap-10">
-          <Reveal className="flex w-full flex-col items-center">
-            <p className="font-garamond text-[0.7rem] tracking-[0.32em] uppercase text-gold/85 md:text-xs">
-              Limited membership
-            </p>
-            <h2 className="mt-2 font-bebas text-[clamp(2.25rem,5vw,3.5rem)] leading-[0.95] tracking-[0.03em] text-mist">
-              Only 20 memberships available.
-            </h2>
-            <p className="mt-4 font-bebas text-lg tracking-wide text-gold md:text-xl">
-              Small by design · Personal · Focused
-            </p>
-            <Prose className="mt-6 text-mist/65">
-              Applications are reviewed carefully to preserve the quality of the mentorship experience.
-            </Prose>
-          </Reveal>
-          <Reveal delay={0.08}>
-            <Link
-              to="/apply"
-              className={`${primaryBtnClass} min-h-14 px-10 text-sm md:min-h-16 md:px-14 md:text-base`}
-            >
-              Apply for Membership
-            </Link>
-          </Reveal>
+            <div className="order-1 flex flex-col items-center gap-8 text-center lg:order-2 lg:items-start lg:text-left">
+              <Reveal className="flex w-full flex-col items-center lg:items-start">
+                <p className="font-garamond text-[0.7rem] tracking-[0.32em] uppercase text-gold/85 md:text-xs">
+                  Limited membership
+                </p>
+                <h2 className="mt-2 font-bebas text-[clamp(2.25rem,5vw,3.5rem)] leading-[0.95] tracking-[0.03em] text-mist">
+                  Only 20 memberships available.
+                </h2>
+                <p className="mt-4 font-bebas text-lg tracking-wide text-gold md:text-xl">
+                  Small by design · Personal · Focused
+                </p>
+                <Prose className="mt-6 text-mist/65">
+                  Applications are reviewed carefully to preserve the quality of the mentorship
+                  experience.
+                </Prose>
+              </Reveal>
+              <Reveal delay={0.08}>
+                <Link
+                  to="/apply"
+                  className={`${primaryBtnClass} min-h-14 px-10 text-sm md:min-h-16 md:px-14 md:text-base`}
+                >
+                  Apply for Membership
+                </Link>
+              </Reveal>
+            </div>
+          </div>
         </div>
       </section>
     </div>

@@ -7,7 +7,6 @@ const nav = [
   { to: '/', label: 'Home' },
   { to: '/club', label: 'The Club' },
   { to: '/about', label: 'About Mike' },
-  { to: '/faq', label: 'FAQ' },
   { to: '/apply', label: 'Apply' },
 ]
 
@@ -158,11 +157,17 @@ export function SiteLayout() {
       </main>
 
       <footer className="relative z-20 border-t border-white/[0.06] bg-charcoal/80 px-5 py-12 text-center md:px-8">
-        <p className="font-garamond text-xs tracking-[0.28em] uppercase text-mist/40">
-          Practical Drumming · Mastermind Club
+        <p className="font-bebas text-2xl tracking-[0.05em] text-mist md:text-[1.75rem]">
+          Practical Drumming
         </p>
-        <p className="mt-3 font-garamond text-[0.65rem] uppercase tracking-[0.28em] text-mist/60 md:text-xs">
-          Copyright 2026 Mike Malinin. All Rights Reserved.
+        <div
+          className="mx-auto mt-8 h-px w-full max-w-md bg-gradient-to-r from-transparent via-gold/50 to-transparent"
+          aria-hidden
+        />
+        <p className="mt-8 font-garamond text-[0.65rem] uppercase tracking-[0.28em] text-mist/60 md:text-xs">
+          Copyright 2026 Mike Malinin.
+          <br />
+          All Rights Reserved.
         </p>
       </footer>
     </div>

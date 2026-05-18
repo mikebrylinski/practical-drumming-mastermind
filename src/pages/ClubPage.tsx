@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
-import { ImagePlaceholder } from '../components/ImagePlaceholder'
 import { Reveal } from '../components/Reveal'
 
 const mastermindBullets = [
@@ -84,18 +83,15 @@ const insideClub = [
   },
 ] as const
 
-const forYouIf = [
-  'You feel stuck in your playing',
-  'You’ve lost motivation practicing alone',
-  'You want direction instead of random exercises',
-  'You want mentorship from a top-level drummer',
-  'You’re serious about improving',
-  'You want to sound musical — not robotic',
-  'You want to finally become confident behind the kit',
-] as const
-
 const primaryBtnClass =
   'inline-flex min-h-11 items-center justify-center rounded-full bg-gold px-7 font-garamond text-xs tracking-[0.18em] uppercase text-void transition hover:bg-gold/90'
+
+const pageWrapClass = 'mx-auto w-full max-w-7xl px-5 md:px-8'
+
+const portraitSizeClass = 'mx-auto w-full max-w-[15rem] sm:max-w-[16rem] lg:max-w-[17rem]'
+
+const twoColClass =
+  'flex flex-col items-center gap-8 lg:grid lg:grid-cols-2 lg:items-center lg:gap-10 xl:gap-12'
 
 function Prose({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
@@ -116,11 +112,11 @@ function SectionShell({
 }) {
   return (
     <section
-      className={`border-t border-white/[0.06] px-5 py-14 md:px-8 md:py-16 lg:py-20 ${
+      className={`border-t border-white/[0.06] py-14 md:py-16 lg:py-20 ${
         alt ? 'bg-charcoal/35' : 'bg-void'
       } ${className}`}
     >
-      <div className="mx-auto w-full max-w-7xl">{children}</div>
+      <div className={pageWrapClass}>{children}</div>
     </section>
   )
 }
@@ -138,10 +134,10 @@ function SectionHeading({
 }) {
   const alignClass =
     align === 'center'
-      ? 'mx-auto max-w-3xl text-center'
+      ? 'w-full text-center'
       : align === 'right'
-        ? 'text-center lg:ml-auto lg:max-w-2xl lg:text-right'
-        : 'text-center lg:max-w-2xl lg:text-left'
+        ? 'w-full text-center lg:text-right'
+        : 'w-full text-center lg:text-left'
 
   return (
     <Reveal className={alignClass}>
@@ -241,7 +237,18 @@ export function ClubPage() {
     <article className="bg-void">
 
       {/* Mastermind + phases */}
-      <SectionShell alt className="border-t-0 pt-16 md:pt-20 lg:pt-24">
+      <section className="relative overflow-hidden border-b border-white/[0.06]">
+        <div
+          className="absolute inset-0 bg-cover bg-[center_55%] bg-no-repeat hero-kenburns"
+          style={{ backgroundImage: "url('/club-hero-arena.png')" }}
+          aria-hidden
+        />
+        <div className="absolute inset-0 bg-void/30" aria-hidden />
+        <div className="absolute inset-0 bg-gradient-to-b from-void/65 via-void/35 to-void/70" aria-hidden />
+        <div className="absolute inset-0 bg-gradient-to-r from-void/70 via-void/40 to-void/50" aria-hidden />
+        <div className="pointer-events-none absolute inset-0 grain opacity-15" aria-hidden />
+
+        <div className={`relative z-10 ${pageWrapClass} pb-16 pt-16 md:pb-20 md:pt-20 lg:pb-24 lg:pt-24`}>
         <Reveal className="mb-10 text-center md:mb-12 lg:text-left">
           <p className="font-garamond text-xs tracking-[0.35em] uppercase text-gold-dim">The Club</p>
           <h1 className="mt-4 font-bebas text-4xl leading-[0.95] tracking-wide text-mist md:text-5xl lg:text-6xl">
@@ -289,43 +296,13 @@ export function ClubPage() {
             </PosterPanel>
           </Reveal>
         </div>
-      </SectionShell>
-
-      {/* Guidance */}
-      <SectionShell>
-        <Reveal className="mx-auto max-w-3xl text-center">
-          <header className="space-y-4">
-            <p className="font-bebas text-2xl tracking-wide text-mist md:text-3xl">
-              The difference between drummers who stay stuck… and drummers who level up… is guidance.
-            </p>
-            <Prose>Most drummers spend years guessing.</Prose>
-            <Prose className="text-mist/85">
-              Inside The Club, you&apos;ll know exactly what to work on, why it matters, and how to
-              improve faster.
-            </Prose>
-          </header>
-        </Reveal>
-      </SectionShell>
-
-      {/* Image break */}
-      <section className="border-t border-white/[0.06] px-5 py-10 md:px-8 md:py-14">
-        <div className="mx-auto w-full max-w-7xl">
-          <Reveal>
-            <ImagePlaceholder
-              label=""
-              aspect="wide"
-              src="/about-mike-stage.png"
-              alt="Mike Malinin on stage behind a drum kit"
-              caption="Live mentorship from a touring professional"
-            />
-          </Reveal>
         </div>
       </section>
 
       {/* Mike */}
       <SectionShell alt>
-        <div className="lg:grid lg:grid-cols-2 lg:items-start lg:gap-14 xl:gap-20">
-          <div>
+        <div className={twoColClass}>
+          <div className="w-full">
             <SectionHeading
               eyebrow="Your mentor"
               title={
@@ -348,15 +325,25 @@ export function ClubPage() {
               </Prose>
             </Reveal>
           </div>
-          <Reveal delay={0.1} className="mt-10 flex justify-center lg:mt-0 lg:justify-end">
-            <ImagePlaceholder
-              label=""
-              aspect="portrait"
-              src="/about-mike-tanya.png"
-              alt="Mike Malinin behind the drum kit for Tanya Tucker"
-              caption="Mike Malinin — bandleader & mentor"
-              className="w-full max-w-[16rem] sm:max-w-xs lg:max-w-sm"
-            />
+          <Reveal delay={0.1} className="flex w-full justify-center">
+            <figure className={portraitSizeClass}>
+              <div className="relative aspect-[4/5] overflow-hidden rounded-[1.75rem] border border-white/10 bg-charcoal/80 shadow-[0_24px_80px_-20px_rgba(0,0,0,0.9)] ring-1 ring-white/10 backdrop-blur-[2px]">
+                <img
+                  src="/about-mike-tanya.png"
+                  alt="Mike Malinin behind the drum kit for Tanya Tucker"
+                  className="absolute inset-0 h-full w-full object-cover object-center"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <div
+                  className="pointer-events-none absolute inset-0 bg-gradient-to-t from-void/50 via-transparent to-void/10"
+                  aria-hidden
+                />
+              </div>
+              <figcaption className="mt-4 text-center font-garamond text-xs tracking-[0.22em] uppercase text-mist/50">
+                Mike Malinin — bandleader &amp; mentor
+              </figcaption>
+            </figure>
           </Reveal>
         </div>
       </SectionShell>
@@ -407,6 +394,26 @@ export function ClubPage() {
           title="Inside The Club"
           subtitle="Weekly coaching, exclusive content, and community."
         />
+        <Reveal delay={0.06} className="mt-10 lg:mt-12">
+          <figure>
+            <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-charcoal/80 shadow-[0_24px_80px_-24px_rgba(0,0,0,0.85)] ring-1 ring-gold/15">
+              <img
+                src="/club-inside-membership.png"
+                alt="Arena stage with drums, live mentorship on screen, and club community icons"
+                className="aspect-[16/10] w-full object-cover object-center sm:aspect-[2/1]"
+                loading="lazy"
+                decoding="async"
+              />
+              <div
+                className="pointer-events-none absolute inset-0 bg-gradient-to-t from-void/45 via-transparent to-void/10"
+                aria-hidden
+              />
+            </div>
+            <figcaption className="mt-4 text-center font-garamond text-xs tracking-[0.22em] uppercase text-mist/50">
+              Live coaching · Exclusive content · A curated community
+            </figcaption>
+          </figure>
+        </Reveal>
         <div className="mt-12 grid gap-8 md:grid-cols-2 md:gap-x-12 md:gap-y-10 lg:gap-x-16">
           {insideClub.map((item, i) => (
             <Reveal key={item.title} delay={0.04 + i * 0.04}>
@@ -416,62 +423,65 @@ export function ClubPage() {
         </div>
       </SectionShell>
 
-      {/* For you if */}
-      <SectionShell>
-        <div className="grid gap-8 lg:grid-cols-2 lg:items-start lg:gap-14">
-          <Reveal delay={0.06} className="order-2 lg:order-1">
-            <BulletList items={forYouIf} />
-          </Reveal>
-          <div className="order-1 lg:order-2">
-            <SectionHeading
-              eyebrow="Is this for you?"
-              title="This Is For You If…"
-              align="right"
-            />
-          </div>
-        </div>
-      </SectionShell>
-
       {/* CTA */}
-      <section className="relative overflow-hidden border-t border-gold/15 px-5 py-16 md:px-8 md:py-20">
+      <section className="relative overflow-hidden border-t border-gold/15 bg-charcoal/25 py-14 md:py-16 lg:py-20">
         <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: "url('/limited-seating-bg.png')" }}
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_80%_50%,rgba(201,165,92,0.08),transparent_65%)]"
           aria-hidden
         />
-        <div className="absolute inset-0 bg-void/88" aria-hidden />
-        <div className="absolute inset-0 bg-gradient-to-r from-void/95 via-void/80 to-void/70" aria-hidden />
+        <div className={`relative z-10 ${pageWrapClass}`}>
+          <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-14 xl:gap-20">
+            <Reveal className="order-2 lg:order-1">
+              <figure className="mx-auto w-full">
+                <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-void/40 shadow-[0_24px_80px_-24px_rgba(0,0,0,0.85)] ring-1 ring-gold/15">
+                  <img
+                    src="/club-cta-case.png"
+                    alt="Practical Drumming Mastermind Club road case with Mike Malinin"
+                    className="aspect-square w-full object-cover object-center"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                  <div
+                    className="pointer-events-none absolute inset-0 bg-gradient-to-t from-void/35 via-transparent to-transparent"
+                    aria-hidden
+                  />
+                </div>
+                <figcaption className="mt-4 text-center font-garamond text-xs tracking-[0.22em] uppercase text-mist/45">
+                  Only 20 members · Curated. Personal. Exclusive.
+                </figcaption>
+              </figure>
+            </Reveal>
 
-        <div className="relative z-10 mx-auto flex max-w-2xl flex-col items-center gap-8 px-2 text-center md:gap-10">
-          <Reveal className="flex w-full flex-col items-center">
-            <p className="font-garamond text-[0.7rem] tracking-[0.32em] uppercase text-gold/85 md:text-xs">
-              Your next level
-            </p>
-            <h2 className="mt-2 font-bebas text-[clamp(2.25rem,5vw,3.5rem)] leading-[0.95] tracking-[0.03em] text-mist">
-              Your Next Level Starts Here
-            </h2>
-            <div className="mt-6 space-y-5">
-              <Prose className="text-mist/65">
-                The fastest way to grow as a drummer is to learn from someone who&apos;s already walked
-                the path.
-              </Prose>
-              <Prose className="text-mist/65">
-                The Club gives you the structure, mentorship, accountability, and community to become
-                the drummer you know you can be.
-              </Prose>
-              <p className="font-bebas text-lg tracking-wide text-gold md:text-xl">
-                Join today — build real confidence, groove, and musicianship.
-              </p>
+            <div className="order-1 flex flex-col items-center gap-8 text-center lg:order-2 lg:items-start lg:text-left">
+              <Reveal className="flex w-full flex-col items-center lg:items-start">
+                <h2 className="font-bebas text-[clamp(2.25rem,5vw,3.5rem)] leading-[0.95] tracking-[0.03em]">
+                  <span className="text-mist">Your Next Level </span>
+                  <span className="text-gold">Starts Here</span>
+                </h2>
+                <div className="mt-6 space-y-5">
+                  <Prose className="text-mist/65">
+                    The fastest way to grow as a drummer is to learn from someone who&apos;s already
+                    walked the path.
+                  </Prose>
+                  <Prose className="text-mist/65">
+                    The Club gives you the structure, mentorship, accountability, and community to
+                    become the drummer you know you can be.
+                  </Prose>
+                  <p className="font-bebas text-lg tracking-wide text-gold md:text-xl">
+                    Join today — build real confidence, groove, and musicianship.
+                  </p>
+                </div>
+              </Reveal>
+              <Reveal delay={0.08}>
+                <Link
+                  to="/apply"
+                  className={`${primaryBtnClass} min-h-14 px-10 text-sm md:min-h-16 md:px-14 md:text-base`}
+                >
+                  Apply for Membership
+                </Link>
+              </Reveal>
             </div>
-          </Reveal>
-          <Reveal delay={0.08}>
-            <Link
-              to="/apply"
-              className={`${primaryBtnClass} min-h-14 px-10 text-sm md:min-h-16 md:px-14 md:text-base`}
-            >
-              Apply for Membership
-            </Link>
-          </Reveal>
+          </div>
         </div>
       </section>
     </article>
