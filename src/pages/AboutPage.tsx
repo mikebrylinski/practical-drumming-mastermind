@@ -109,7 +109,7 @@ function AboutImagePlaceholder({
             <img
               src={src}
               alt={alt ?? ''}
-              className="absolute inset-0 h-full w-full object-cover object-[center_22%]"
+              className="absolute inset-0 h-full w-full object-cover object-[center_20%]"
               loading="eager"
               decoding="async"
             />
@@ -172,7 +172,7 @@ export function AboutPage() {
     <article className="bg-void">
       <section className="border-b border-white/[0.06] px-5 py-20 md:px-8 md:py-28">
         <div className="mx-auto w-full max-w-5xl">
-          <Reveal>
+          <Reveal className="text-center md:text-left">
             <p className="font-garamond text-xs tracking-[0.35em] uppercase text-gold-dim">About</p>
             <h1 className="mt-4 font-bebas text-4xl text-mist md:text-5xl lg:text-6xl">
               About Mike Malinin
@@ -180,17 +180,17 @@ export function AboutPage() {
           </Reveal>
           <Reveal
             delay={0.06}
-            className="mt-10 grid items-start gap-8 md:grid-cols-[minmax(0,13rem)_1fr] md:gap-10 lg:grid-cols-[minmax(0,15rem)_1fr] lg:gap-12"
+            className="mt-10 flex flex-col items-center gap-8 text-center md:grid md:items-start md:gap-10 md:text-left md:grid-cols-[minmax(0,13rem)_1fr] lg:grid-cols-[minmax(0,15rem)_1fr] lg:gap-12"
           >
             <AboutImagePlaceholder
               fill
               aspect="portrait"
               src="/about-mike.png"
-              alt="Mike Malinin performing live on drums"
+              alt="Mike Malinin speaking at an event"
               caption="Mike Malinin — Practical Drumming"
-              className="w-full max-w-[13rem] md:max-w-none"
+              className="mx-auto w-full max-w-[13rem] md:mx-0 md:max-w-none"
             />
-            <div className="space-y-6 font-garamond text-base leading-relaxed text-mist/75 md:text-lg">
+            <div className="w-full max-w-xl space-y-6 font-garamond text-base leading-relaxed text-mist/75 md:max-w-none md:text-lg">
               <p>
                 Mike Malinin is an American rock drummer best known for anchoring the rhythm section of
                 the alternative rock band Goo Goo Dolls during their most commercially successful era.
@@ -220,7 +220,8 @@ export function AboutPage() {
           <Reveal>
             <AboutImagePlaceholder
               aspect="wide"
-              label="Live at arena · photo coming soon"
+              src="/about-mike-live.png"
+              alt="Mike Malinin performing live on drums"
               caption="Goo Goo Dolls era — stadium & festival performances"
             />
           </Reveal>
@@ -269,8 +270,9 @@ export function AboutPage() {
         <div className="mx-auto w-full max-w-5xl">
           <Reveal>
             <AboutImagePlaceholder
-              label="Studio & screen · photo coming soon"
-              caption="Recording sessions, film, and television appearances"
+              src="/about-mike-stage.png"
+              alt="Mike Malinin behind a TAMA drum kit on stage"
+              caption="Live on stage — Goo Goo Dolls era"
             />
           </Reveal>
         </div>
@@ -290,6 +292,15 @@ export function AboutPage() {
               Malinin to find &ldquo;intensity without volume,&rdquo; perfectly supporting Tucker&apos;s
               immense vocal presence.
             </p>
+          </Reveal>
+          <Reveal delay={0.05} className="mt-10 flex justify-center md:mt-12">
+            <AboutImagePlaceholder
+              aspect="portrait"
+              src="/about-mike-tanya.png"
+              alt="Mike Malinin behind the drum kit for Tanya Tucker"
+              caption="Bandleader for Tanya Tucker — Nashville"
+              className="w-full max-w-[16rem] sm:max-w-xs"
+            />
           </Reveal>
           <div className="mt-12 space-y-10">
             {tanyaHighlights.map((item, i) => (

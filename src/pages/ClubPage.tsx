@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
+import { ImagePlaceholder } from '../components/ImagePlaceholder'
 import { Reveal } from '../components/Reveal'
 
 const mastermindBullets = [
@@ -33,17 +34,6 @@ const phases = [
     title: 'Objective Listening & Thinking',
     body: 'Identify what works, fix what doesn’t, and consistently improve with direction and clarity.',
   },
-] as const
-
-const designedToHelp = [
-  'Play with more confidence and control',
-  'Break through frustrating plateaus',
-  'Build real musicality — not just chops',
-  'Develop professional habits and mindset',
-  'Learn how great drummers actually think',
-  'Stay motivated and consistent',
-  'Get feedback, direction, and support from a real mentor',
-  'Become the drummer other musicians want to play with',
 ] as const
 
 const mikeCredentials = [
@@ -92,17 +82,6 @@ const insideClub = [
     title: 'Accountability & Growth',
     body: 'Stay consistent with a system designed to keep you progressing week after week.',
   },
-  {
-    title: 'Real-World Drumming Knowledge',
-    body: 'Learn the things most drum lessons never teach:',
-    subItems: [
-      'playing for the song',
-      'musical maturity',
-      'live performance mindset',
-      'industry professionalism',
-      'creative decision making',
-    ],
-  },
 ] as const
 
 const forYouIf = [
@@ -115,323 +94,382 @@ const forYouIf = [
   'You want to finally become confident behind the kit',
 ] as const
 
-function SectionHeading({
-  eyebrow,
-  title,
-  className = '',
-}: {
-  eyebrow?: string
-  title: string
-  className?: string
-}) {
+const primaryBtnClass =
+  'inline-flex min-h-11 items-center justify-center rounded-full bg-gold px-7 font-garamond text-xs tracking-[0.18em] uppercase text-void transition hover:bg-gold/90'
+
+function Prose({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
-    <div className={className}>
-      {eyebrow ? (
-        <p className="font-garamond text-xs tracking-[0.32em] uppercase text-gold-dim">{eyebrow}</p>
-      ) : null}
-      <h2
-        className={`font-bebas text-3xl tracking-wide text-mist md:text-4xl ${eyebrow ? 'mt-3' : ''}`}
-      >
-        {title}
-      </h2>
-    </div>
+    <p className={`font-garamond text-base leading-relaxed text-mist/70 md:text-[1.05rem] ${className}`}>
+      {children}
+    </p>
   )
 }
 
-function BulletList({ items, className = '' }: { items: readonly string[]; className?: string }) {
+function SectionShell({
+  children,
+  className = '',
+  alt = false,
+}: {
+  children: ReactNode
+  className?: string
+  alt?: boolean
+}) {
   return (
-    <ul className={`space-y-4 ${className}`}>
+    <section
+      className={`border-t border-white/[0.06] px-5 py-14 md:px-8 md:py-16 lg:py-20 ${
+        alt ? 'bg-charcoal/35' : 'bg-void'
+      } ${className}`}
+    >
+      <div className="mx-auto w-full max-w-7xl">{children}</div>
+    </section>
+  )
+}
+
+function SectionHeading({
+  eyebrow,
+  title,
+  subtitle,
+  align = 'left',
+}: {
+  eyebrow?: string
+  title: ReactNode
+  subtitle?: string
+  align?: 'left' | 'center' | 'right'
+}) {
+  const alignClass =
+    align === 'center'
+      ? 'mx-auto max-w-3xl text-center'
+      : align === 'right'
+        ? 'text-center lg:ml-auto lg:max-w-2xl lg:text-right'
+        : 'text-center lg:max-w-2xl lg:text-left'
+
+  return (
+    <Reveal className={alignClass}>
+      {eyebrow ? (
+        <p className="font-garamond text-[0.7rem] tracking-[0.32em] uppercase text-gold/75 md:text-xs">
+          {eyebrow}
+        </p>
+      ) : null}
+      <h2
+        className={`font-bebas text-[clamp(2rem,5vw,3.25rem)] leading-[0.95] tracking-[0.03em] text-mist ${
+          eyebrow ? 'mt-2' : ''
+        }`}
+      >
+        {title}
+      </h2>
+      {subtitle ? (
+        <p className="mt-3 font-garamond text-lg leading-snug text-mist/65 md:text-xl">{subtitle}</p>
+      ) : null}
+    </Reveal>
+  )
+}
+
+function BulletList({
+  items,
+  compact = false,
+  centered = false,
+}: {
+  items: readonly string[]
+  compact?: boolean
+  centered?: boolean
+}) {
+  return (
+    <ul className={`${compact ? 'space-y-2.5' : 'space-y-3'} ${centered ? 'mx-auto w-full max-w-sm' : ''}`}>
       {items.map((item) => (
-        <li key={item} className="flex gap-4">
-          <span className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-gold/80" />
-          <p className="font-garamond text-base leading-relaxed text-mist/75 md:text-lg">{item}</p>
+        <li
+          key={item}
+          className={
+            centered
+              ? 'flex max-w-xs flex-col items-center gap-2 text-center'
+              : 'flex items-start gap-3'
+          }
+        >
+          <span
+            className={`shrink-0 rounded-full bg-gold/90 ${centered ? 'h-1.5 w-1.5' : 'mt-2 h-1 w-1'}`}
+            aria-hidden
+          />
+          <p className="font-garamond text-sm leading-relaxed text-mist/75 md:text-base">{item}</p>
         </li>
       ))}
     </ul>
   )
 }
 
-function Prose({ children, className = '' }: { children: ReactNode; className?: string }) {
+function PosterPanel({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
-    <p className={`font-garamond text-base leading-relaxed text-mist/75 md:text-lg ${className}`}>
-      {children}
-    </p>
+    <div
+      className={`relative flex h-full min-h-[16rem] flex-col justify-center overflow-hidden border border-gold/25 bg-charcoal/55 p-8 md:min-h-[18rem] md:p-10 ${className}`}
+    >
+      <div
+        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-gold/[0.06] to-transparent"
+        aria-hidden
+      />
+      <div className="relative">{children}</div>
+    </div>
+  )
+}
+
+function HighlightBlock({
+  title,
+  body,
+  subItems,
+}: {
+  title: string
+  body: string
+  subItems?: readonly string[]
+}) {
+  return (
+    <div className="border-l border-gold/30 pl-6 md:pl-8">
+      <h3 className="font-garamond text-lg text-gold md:text-xl">{title}</h3>
+      <p className="mt-3 font-garamond text-base leading-relaxed text-mist/75 md:text-lg">{body}</p>
+      {subItems ? (
+        <ul className="mt-4 space-y-2 pl-1">
+          {subItems.map((sub) => (
+            <li key={sub} className="flex gap-3 font-garamond text-base text-mist/65 md:text-lg">
+              <span className="text-gold/60">—</span>
+              {sub}
+            </li>
+          ))}
+        </ul>
+      ) : null}
+    </div>
   )
 }
 
 export function ClubPage() {
   return (
-    <article className="relative bg-void">
-      {/* Hero */}
-      <section className="relative min-h-[32rem] overflow-hidden border-b border-white/[0.06] px-5 pb-16 pt-16 md:min-h-[38rem] md:px-8 md:pb-24 md:pt-24">
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: "url('/club-hero-bg.png')" }}
-          aria-hidden
-        />
-        <div className="absolute inset-0 bg-void/55" aria-hidden />
-        <div
-          className="absolute inset-0 bg-gradient-to-b from-void/90 via-void/65 to-void/88"
-          aria-hidden
-        />
-        <div
-          className="pointer-events-none absolute inset-0"
-          style={{
-            background:
-              'radial-gradient(ellipse 90% 75% at 50% 55%, rgba(5,5,5,0.25) 0%, rgba(5,5,5,0.72) 100%)',
-          }}
-          aria-hidden
-        />
-        <div className="relative z-10 mx-auto w-full max-w-5xl">
-          <Reveal>
-            <p className="font-garamond text-xs tracking-[0.35em] uppercase text-gold">The Club</p>
-            <h1 className="mt-4 font-bebas text-4xl leading-[0.95] tracking-wide text-mist md:text-5xl lg:text-6xl">
-              Stop Practicing Alone.
-              <br />
-              Start Playing Like a Real Drummer.
-            </h1>
-          </Reveal>
-          <Reveal delay={0.06} className="mt-10 space-y-6">
-            <Prose className="text-mist/80">
-              Join an elite drumming community built for drummers who want more than random YouTube
-              lessons and scattered practice routines.
-            </Prose>
-            <Prose className="text-mist/80">
-              Inside The Club, you&apos;ll get direct mentorship, real-world guidance, accountability,
-              and a proven roadmap from a professional touring drummer who&apos;s performed on some of
-              the biggest stages in the world.
-            </Prose>
-            <Prose className="text-mist/90">
-              This isn&apos;t just another drum lesson membership.
-            </Prose>
-          </Reveal>
-        </div>
-      </section>
-
-      {/* Designed to help */}
-      <section className="border-b border-white/[0.06] bg-charcoal/40 px-5 py-16 md:px-8 md:py-24">
-        <div className="mx-auto w-full max-w-5xl">
-          <Reveal>
-            <h2 className="font-bebas text-2xl tracking-wide text-mist md:text-3xl">
-              It&apos;s a mentorship experience designed to help you:
-            </h2>
-          </Reveal>
-          <Reveal delay={0.06} className="mt-10">
-            <BulletList items={designedToHelp} />
-          </Reveal>
-        </div>
-      </section>
+    <article className="bg-void">
 
       {/* Mastermind + phases */}
-      <section className="border-b border-white/[0.06] px-5 py-16 md:px-8 md:py-24">
-        <div className="mx-auto grid max-w-5xl gap-6 lg:grid-cols-2">
-          <Reveal>
-            <div className="relative overflow-hidden border border-gold/25 bg-charcoal/55 p-8">
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-gold/[0.06] to-transparent" />
-              <p className="relative font-bebas text-lg leading-tight tracking-wide text-mist md:text-xl lg:text-2xl">
-                Practical Drumming is a mastermind club that
-              </p>
-              <ul className="relative mt-8 space-y-5">
-                {mastermindBullets.map((b) => (
-                  <li key={b} className="flex gap-4">
-                    <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-gold/80" />
-                    <p className="font-garamond text-base leading-relaxed text-mist/75 md:text-lg">
-                      {b}
-                    </p>
-                  </li>
-                ))}
-                <li className="flex gap-4">
-                  <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-gold/80" />
-                  <p className="font-garamond text-base leading-relaxed text-mist/75 md:text-lg">
-                    Includes 2x weekly collaboration calls for feedback, clarity, and progress.
-                  </p>
-                </li>
-              </ul>
-            </div>
+      <SectionShell alt className="border-t-0 pt-16 md:pt-20 lg:pt-24">
+        <Reveal className="mb-10 text-center md:mb-12 lg:text-left">
+          <p className="font-garamond text-xs tracking-[0.35em] uppercase text-gold-dim">The Club</p>
+          <h1 className="mt-4 font-bebas text-4xl leading-[0.95] tracking-wide text-mist md:text-5xl lg:text-6xl">
+            Stop Practicing Alone.
+            <br />
+            <span className="text-gold">Start Playing Like a Real Drummer.</span>
+          </h1>
+        </Reveal>
+        <div className="grid gap-6 lg:grid-cols-2 lg:gap-8">
+          <Reveal className="h-full">
+            <PosterPanel>
+              <div className="space-y-6">
+                <p className="font-bebas text-xl tracking-wide text-mist md:text-2xl">
+                  Practical Drumming is a mastermind club that
+                </p>
+                <BulletList items={mastermindBullets} compact />
+                <Prose className="text-mist/80">
+                  Includes 2× weekly collaboration calls for feedback, clarity, and progress.
+                </Prose>
+              </div>
+            </PosterPanel>
           </Reveal>
-
-          <Reveal delay={0.06}>
-            <div className="relative overflow-hidden border border-gold/25 bg-charcoal/55 p-8">
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-gold/[0.06] to-transparent" />
-              <p className="relative font-bebas text-lg leading-tight tracking-wide text-mist md:text-xl lg:text-2xl">
-                The 4 phases of your development
-              </p>
-              <ol className="relative mt-8 space-y-7">
-                {phases.map((p) => (
-                  <li key={p.n} className="flex gap-5">
-                    <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-gold/35 bg-gold/5 font-garamond text-lg text-gold">
-                      {p.n}
-                    </div>
-                    <div className="border-b border-white/[0.06] pb-6">
-                      <p className="font-bebas text-2xl tracking-[0.12em] text-mist">{p.title}</p>
-                      <p className="mt-2 font-garamond text-base leading-relaxed text-mist/70 md:text-lg">
-                        {p.body}
-                      </p>
-                    </div>
-                  </li>
-                ))}
-              </ol>
-            </div>
+          <Reveal delay={0.06} className="h-full">
+            <PosterPanel>
+              <div className="space-y-5">
+                <p className="font-bebas text-xl tracking-wide text-mist md:text-2xl">
+                  The 4 phases of your development
+                </p>
+                <ol className="space-y-6">
+                  {phases.map((p) => (
+                    <li key={p.n} className="flex gap-4 border-b border-white/[0.06] pb-5 last:border-0 last:pb-0">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-gold/35 bg-gold/5 font-garamond text-lg text-gold">
+                        {p.n}
+                      </div>
+                      <div>
+                        <p className="font-bebas text-xl tracking-[0.08em] text-mist md:text-2xl">{p.title}</p>
+                        <p className="mt-1.5 font-garamond text-sm leading-relaxed text-mist/70 md:text-base">
+                          {p.body}
+                        </p>
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            </PosterPanel>
           </Reveal>
         </div>
-      </section>
+      </SectionShell>
 
       {/* Guidance */}
-      <section className="border-b border-white/[0.06] bg-charcoal/40 px-5 py-16 md:px-8 md:py-24">
-        <div className="mx-auto w-full max-w-5xl space-y-8">
-          <Reveal>
-            <Prose className="text-lg text-mist/85 md:text-xl">
+      <SectionShell>
+        <Reveal className="mx-auto max-w-3xl text-center">
+          <header className="space-y-4">
+            <p className="font-bebas text-2xl tracking-wide text-mist md:text-3xl">
               The difference between drummers who stay stuck… and drummers who level up… is guidance.
-            </Prose>
-          </Reveal>
-          <Reveal delay={0.04}>
+            </p>
             <Prose>Most drummers spend years guessing.</Prose>
-          </Reveal>
-          <Reveal delay={0.08}>
-            <Prose>
+            <Prose className="text-mist/85">
               Inside The Club, you&apos;ll know exactly what to work on, why it matters, and how to
               improve faster.
             </Prose>
+          </header>
+        </Reveal>
+      </SectionShell>
+
+      {/* Image break */}
+      <section className="border-t border-white/[0.06] px-5 py-10 md:px-8 md:py-14">
+        <div className="mx-auto w-full max-w-7xl">
+          <Reveal>
+            <ImagePlaceholder
+              label=""
+              aspect="wide"
+              src="/about-mike-stage.png"
+              alt="Mike Malinin on stage behind a drum kit"
+              caption="Live mentorship from a touring professional"
+            />
           </Reveal>
         </div>
       </section>
 
       {/* Mike */}
-      <section className="border-b border-white/[0.06] bg-charcoal/40 px-5 py-16 md:px-8 md:py-24">
-        <div className="mx-auto w-full max-w-5xl">
-          <Reveal>
-            <SectionHeading title="Learn From Someone Who's Actually Done It" />
-            <p className="mt-6 font-garamond text-xl tracking-[0.12em] text-gold md:text-2xl">
-              Mike Malinin
-            </p>
-          </Reveal>
-          <Reveal delay={0.06} className="mt-8 space-y-6">
-            <Prose>
-              When you join The Club, you&apos;re not learning from a random internet instructor.
-            </Prose>
-            <Prose>
-              You&apos;re getting mentorship from a professional drummer who has:
-            </Prose>
-          </Reveal>
-          <Reveal delay={0.1} className="mt-8">
-            <BulletList items={mikeCredentials} />
-          </Reveal>
-          <Reveal delay={0.14} className="mt-8">
-            <Prose>
-              You&apos;ll gain insights most drummers never get access to — from groove, feel,
-              dynamics, creativity, professionalism, touring, recording, mindset, and musical
-              decision-making.
-            </Prose>
+      <SectionShell alt>
+        <div className="lg:grid lg:grid-cols-2 lg:items-start lg:gap-14 xl:gap-20">
+          <div>
+            <SectionHeading
+              eyebrow="Your mentor"
+              title={
+                <>
+                  Learn From Someone Who&apos;s{' '}
+                  <span className="text-gold">Actually Done It</span>
+                </>
+              }
+            />
+            <Reveal delay={0.06} className="mt-8 space-y-6">
+              <Prose>
+                When you join The Club, you&apos;re not learning from a random internet instructor.
+              </Prose>
+              <Prose>You&apos;re getting mentorship from a professional drummer who has:</Prose>
+              <BulletList items={mikeCredentials} compact />
+              <Prose>
+                You&apos;ll gain insights most drummers never get access to — from groove, feel,
+                dynamics, creativity, professionalism, touring, recording, mindset, and musical
+                decision-making.
+              </Prose>
+            </Reveal>
+          </div>
+          <Reveal delay={0.1} className="mt-10 flex justify-center lg:mt-0 lg:justify-end">
+            <ImagePlaceholder
+              label=""
+              aspect="portrait"
+              src="/about-mike-tanya.png"
+              alt="Mike Malinin behind the drum kit for Tanya Tucker"
+              caption="Mike Malinin — bandleader & mentor"
+              className="w-full max-w-[16rem] sm:max-w-xs lg:max-w-sm"
+            />
           </Reveal>
         </div>
-      </section>
+      </SectionShell>
 
       {/* What makes different */}
-      <section className="border-b border-white/[0.06] px-5 py-16 md:px-8 md:py-24">
-        <div className="mx-auto w-full max-w-5xl">
-          <Reveal>
-            <SectionHeading title="What Makes This Different?" />
+      <SectionShell>
+        <SectionHeading
+          eyebrow="The difference"
+          title="What Makes This Different?"
+          subtitle="Most online drum programs give you information. The Club gives you transformation."
+        />
+        <div className="mt-10 grid gap-6 lg:mt-12 lg:grid-cols-2 lg:gap-8">
+          <Reveal delay={0.04}>
+            <PosterPanel>
+              <div className="space-y-5">
+                <p className="font-bebas text-xl tracking-wide text-mist md:text-2xl">Built around:</p>
+                <BulletList items={differentiators} compact />
+                <Prose className="text-mist/80">
+                  Instead of endlessly consuming videos and hoping you improve, you&apos;ll follow a
+                  structured path designed to create measurable progress.
+                </Prose>
+              </div>
+            </PosterPanel>
           </Reveal>
-          <Reveal delay={0.06} className="mt-8 space-y-6">
-            <Prose className="text-lg text-mist/85 md:text-xl">
-              Most online drum programs give you information.
-            </Prose>
-            <Prose className="text-lg text-gold/90 md:text-xl">The Club gives you transformation.</Prose>
-            <Prose>This is built around:</Prose>
-          </Reveal>
-          <Reveal delay={0.1} className="mt-8">
-            <BulletList items={differentiators} />
-          </Reveal>
-          <Reveal delay={0.14} className="mt-10 space-y-6">
-            <Prose>
-              Instead of endlessly consuming videos and hoping you improve, you&apos;ll follow a
-              structured path designed to create measurable progress.
-            </Prose>
-            <Prose>You&apos;ll finally stop feeling:</Prose>
-          </Reveal>
-          <Reveal delay={0.18} className="mt-6">
-            <BulletList items={stopFeeling} />
-          </Reveal>
-          <Reveal delay={0.22} className="mt-8">
-            <Prose>And start feeling:</Prose>
-          </Reveal>
-          <Reveal delay={0.26} className="mt-6">
-            <BulletList items={startFeeling} />
+          <Reveal delay={0.08}>
+            <div className="grid h-full gap-6 sm:grid-cols-2 lg:grid-cols-1">
+              <PosterPanel className="min-h-0">
+                <div className="space-y-4">
+                  <p className="font-bebas text-lg tracking-wide text-mist md:text-xl">Stop feeling:</p>
+                  <BulletList items={stopFeeling} compact />
+                </div>
+              </PosterPanel>
+              <PosterPanel className="min-h-0">
+                <div className="space-y-4">
+                  <p className="font-bebas text-lg tracking-wide text-gold md:text-xl">Start feeling:</p>
+                  <BulletList items={startFeeling} compact />
+                </div>
+              </PosterPanel>
+            </div>
           </Reveal>
         </div>
-      </section>
+      </SectionShell>
 
       {/* Inside The Club */}
-      <section className="border-b border-white/[0.06] bg-smoke/30 px-5 py-16 md:px-8 md:py-24">
-        <div className="mx-auto w-full max-w-5xl">
-          <Reveal>
-            <SectionHeading title="Inside The Club" />
-          </Reveal>
-          <div className="mt-12 space-y-10">
-            {insideClub.map((item, i) => (
-              <Reveal key={item.title} delay={i * 0.04}>
-                <div className="border-l border-gold/35 pl-6 md:pl-8">
-                  <h3 className="font-garamond text-lg text-gold md:text-xl">{item.title}</h3>
-                  <p className="mt-3 font-garamond text-base leading-relaxed text-mist/70 md:text-lg">
-                    {item.body}
-                  </p>
-                  {'subItems' in item && item.subItems ? (
-                    <ul className="mt-4 space-y-2 pl-1">
-                      {item.subItems.map((sub) => (
-                        <li
-                          key={sub}
-                          className="flex gap-3 font-garamond text-base text-mist/65 md:text-lg"
-                        >
-                          <span className="text-gold/60">—</span>
-                          {sub}
-                        </li>
-                      ))}
-                    </ul>
-                  ) : null}
-                </div>
-              </Reveal>
-            ))}
-          </div>
+      <SectionShell alt>
+        <SectionHeading
+          eyebrow="Membership"
+          title="Inside The Club"
+          subtitle="Weekly coaching, exclusive content, and community."
+        />
+        <div className="mt-12 grid gap-8 md:grid-cols-2 md:gap-x-12 md:gap-y-10 lg:gap-x-16">
+          {insideClub.map((item, i) => (
+            <Reveal key={item.title} delay={0.04 + i * 0.04}>
+              <HighlightBlock title={item.title} body={item.body} />
+            </Reveal>
+          ))}
         </div>
-      </section>
+      </SectionShell>
 
       {/* For you if */}
-      <section className="border-b border-white/[0.06] px-5 py-16 md:px-8 md:py-24">
-        <div className="mx-auto w-full max-w-5xl">
-          <Reveal>
-            <SectionHeading title="This Is For You If…" />
-          </Reveal>
-          <Reveal delay={0.06} className="mt-10">
+      <SectionShell>
+        <div className="grid gap-8 lg:grid-cols-2 lg:items-start lg:gap-14">
+          <Reveal delay={0.06} className="order-2 lg:order-1">
             <BulletList items={forYouIf} />
           </Reveal>
+          <div className="order-1 lg:order-2">
+            <SectionHeading
+              eyebrow="Is this for you?"
+              title="This Is For You If…"
+              align="right"
+            />
+          </div>
         </div>
-      </section>
+      </SectionShell>
 
       {/* CTA */}
-      <section className="px-5 py-16 md:px-8 md:py-24">
-        <div className="mx-auto w-full max-w-5xl text-center">
-          <Reveal>
-            <SectionHeading title="Your Next Level Starts Here" className="text-center" />
-            <div className="mt-8 space-y-6 text-left md:text-center">
-              <Prose>
+      <section className="relative overflow-hidden border-t border-gold/15 px-5 py-16 md:px-8 md:py-20">
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: "url('/limited-seating-bg.png')" }}
+          aria-hidden
+        />
+        <div className="absolute inset-0 bg-void/88" aria-hidden />
+        <div className="absolute inset-0 bg-gradient-to-r from-void/95 via-void/80 to-void/70" aria-hidden />
+
+        <div className="relative z-10 mx-auto flex max-w-2xl flex-col items-center gap-8 px-2 text-center md:gap-10">
+          <Reveal className="flex w-full flex-col items-center">
+            <p className="font-garamond text-[0.7rem] tracking-[0.32em] uppercase text-gold/85 md:text-xs">
+              Your next level
+            </p>
+            <h2 className="mt-2 font-bebas text-[clamp(2.25rem,5vw,3.5rem)] leading-[0.95] tracking-[0.03em] text-mist">
+              Your Next Level Starts Here
+            </h2>
+            <div className="mt-6 space-y-5">
+              <Prose className="text-mist/65">
                 The fastest way to grow as a drummer is to learn from someone who&apos;s already walked
                 the path.
               </Prose>
-              <Prose>
+              <Prose className="text-mist/65">
                 The Club gives you the structure, mentorship, accountability, and community to become
                 the drummer you know you can be.
               </Prose>
-              <Prose className="text-mist/90">
-                Join today and start building real confidence, real groove, and real musicianship.
-              </Prose>
+              <p className="font-bebas text-lg tracking-wide text-gold md:text-xl">
+                Join today — build real confidence, groove, and musicianship.
+              </p>
             </div>
           </Reveal>
-          <Reveal delay={0.1} className="mt-12 flex justify-center">
+          <Reveal delay={0.08}>
             <Link
               to="/apply"
-              className="inline-flex min-h-12 items-center justify-center border border-gold/50 bg-gold/10 px-10 font-garamond text-xs tracking-[0.22em] uppercase text-gold transition hover:border-gold hover:bg-gold/20"
+              className={`${primaryBtnClass} min-h-14 px-10 text-sm md:min-h-16 md:px-14 md:text-base`}
             >
-              Apply for membership
+              Apply for Membership
             </Link>
           </Reveal>
         </div>

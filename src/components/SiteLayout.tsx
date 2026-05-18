@@ -68,7 +68,7 @@ export function SiteLayout() {
           menuOpen ? 'z-[110]' : 'z-20'
         }`}
       >
-        <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-5 py-4 md:gap-6 md:px-8 md:py-5">
+        <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-5 py-4 md:gap-6 md:px-8 md:py-5">
           <TextLogo className="mr-auto min-w-0 shrink-0" />
 
           <nav
@@ -136,7 +136,7 @@ export function SiteLayout() {
                     <Link
                       to={to}
                       onClick={() => setMenuOpen(false)}
-                      className={`block border-b border-white/[0.06] py-4 font-garamond text-lg uppercase tracking-[0.22em] transition-colors ${
+                      className={`block border-b border-white/[0.06] py-4 text-center font-garamond text-lg uppercase tracking-[0.22em] transition-colors ${
                         active ? 'text-gold' : 'text-mist/75 hover:text-gold'
                       }`}
                     >

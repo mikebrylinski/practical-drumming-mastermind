@@ -308,7 +308,7 @@ export function HomePage() {
               <div className="hero-visual relative mx-auto w-full max-w-sm lg:ml-auto lg:max-w-md">
                 <div className="relative aspect-[4/5] overflow-hidden rounded-[1.75rem] bg-charcoal/80 shadow-[0_24px_80px_-20px_rgba(0,0,0,0.9)] ring-1 ring-white/10 backdrop-blur-[2px] sm:aspect-[5/6]">
                   <img
-                    src="/about-mike.png"
+                    src="/hero-mike-live.png"
                     alt="Mike Malinin performing live on drums"
                     className="absolute inset-0 h-full w-full object-cover object-center"
                     fetchPriority="high"
@@ -343,8 +343,8 @@ export function HomePage() {
           <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)] lg:items-start lg:gap-12 xl:gap-16">
             <SectionHeading
               eyebrow="Credibility"
-              title="5 billion streams. Diamond & platinum records. Arena stages."
-              subtitle="Former Goo Goo Dolls drummer — now mentoring a private group of twenty committed drummers."
+              title="5 billion streams. Diamond & platinum records. The world&apos;s biggest stages."
+              subtitle="Former Goo Goo Dolls / Tayna Tucker drummer — now mentoring a private group of twenty committed drummers."
             />
             <CredibilityIconRow />
           </div>
