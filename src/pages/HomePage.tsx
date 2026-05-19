@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { CredibilityIconRow } from '../components/home/CredibilityIconRow'
 import { Reveal } from '../components/Reveal'
+import { SectionGridOverlay } from '../components/SectionGridOverlay'
+import { pageWrapClass, SectionShell } from '../components/SectionShell'
 
 const heroOutcomes = [
   'Develop better feel.',
@@ -98,8 +100,6 @@ const primaryBtnClass =
 const ghostBtnClass =
   'inline-flex min-h-11 items-center justify-center rounded-full px-6 font-garamond text-xs tracking-[0.16em] uppercase text-gold ring-1 ring-gold/30 transition hover:bg-gold/10 hover:text-mist'
 
-const pageWrapClass = 'mx-auto w-full max-w-7xl px-5 md:px-8'
-
 const twoColClass =
   'flex flex-col items-center gap-8 lg:grid lg:grid-cols-2 lg:items-center lg:gap-10 xl:gap-12'
 
@@ -108,26 +108,6 @@ function Prose({ children, className = '' }: { children: ReactNode; className?: 
     <p className={`font-garamond text-base leading-relaxed text-mist/70 md:text-[1.05rem] ${className}`}>
       {children}
     </p>
-  )
-}
-
-function SectionShell({
-  children,
-  className = '',
-  alt = false,
-}: {
-  children: ReactNode
-  className?: string
-  alt?: boolean
-}) {
-  return (
-    <section
-      className={`border-t border-white/[0.06] py-14 md:py-16 lg:py-20 ${
-        alt ? 'bg-charcoal/35' : 'bg-void'
-      } ${className}`}
-    >
-      <div className={pageWrapClass}>{children}</div>
-    </section>
   )
 }
 
@@ -268,7 +248,7 @@ export function HomePage() {
               transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
               className="order-2 text-center lg:order-1 lg:text-left"
             >
-              <p className="font-garamond text-[0.7rem] tracking-[0.32em] uppercase text-gold/80 md:text-xs">
+              <p className="font-garamond text-sm tracking-[0.26em] uppercase text-gold/85 sm:text-base md:text-lg">
                 Mentorship with Mike Malinin
               </p>
               <h1 className="mt-3 font-bebas text-[clamp(2.75rem,7vw,4.5rem)] leading-[0.95] tracking-[0.04em] text-mist">
@@ -291,7 +271,7 @@ export function HomePage() {
               </ul>
 
               <p className="mt-6 font-bebas text-lg tracking-wide text-gold md:text-xl">
-                Twenty members · Direct access · Real-world musicianship
+                Direct access · Real-world musicianship
               </p>
 
               <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center lg:justify-start">
@@ -345,12 +325,19 @@ export function HomePage() {
         <div className="absolute inset-0 bg-gradient-to-b from-void/25 via-transparent to-void/55" aria-hidden />
 
         <div className={`relative z-10 ${pageWrapClass} py-14 md:py-16 lg:py-20`}>
-          <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)] lg:items-start lg:gap-12 xl:gap-16">
-            <SectionHeading
-              eyebrow="Credibility"
-              title="5 billion streams. Diamond & platinum records. The world&apos;s biggest stages."
-              subtitle="Former Goo Goo Dolls / Tayna Tucker drummer — now mentoring a private group of twenty committed drummers."
-            />
+          <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)] lg:items-center lg:gap-12 xl:gap-16">
+            <div className="flex w-full flex-col justify-center lg:self-center">
+              <SectionHeading
+                eyebrow="Credibility"
+                title={
+                  <>
+                    5 billion streams. Diamond &amp; platinum records.{' '}
+                    <span className="text-gold">The world&apos;s biggest stages.</span>
+                  </>
+                }
+                subtitle="Former Goo Goo Dolls / Tanya Tucker drummer — now mentoring a private group of committed drummers."
+              />
+            </div>
             <CredibilityIconRow />
           </div>
         </div>
@@ -473,7 +460,14 @@ export function HomePage() {
       <SectionShell alt>
         <div className={twoColClass}>
           <div className="w-full">
-            <SectionHeading eyebrow="Who this is for" title="Built for drummers ready to level up." />
+            <SectionHeading
+              eyebrow="Who this is for"
+              title={
+                <>
+                  Built for drummers ready to <span className="text-gold">level up.</span>
+                </>
+              }
+            />
             <Reveal delay={0.06} className="mt-8 space-y-6">
               <Prose>This mentorship is for musicians who:</Prose>
               <BulletList items={whoFor} />
@@ -485,10 +479,12 @@ export function HomePage() {
                 <p className="font-garamond text-[0.7rem] tracking-[0.32em] uppercase text-gold/75 md:text-xs">
                   The difference
                 </p>
-                <h3 className="font-bebas text-2xl leading-[0.95] tracking-[0.03em] text-mist md:text-3xl">
+                <p className="font-bebas text-2xl leading-[0.95] tracking-[0.03em] text-mist md:text-3xl">
                   Information is everywhere.
-                </h3>
-                <p className="font-bebas text-xl tracking-wide text-gold md:text-2xl">Experience is not.</p>
+                </p>
+                <p className="font-bebas text-2xl leading-[0.95] tracking-[0.03em] text-gold md:text-3xl">
+                  Experience is not.
+                </p>
                 <Prose>You can learn rudiments anywhere. Very few drummers can teach:</Prose>
                 <BulletList items={differencePoints} />
                 <p className="font-garamond text-base italic text-mist/80 md:text-lg">
@@ -502,6 +498,7 @@ export function HomePage() {
 
       {/* Limited membership */}
       <section className="relative overflow-hidden border-t border-gold/15 bg-charcoal/25 py-14 md:py-16 lg:py-20">
+        <SectionGridOverlay />
         <div
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_20%_50%,rgba(201,165,92,0.08),transparent_65%)]"
           aria-hidden
@@ -535,7 +532,7 @@ export function HomePage() {
                   Limited membership
                 </p>
                 <h2 className="mt-2 font-bebas text-[clamp(2.25rem,5vw,3.5rem)] leading-[0.95] tracking-[0.03em] text-mist">
-                  Only 20 memberships available.
+                  Limited mentorships available.
                 </h2>
                 <p className="mt-4 font-bebas text-lg tracking-wide text-gold md:text-xl">
                   Small by design · Personal · Focused

@@ -157,9 +157,14 @@ export function SiteLayout() {
       </main>
 
       <footer className="relative z-20 border-t border-white/[0.06] bg-charcoal/80 px-5 py-12 text-center md:px-8">
-        <p className="font-bebas text-2xl tracking-[0.05em] text-mist md:text-[1.75rem]">
-          Practical Drumming
-        </p>
+        <div className="leading-none">
+          <p className="font-bebas text-2xl tracking-[0.05em] text-mist md:text-[1.75rem]">
+            Practical Drumming
+          </p>
+          <p className="mt-0.5 font-bebas text-lg leading-none tracking-[0.08em] text-gold md:text-xl">
+            mastermind club
+          </p>
+        </div>
         <div
           className="mx-auto mt-8 h-px w-full max-w-md bg-gradient-to-r from-transparent via-gold/50 to-transparent"
           aria-hidden

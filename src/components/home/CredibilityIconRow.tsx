@@ -1,10 +1,5 @@
 import { Reveal } from '../Reveal'
-
-const gridPattern = {
-  backgroundImage:
-    'linear-gradient(rgba(201,165,92,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(201,165,92,0.07) 1px, transparent 1px)',
-  backgroundSize: '24px 24px',
-}
+import { sectionGridPatternStyle } from '../SectionGridOverlay'
 
 const credibilityItems = [
   {
@@ -13,32 +8,66 @@ const credibilityItems = [
   },
   {
     imageSrc: '/icon-gramophone.png',
+    label: 'Grammy Nominated',
+  },
+  {
+    imageSrc: '/icon-vinyl.png',
     label: 'Diamond and multi-platinum recordings',
   },
   {
     imageSrc: '/icon-drum.png',
     label: 'Decades of arena and festival touring',
   },
+  {
+    imageSrc: '/icon-waveform.png',
+    label: 'Work in major films',
+  },
 ] as const
+
+const topRowItems = credibilityItems.slice(0, 3)
+const bottomRowItems = credibilityItems.slice(3)
 
 export function CredibilityIconRow() {
   return (
-    <Reveal
-      delay={0.05}
-      className="mt-10 flex w-full flex-col items-center gap-4 sm:gap-5 lg:mt-0 lg:grid lg:grid-cols-3 lg:items-stretch lg:gap-8 xl:gap-10"
-    >
-      {credibilityItems.map((item) => (
-        <CredibilityIconCard key={item.label} imageSrc={item.imageSrc} label={item.label} />
-      ))}
-    </Reveal>
+    <div className="mt-10 flex w-full flex-col gap-4 sm:gap-5 lg:mt-0 lg:gap-6">
+      <Reveal
+        delay={0.05}
+        className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 lg:gap-6"
+      >
+        {topRowItems.map((item) => (
+          <CredibilityIconCard key={item.label} imageSrc={item.imageSrc} label={item.label} />
+        ))}
+      </Reveal>
+      <Reveal
+        delay={0.08}
+        className="flex w-full flex-col items-stretch gap-4 sm:flex-row sm:flex-wrap sm:justify-center sm:gap-5 lg:gap-6"
+      >
+        {bottomRowItems.map((item) => (
+          <CredibilityIconCard
+            key={item.label}
+            imageSrc={item.imageSrc}
+            label={item.label}
+            className="sm:max-w-[min(100%,20rem)] lg:w-[calc((100%-3rem)/3)] lg:max-w-none"
+          />
+        ))}
+      </Reveal>
+    </div>
   )
 }
 
-function CredibilityIconCard({ imageSrc, label }: { imageSrc: string; label: string }) {
+function CredibilityIconCard({
+  imageSrc,
+  label,
+  className = '',
+}: {
+  imageSrc: string
+  label: string
+  className?: string
+}) {
   return (
-    <figure className="w-full max-w-lg lg:max-w-none lg:min-w-0">
+    <figure className={`w-full max-w-lg lg:min-w-0 ${className}`}>
       <div className="group relative flex w-full flex-col overflow-hidden border border-white/[0.1] bg-charcoal shadow-[inset_0_1px_0_rgba(201,165,92,0.12)] transition-colors duration-300 hover:border-gold/30 lg:aspect-[4/5] lg:min-h-[15rem]">
-        <div className="absolute inset-0 opacity-40" style={gridPattern} aria-hidden />
+        <div className="absolute inset-0 opacity-40" style={sectionGridPatternStyle} aria-hidden />
         <div
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_42%,rgba(201,165,92,0.2),transparent_65%)]"
           aria-hidden

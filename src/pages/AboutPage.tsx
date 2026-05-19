@@ -1,6 +1,8 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { Reveal } from '../components/Reveal'
+import { SectionGridOverlay } from '../components/SectionGridOverlay'
+import { pageWrapClass, SectionShell } from '../components/SectionShell'
 
 const careerHighlights = [
   {
@@ -75,35 +77,11 @@ const colClass = 'flex w-full flex-col items-center justify-center text-center l
 
 const portraitSizeClass = 'mx-auto w-full max-w-[13rem] sm:max-w-[14rem] lg:max-w-[15rem]'
 
-const pageWrapClass = 'mx-auto w-full max-w-7xl px-5 md:px-8'
-
 function Prose({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
     <p className={`font-garamond text-base leading-relaxed text-mist/70 md:text-[1.05rem] ${className}`}>
       {children}
     </p>
-  )
-}
-
-function SectionShell({
-  children,
-  className = '',
-  alt = false,
-  noBorder = false,
-}: {
-  children: ReactNode
-  className?: string
-  alt?: boolean
-  noBorder?: boolean
-}) {
-  return (
-    <section
-      className={`${noBorder ? '' : 'border-t border-white/[0.06]'} py-14 md:py-16 lg:py-20 ${
-        alt ? 'bg-charcoal/35' : 'bg-void'
-      } ${className}`}
-    >
-      <div className={pageWrapClass}>{children}</div>
-    </section>
   )
 }
 
@@ -341,6 +319,7 @@ export function AboutPage() {
       </SectionShell>
 
       <section className="relative overflow-hidden border-t border-gold/15 bg-charcoal/25 py-14 md:py-16 lg:py-20">
+        <SectionGridOverlay />
         <div
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_20%_50%,rgba(201,165,92,0.08),transparent_65%)]"
           aria-hidden
@@ -376,8 +355,9 @@ export function AboutPage() {
                     and Grammy-winning country charts alike.
                   </Prose>
                   <Prose>
-                    Mike offers exclusive mentorship to exactly 20 dedicated students — whether you
-                    want intricate rock rhythms, stadium-ready endurance, or your unique studio pocket.
+                    Mike offers exclusive mentorship to a limited number of dedicated students —
+                    whether you want intricate rock rhythms, stadium-ready endurance, or your unique
+                    studio pocket.
                   </Prose>
                 </div>
               </Reveal>

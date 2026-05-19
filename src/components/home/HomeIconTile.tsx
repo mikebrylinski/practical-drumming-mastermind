@@ -1,13 +1,8 @@
 import type { ReactNode } from 'react'
+import { sectionGridPatternStyle } from '../SectionGridOverlay'
 import { HomeIcon, type HomeIconName } from './HomeIcons'
 
 type HomeTileIcon = Exclude<HomeIconName, 'groove' | 'session' | 'touring'>
-
-const gridPattern = {
-  backgroundImage:
-    'linear-gradient(rgba(201,165,92,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(201,165,92,0.07) 1px, transparent 1px)',
-  backgroundSize: '24px 24px',
-}
 
 type HomeIconTileProps = {
   label: string
@@ -45,7 +40,7 @@ export function HomeIconTile({
       <div
         className={`group relative overflow-hidden border border-white/[0.1] bg-charcoal shadow-[inset_0_1px_0_rgba(201,165,92,0.12)] transition-colors duration-300 hover:border-gold/30 ${tileShape} ${tileSize}`}
       >
-        <div className="absolute inset-0 opacity-40" style={gridPattern} aria-hidden />
+        <div className="absolute inset-0 opacity-40" style={sectionGridPatternStyle} aria-hidden />
         <div
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_42%,rgba(201,165,92,0.2),transparent_65%)]"
           aria-hidden
@@ -120,7 +115,7 @@ function BannerShell({
     <div
       className={`group relative w-full overflow-hidden border border-white/[0.08] bg-charcoal shadow-[inset_0_1px_0_rgba(201,165,92,0.1)] transition-colors hover:border-gold/25 ${aspectClasses[aspect]}`}
     >
-      <div className="absolute inset-0 opacity-35" style={gridPattern} aria-hidden />
+      <div className="absolute inset-0 opacity-35" style={sectionGridPatternStyle} aria-hidden />
       <div
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_50%,rgba(201,165,92,0.14),transparent)]"
         aria-hidden

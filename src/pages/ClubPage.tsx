@@ -1,6 +1,8 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { Reveal } from '../components/Reveal'
+import { SectionGridOverlay } from '../components/SectionGridOverlay'
+import { pageWrapClass, SectionShell } from '../components/SectionShell'
 
 const mastermindBullets = [
   'Geared towards adult drum set players mastering the art of performing in band situations using ideas focusing on musicality and confidence.',
@@ -86,8 +88,6 @@ const insideClub = [
 const primaryBtnClass =
   'inline-flex min-h-11 items-center justify-center rounded-full bg-gold px-7 font-garamond text-xs tracking-[0.18em] uppercase text-void transition hover:bg-gold/90'
 
-const pageWrapClass = 'mx-auto w-full max-w-7xl px-5 md:px-8'
-
 const portraitSizeClass = 'mx-auto w-full max-w-[15rem] sm:max-w-[16rem] lg:max-w-[17rem]'
 
 const twoColClass =
@@ -98,26 +98,6 @@ function Prose({ children, className = '' }: { children: ReactNode; className?: 
     <p className={`font-garamond text-base leading-relaxed text-mist/70 md:text-[1.05rem] ${className}`}>
       {children}
     </p>
-  )
-}
-
-function SectionShell({
-  children,
-  className = '',
-  alt = false,
-}: {
-  children: ReactNode
-  className?: string
-  alt?: boolean
-}) {
-  return (
-    <section
-      className={`border-t border-white/[0.06] py-14 md:py-16 lg:py-20 ${
-        alt ? 'bg-charcoal/35' : 'bg-void'
-      } ${className}`}
-    >
-      <div className={pageWrapClass}>{children}</div>
-    </section>
   )
 }
 
@@ -425,6 +405,7 @@ export function ClubPage() {
 
       {/* CTA */}
       <section className="relative overflow-hidden border-t border-gold/15 bg-charcoal/25 py-14 md:py-16 lg:py-20">
+        <SectionGridOverlay />
         <div
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_80%_50%,rgba(201,165,92,0.08),transparent_65%)]"
           aria-hidden
@@ -447,7 +428,7 @@ export function ClubPage() {
                   />
                 </div>
                 <figcaption className="mt-4 text-center font-garamond text-xs tracking-[0.22em] uppercase text-mist/45">
-                  Only 20 members · Curated. Personal. Exclusive.
+                  Curated. Personal. Exclusive.
                 </figcaption>
               </figure>
             </Reveal>

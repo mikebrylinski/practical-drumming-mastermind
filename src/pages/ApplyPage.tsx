@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { Reveal } from '../components/Reveal'
+import { SectionGridOverlay } from '../components/SectionGridOverlay'
+import { pageWrapClass } from '../components/SectionShell'
 
 const levels = ['Beginner', 'Intermediate', 'Advanced', 'Professional'] as const
 
@@ -53,7 +55,9 @@ export function ApplyPage() {
     'mt-2 w-full border border-white/10 bg-charcoal/80 px-4 py-3 font-garamond text-sm text-mist placeholder:text-mist/30 outline-none transition focus:border-gold/50 focus:ring-1 focus:ring-gold/30'
 
   return (
-    <article className="mx-auto w-full max-w-6xl px-5 py-20 md:px-8 md:py-28">
+    <section className="relative overflow-hidden border-t border-white/[0.06] bg-void py-14 md:py-20 lg:py-28">
+      <SectionGridOverlay />
+      <article className={`relative z-10 ${pageWrapClass} max-w-6xl`}>
       <Reveal>
         <p className="font-garamond text-xs tracking-[0.35em] uppercase text-gold-dim">
           Application
@@ -201,6 +205,7 @@ export function ApplyPage() {
           </Reveal>
         </form>
       )}
-    </article>
+      </article>
+    </section>
   )
 }
