@@ -48,6 +48,17 @@
   will-change: transform;
 }
 
+.join-club-kenburns {
+  animation: ken-burns 48s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .join-club-kenburns {
+    animation: none;
+  }
+}
+
 .hero-visual {
   perspective: 1200px;
 }

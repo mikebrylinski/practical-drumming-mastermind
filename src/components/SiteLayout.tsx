@@ -2,13 +2,8 @@ import { useEffect, useState } from 'react'
 import { Link, Outlet, useLocation } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { TextLogo } from './TextLogo'
-
-const nav = [
-  { to: '/', label: 'Home' },
-  { to: '/club', label: 'The Club' },
-  { to: '/about', label: 'About Mike' },
-  { to: '/apply', label: 'Apply' },
-]
+import { SiteFooter } from './SiteFooter'
+import { siteNav } from '../nav'
 
 function HamburgerIcon({ open }: { open: boolean }) {
   return (
@@ -74,7 +69,7 @@ export function SiteLayout() {
             className="hidden items-center gap-x-6 md:flex lg:gap-x-7"
             aria-label="Main"
           >
-            {nav.map(({ to, label }) => {
+            {siteNav.map(({ to, label }) => {
               const active = pathname === to
               return (
                 <Link
@@ -123,7 +118,7 @@ export function SiteLayout() {
             aria-label="Site menu"
           >
             <nav className="flex flex-1 flex-col gap-1" aria-label="Main mobile">
-              {nav.map(({ to, label }, i) => {
+              {siteNav.map(({ to, label }, i) => {
                 const active = pathname === to
                 return (
                   <motion.div
@@ -156,25 +151,7 @@ export function SiteLayout() {
         <Outlet />
       </main>
 
-      <footer className="relative z-20 border-t border-white/[0.06] bg-charcoal/80 px-5 py-12 text-center md:px-8">
-        <div className="leading-none">
-          <p className="font-bebas text-2xl tracking-[0.05em] text-mist md:text-[1.75rem]">
-            Practical Drumming
-          </p>
-          <p className="mt-0.5 font-bebas text-lg leading-none tracking-[0.08em] text-gold md:text-xl">
-            mastermind club
-          </p>
-        </div>
-        <div
-          className="mx-auto mt-8 h-px w-full max-w-md bg-gradient-to-r from-transparent via-gold/50 to-transparent"
-          aria-hidden
-        />
-        <p className="mt-8 font-garamond text-[0.65rem] uppercase tracking-[0.28em] text-mist/60 md:text-xs">
-          Copyright 2026 Mike Malinin.
-          <br />
-          All Rights Reserved.
-        </p>
-      </footer>
+      <SiteFooter />
     </div>
   )
 }

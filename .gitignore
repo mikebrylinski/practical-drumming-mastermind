@@ -15,6 +15,7 @@ dist-ssr
 
 # Application submissions (local MVP store)
 data/applications.json
+data/contacts.json
 
 # Editor directories and files
 .vscode/*

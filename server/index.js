@@ -1,6 +1,7 @@
 import express from 'express'
 import cors from 'cors'
 import applyHandler from './routes/apply.js'
+import contactHandler from './routes/contact.js'
 
 const app = express()
 const PORT = Number(process.env.API_PORT) || 3003
@@ -22,6 +23,7 @@ app.use(
 app.use(express.json({ limit: '256kb' }))
 
 app.post('/api/apply', applyHandler)
+app.post('/api/contact', contactHandler)
 
 const server = app.listen(PORT, () => {
   console.log(`Practical Drumming API listening on http://localhost:${PORT}`)
