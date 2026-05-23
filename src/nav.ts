@@ -1,6 +1,8 @@
 export const siteNav = [
   { to: '/', label: 'Home' },
-  { to: '/club', label: 'The Club' },
+  { to: '/club', label: 'Mastermind Club' },
   { to: '/about', label: 'About Mike' },
-  { to: '/apply', label: 'Apply' },
+  { to: '/apply', label: 'Book a Call' },
 ] as const
+
+export const membersPath = '/members' as const

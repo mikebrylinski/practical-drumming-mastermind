@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react'
 import { Link, Outlet, useLocation } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { TextLogo } from './TextLogo'
+import { PersonIcon } from './PersonIcon'
 import { SiteFooter } from './SiteFooter'
-import { siteNav } from '../nav'
+import { membersPath, siteNav } from '../nav'
 
 function HamburgerIcon({ open }: { open: boolean }) {
   return (
@@ -29,6 +30,7 @@ function HamburgerIcon({ open }: { open: boolean }) {
 
 export function SiteLayout() {
   const { pathname } = useLocation()
+  const isMembersArea = pathname.startsWith(membersPath)
   const [menuOpen, setMenuOpen] = useState(false)
 
   useEffect(() => {
@@ -48,14 +50,18 @@ export function SiteLayout() {
 
   return (
     <div className="relative flex min-h-svh flex-col bg-void">
-      <div
-        className="pointer-events-none fixed inset-0 z-[1] opacity-[0.07] grain"
-        aria-hidden
-      />
-      <div
-        className="pointer-events-none fixed -top-40 left-1/2 z-0 h-[50vh] w-[120vw] -translate-x-1/2 rounded-full bg-gold/15 blur-[120px] hero-glow-pulse"
-        aria-hidden
-      />
+      {!isMembersArea ? (
+        <>
+          <div
+            className="pointer-events-none fixed inset-0 z-[1] opacity-[0.07] grain"
+            aria-hidden
+          />
+          <div
+            className="pointer-events-none fixed -top-40 left-1/2 z-0 h-[50vh] w-[120vw] -translate-x-1/2 rounded-full bg-gold/15 blur-[120px] hero-glow-pulse"
+            aria-hidden
+          />
+        </>
+      ) : null}
 
       <header
         className={`relative border-b border-white/[0.06] bg-black ${
@@ -89,6 +95,18 @@ export function SiteLayout() {
                 </Link>
               )
             })}
+            <Link
+              to={membersPath}
+              aria-label="Members sign in"
+              aria-current={pathname === membersPath ? 'page' : undefined}
+              className={`ml-1 flex min-h-10 min-w-10 items-center justify-center rounded-full border transition ${
+                pathname === membersPath
+                  ? 'border-gold/50 bg-gold/15 text-gold'
+                  : 'border-white/12 bg-charcoal/40 text-mist/70 hover:border-gold/35 hover:bg-charcoal/70 hover:text-gold'
+              }`}
+            >
+              <PersonIcon className="size-5" />
+            </Link>
           </nav>
 
           <button
@@ -140,14 +158,30 @@ export function SiteLayout() {
                 )
               })}
             </nav>
-            <p className="mt-auto text-center font-garamond text-xs tracking-[0.2em] text-mist/35">
-              Practical Drumming
-            </p>
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.22, duration: 0.28 }}
+              className="mt-auto pt-6"
+            >
+              <Link
+                to={membersPath}
+                onClick={() => setMenuOpen(false)}
+                className={`flex min-h-14 w-full items-center justify-center gap-2.5 rounded-full font-garamond text-sm tracking-[0.2em] uppercase transition ${
+                  pathname === membersPath
+                    ? 'bg-gold text-void'
+                    : 'bg-gold text-void hover:bg-gold/90'
+                }`}
+              >
+                <PersonIcon className="size-5" />
+                Members
+              </Link>
+            </motion.div>
           </motion.div>
         ) : null}
       </AnimatePresence>
 
-      <main className="relative z-10 flex-1">
+      <main className={`relative flex-1 ${isMembersArea ? 'min-h-0' : 'z-10'}`}>
         <Outlet />
       </main>
 

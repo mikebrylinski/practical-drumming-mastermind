@@ -6,6 +6,7 @@ import { AboutPage } from './pages/AboutPage'
 import { ApplyPage } from './pages/ApplyPage'
 import { FaqPage } from './pages/FaqPage'
 import { ClubPage } from './pages/ClubPage'
+import { MembersPage } from './pages/MembersPage'
 
 export default function App() {
   return (
@@ -19,6 +20,7 @@ export default function App() {
           <Route path="apply" element={<ApplyPage />} />
           <Route path="faq" element={<FaqPage />} />
           <Route path="club" element={<ClubPage />} />
+          <Route path="members" element={<MembersPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>
