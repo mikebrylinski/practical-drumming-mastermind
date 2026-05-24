@@ -18,9 +18,10 @@ export function SiteFooter() {
             <div className="mt-5 leading-none">
               <p className="font-bebas text-2xl tracking-[0.05em] text-mist md:text-[1.75rem]">
                 Practical Drumming
-              </p>
-              <p className="mt-0.5 font-bebas text-lg tracking-[0.08em] text-gold md:text-xl">
-                mastermind club
+                <br className="md:hidden" />
+                <span className="mt-1 block font-bebas text-lg tracking-[0.08em] text-gold md:mt-0.5 md:text-xl">
+                  mastermind club
+                </span>
               </p>
             </div>
           </div>

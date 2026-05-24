@@ -86,3 +86,119 @@
 .gold-line-r {
   @apply h-px flex-1 max-w-[4rem] bg-gradient-to-l from-transparent via-gold/60 to-gold/20;
 }
+
+@keyframes club-cta-orbit {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes club-cta-pulse-ring {
+  0% {
+    transform: scale(0.55);
+    opacity: 0.55;
+  }
+  100% {
+    transform: scale(1.35);
+    opacity: 0;
+  }
+}
+
+.club-cta-orbit {
+  animation: club-cta-orbit linear infinite;
+  will-change: transform;
+}
+
+.club-cta-pulse-ring {
+  transform-origin: 160px 160px;
+  animation: club-cta-pulse-ring 7s ease-out infinite;
+  will-change: transform, opacity;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .club-cta-orbit,
+  .club-cta-pulse-ring {
+    animation: none;
+  }
+}
+
+@keyframes club-benefits-grid-drift {
+  from {
+    transform: translate(0, 0);
+  }
+  to {
+    transform: translate(24px, 24px);
+  }
+}
+
+@keyframes club-benefits-ring {
+  0% {
+    transform: scale(0.85);
+    opacity: 0.35;
+  }
+  100% {
+    transform: scale(1.15);
+    opacity: 0;
+  }
+}
+
+@keyframes club-benefits-flow {
+  0%,
+  100% {
+    transform: translateX(-2%);
+    opacity: 0.35;
+  }
+  50% {
+    transform: translateX(2%);
+    opacity: 0.7;
+  }
+}
+
+@keyframes club-benefits-column {
+  0%,
+  100% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+.club-benefits-grid-drift {
+  animation: club-benefits-grid-drift 48s linear infinite;
+  will-change: transform;
+}
+
+.club-benefits-grid-drift-reverse {
+  animation: club-benefits-grid-drift 64s linear infinite reverse;
+  will-change: transform;
+}
+
+.club-benefits-ring {
+  transform-origin: 600px 300px;
+  animation: club-benefits-ring 16s ease-out infinite;
+  will-change: transform, opacity;
+}
+
+.club-benefits-flow {
+  animation: club-benefits-flow 12s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.club-benefits-column {
+  animation: club-benefits-column 8s ease-in-out infinite;
+  will-change: opacity;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .club-benefits-grid-drift,
+  .club-benefits-grid-drift-reverse,
+  .club-benefits-ring,
+  .club-benefits-flow,
+  .club-benefits-column {
+    animation: none;
+  }
+}

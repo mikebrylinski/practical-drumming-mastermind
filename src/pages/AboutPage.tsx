@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
+import { CredibilityIconRow } from '../components/home/CredibilityIconRow'
 import { Reveal } from '../components/Reveal'
 import { SectionGridOverlay } from '../components/SectionGridOverlay'
 import { pageWrapClass, SectionShell } from '../components/SectionShell'
@@ -196,38 +197,50 @@ function HighlightGrid({
 export function AboutPage() {
   return (
     <article className="bg-void">
+      {/* Hero — credibility from original home */}
       <section className="relative overflow-hidden border-b border-white/[0.06]">
         <div
-          className="absolute inset-0 bg-cover bg-[center_40%] bg-no-repeat"
-          style={{ backgroundImage: "url('/about-hero-crowd.png')" }}
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: "url('/credibility-bg.png')" }}
           aria-hidden
         />
-        <div className="absolute inset-0 bg-void/50" aria-hidden />
-        <div className="absolute inset-0 bg-gradient-to-b from-void/80 via-void/55 to-void/90" aria-hidden />
-        <div className="absolute inset-0 bg-gradient-to-r from-void/75 via-void/45 to-void/60" aria-hidden />
-        <div className="pointer-events-none absolute inset-0 grain opacity-20" aria-hidden />
+        <div className="absolute inset-0 bg-void/45" aria-hidden />
+        <div className="absolute inset-0 bg-gradient-to-r from-void/75 via-void/50 to-void/25" aria-hidden />
+        <div className="absolute inset-0 bg-gradient-to-b from-void/25 via-transparent to-void/55" aria-hidden />
 
         <div className={`relative z-10 ${pageWrapClass} py-14 md:py-16 lg:py-20`}>
+          <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)] lg:items-center lg:gap-12 xl:gap-16">
+            <div className="flex w-full flex-col justify-center lg:self-center">
+              <SectionHeading
+                eyebrow="About"
+                title={
+                  <>
+                    5 billion streams. Diamond &amp; platinum records.{' '}
+                    <span className="text-gold">The world&apos;s biggest stages.</span>
+                  </>
+                }
+                subtitle="Former Goo Goo Dolls / Tanya Tucker drummer — anchoring some of the most dominant records and live spectacles in modern rock."
+              />
+            </div>
+            <CredibilityIconRow />
+          </div>
+        </div>
+      </section>
+
+      <SectionShell alt>
         <Reveal delay={0.05} className={twoColClass}>
           <div className="flex w-full flex-col items-center justify-center text-center">
             <AboutFigure
-              aspect="portrait"
-              src="/about-mike.png"
-              alt="Mike Malinin speaking at an event"
+              aspect="landscape"
+              src="/about-mike-practical.png"
+              alt="Mike Malinin behind the drum kit"
               caption="Mike Malinin — Practical Drumming"
               captionCenter
-              className={portraitSizeClass}
+              className="w-full max-w-md lg:max-w-none"
             />
           </div>
           <div className={`${colClass} space-y-5`}>
-            <div className="w-full text-center">
-              <p className="font-garamond text-[0.7rem] tracking-[0.32em] uppercase text-gold/90 md:text-xs">
-                About
-              </p>
-              <h1 className="mt-2 font-bebas text-[clamp(2.5rem,6vw,4rem)] leading-[0.95] tracking-[0.03em] text-mist">
-                Mike Malinin
-              </h1>
-            </div>
+            <SectionHeading title="Mike Malinin" />
             <Prose>
               Mike Malinin is an American rock drummer best known for anchoring the rhythm section of
               the alternative rock band Goo Goo Dolls during their most commercially successful era.
@@ -238,16 +251,17 @@ export function AboutPage() {
             <Prose>
               His career is defined by driving the percussion on some of the most statistically dominant
               records, iconic live spectacles, and prestigious award-winning projects in modern music
-              history.
+              history. He was also featured on the cover of{' '}
+              <em className="text-mist/85">Modern Drummer</em> magazine — recognition reserved for
+              drummers whose impact on the instrument reaches far beyond the stage.
             </Prose>
           </div>
         </Reveal>
 
         <HighlightGrid items={careerHighlights} delayStart={0.08} />
-        </div>
-      </section>
+      </SectionShell>
 
-      <SectionShell alt>
+      <SectionShell>
         <Reveal delay={0.04} className={twoColClass}>
           <div className={colClass}>
             <SectionHeading title="Massive Shows and Arena Footprint" />
@@ -269,7 +283,7 @@ export function AboutPage() {
         <HighlightGrid items={arenaHighlights} />
       </SectionShell>
 
-      <SectionShell>
+      <SectionShell alt>
         <Reveal delay={0.04} className={twoColClass}>
           <div className={`${colClass} lg:order-1`}>
             <AboutFigure
@@ -355,9 +369,9 @@ export function AboutPage() {
                     and Grammy-winning country charts alike.
                   </Prose>
                   <Prose>
-                    Mike offers exclusive mentorship to a limited number of dedicated students —
-                    whether you want intricate rock rhythms, stadium-ready endurance, or your unique
-                    studio pocket.
+                    Today, Mike runs Practical Drumming full time — building the mastermind community
+                    where serious drummers get live mentorship, honest feedback, and direct access to
+                    someone who&apos;s lived it at the highest level.
                   </Prose>
                 </div>
               </Reveal>

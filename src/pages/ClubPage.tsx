@@ -1,97 +1,64 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
+import { ClubAnimatedBackground } from '../components/club/ClubAnimatedBackground'
+import { ClubBenefitsBackground } from '../components/club/ClubBenefitsBackground'
+import { ClubCtaAnimation } from '../components/club/ClubCtaAnimation'
 import { Reveal } from '../components/Reveal'
-import { SectionGridOverlay } from '../components/SectionGridOverlay'
 import { pageWrapClass, SectionShell } from '../components/SectionShell'
 
-const mastermindBullets = [
-  'Geared towards adult drum set players mastering the art of performing in band situations using ideas focusing on musicality and confidence.',
-  'Focuses on elements to help master performing on drum set instead of endless exercises focused solely on technique with no practical applications.',
-  'Teaches methods on how to approach playing a song, composing parts, performing with others, and having confidence leading to full command of the instrument.',
-  'Trains members to understand the mindset of great drummers who have had success playing in band situations and learning to apply that knowledge.',
-  'Run by Mike Malinin, sharing knowledge gained from 30+ years of recording and touring the world with The Goo Goo Dolls, Tanya Tucker and others.',
-  'Focuses on learning from other members who are on the same journey and growing together as drummers.',
-  'A fun group of fellow drummers. No egos or attitudes. Just players helping each other improve and become experts at their craft.',
+const clubBenefits: { title: string; body: ReactNode }[] = [
+  {
+    title: 'Weekly Live Mastermind Calls',
+    body: 'Structured group sessions led by Mike (and guest pros) where members bring real questions—gig prep, technique roadblocks, career decisions, recording mindset, and band dynamics.',
+  },
+  {
+    title: 'Video Feedback Channel',
+    body: 'Post playing clips and get direct critique on groove, feel, dynamics, and musical choices—not generic “sounds good” comments from strangers.',
+  },
+  {
+    title: 'Session Vault & Replays',
+    body: 'Every call is recorded and archived so you can revisit breakdowns, guest interviews, and member discussions on your own schedule.',
+  },
+  {
+    title: 'Private Member Community',
+    body: 'A closed space for committed drummers only—no algorithm noise, no posturing. Share wins, ask for help, and stay accountable between live sessions.',
+  },
+  {
+    title: 'Guest Pros & Deep Dives',
+    body: 'Periodic sessions with touring and session players who share how they actually prepare, tour, record, and survive in the industry.',
+  },
+  {
+    title: 'Ongoing Mentorship, Not a Course',
+    body: 'Membership stays active as your goals change. You’re in the room week after week—not buying a module and moving on.',
+  },
+]
+
+const sessionTopics = [
+  'Groove, pocket, and feel in real band contexts',
+  'Dynamics, tone, and musical decision-making behind the kit',
+  'Preparing for gigs, auditions, and studio dates',
+  'Touring, recording, and working with artists and producers',
+  'Mindset, confidence, and performing under pressure',
+  'Building a sustainable career as a working drummer',
 ] as const
 
-const phases = [
-  {
-    n: '1',
-    title: 'Essential Basics',
-    body: 'Understand the process of making musical decisions and actually function as a drummer, not just hit drums.',
-  },
-  {
-    n: '2',
-    title: 'Technique & Tone',
-    body: 'Produce a controlled, professional sound without relying only on volume or force.',
-  },
-  {
-    n: '3',
-    title: 'Mental Confidence',
-    body: 'Play with certainty, stay locked in, and stop second-guessing yourself.',
-  },
-  {
-    n: '4',
-    title: 'Objective Listening & Thinking',
-    body: 'Identify what works, fix what doesn’t, and consistently improve with direction and clarity.',
-  },
-] as const
-
-const mikeCredentials = [
-  'Toured arenas worldwide',
-  'Performed in front of millions',
-  'Recorded platinum-selling music',
-  'Worked inside the real music industry',
-  'Spent decades developing practical drumming skills that actually matter on stage and in the studio',
-] as const
-
-const differentiators = [
-  'Real mentorship',
-  'Real accountability',
-  'Real community',
-  'Real musical growth',
-] as const
-
-const stopFeeling = [
-  'overwhelmed',
-  'inconsistent',
-  'uninspired',
-  'stuck in the same patterns',
-] as const
-
-const startFeeling = [
-  'focused',
-  'motivated',
-  'creative',
-  'confident behind the kit',
-] as const
-
-const insideClub = [
-  {
-    title: 'Weekly Mentorship & Coaching',
-    body: 'Get ongoing guidance, mindset shifts, and practical drumming strategies directly from Mike.',
-  },
-  {
-    title: 'Exclusive Training Content',
-    body: 'Lessons focused on groove, musicality, creativity, performance, feel, and professional-level drumming concepts.',
-  },
-  {
-    title: 'Community of Serious Drummers',
-    body: 'Surround yourself with motivated drummers who actually want to improve and push each other forward.',
-  },
-  {
-    title: 'Accountability & Growth',
-    body: 'Stay consistent with a system designed to keep you progressing week after week.',
-  },
+const whoItsFor = [
+  'You practice seriously but lack consistent feedback from players above your level',
+  'You want honest critique—not another playlist of isolated licks',
+  'You’re aiming at gigs, sessions, or a full-time music path and need industry reality, not hype',
+  'You value showing up live, asking questions, and contributing—not binge-watching lessons alone',
 ] as const
 
 const primaryBtnClass =
   'inline-flex min-h-11 items-center justify-center rounded-full bg-gold px-7 font-garamond text-xs tracking-[0.18em] uppercase text-void transition hover:bg-gold/90'
 
+const ghostBtnClass =
+  'inline-flex min-h-11 items-center justify-center rounded-full px-6 font-garamond text-xs tracking-[0.16em] uppercase text-gold ring-1 ring-gold/30 transition hover:bg-gold/10 hover:text-mist'
+
 const portraitSizeClass = 'mx-auto w-full max-w-[15rem] sm:max-w-[16rem] lg:max-w-[17rem]'
 
 const twoColClass =
-  'flex flex-col items-center gap-8 lg:grid lg:grid-cols-2 lg:items-center lg:gap-10 xl:gap-12'
+  'flex flex-col items-center gap-10 lg:grid lg:grid-cols-2 lg:items-center lg:gap-10 xl:gap-12'
 
 function Prose({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
@@ -140,30 +107,27 @@ function SectionHeading({
   )
 }
 
+function BenefitCard({ title, body }: { title: string; body: ReactNode }) {
+  return (
+    <div className="flex h-full flex-col rounded-2xl border border-white/10 bg-charcoal/45 p-6 ring-1 ring-white/[0.04] backdrop-blur-md md:p-7">
+      <h3 className="font-bebas text-xl tracking-wide text-gold md:text-2xl">{title}</h3>
+      <p className="mt-2.5 font-garamond text-sm leading-relaxed text-mist/65 md:text-base">{body}</p>
+    </div>
+  )
+}
+
 function BulletList({
   items,
   compact = false,
-  centered = false,
 }: {
   items: readonly string[]
   compact?: boolean
-  centered?: boolean
 }) {
   return (
-    <ul className={`${compact ? 'space-y-2.5' : 'space-y-3'} ${centered ? 'mx-auto w-full max-w-sm' : ''}`}>
+    <ul className={compact ? 'space-y-2.5' : 'space-y-3'}>
       {items.map((item) => (
-        <li
-          key={item}
-          className={
-            centered
-              ? 'flex max-w-xs flex-col items-center gap-2 text-center'
-              : 'flex items-start gap-3'
-          }
-        >
-          <span
-            className={`shrink-0 rounded-full bg-gold/90 ${centered ? 'h-1.5 w-1.5' : 'mt-2 h-1 w-1'}`}
-            aria-hidden
-          />
+        <li key={item} className="flex items-start gap-3">
+          <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-gold/90" aria-hidden />
           <p className="font-garamond text-sm leading-relaxed text-mist/75 md:text-base">{item}</p>
         </li>
       ))}
@@ -171,143 +135,255 @@ function BulletList({
   )
 }
 
-function PosterPanel({ children, className = '' }: { children: ReactNode; className?: string }) {
-  return (
-    <div
-      className={`relative flex h-full min-h-[16rem] flex-col justify-center overflow-hidden border border-gold/25 bg-charcoal/55 p-8 md:min-h-[18rem] md:p-10 ${className}`}
-    >
-      <div
-        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-gold/[0.06] to-transparent"
-        aria-hidden
-      />
-      <div className="relative">{children}</div>
-    </div>
-  )
-}
-
-function HighlightBlock({
-  title,
-  body,
-  subItems,
-}: {
-  title: string
-  body: string
-  subItems?: readonly string[]
-}) {
-  return (
-    <div className="border-l border-gold/30 pl-6 md:pl-8">
-      <h3 className="font-garamond text-lg text-gold md:text-xl">{title}</h3>
-      <p className="mt-3 font-garamond text-base leading-relaxed text-mist/75 md:text-lg">{body}</p>
-      {subItems ? (
-        <ul className="mt-4 space-y-2 pl-1">
-          {subItems.map((sub) => (
-            <li key={sub} className="flex gap-3 font-garamond text-base text-mist/65 md:text-lg">
-              <span className="text-gold/60">—</span>
-              {sub}
-            </li>
-          ))}
-        </ul>
-      ) : null}
-    </div>
-  )
-}
-
 export function ClubPage() {
   return (
     <article className="bg-void">
-
-      {/* Mastermind + phases */}
+      {/* Hero — club-specific, not home repeat */}
       <section className="relative overflow-hidden border-b border-white/[0.06]">
         <div
-          className="absolute inset-0 bg-cover bg-[center_55%] bg-no-repeat hero-kenburns"
-          style={{ backgroundImage: "url('/club-hero-arena.png')" }}
+          className="absolute inset-0 bg-cover bg-[center_45%] bg-no-repeat hero-kenburns"
+          style={{ backgroundImage: "url('/club-hero-field.png')" }}
           aria-hidden
         />
-        <div className="absolute inset-0 bg-void/30" aria-hidden />
-        <div className="absolute inset-0 bg-gradient-to-b from-void/65 via-void/35 to-void/70" aria-hidden />
-        <div className="absolute inset-0 bg-gradient-to-r from-void/70 via-void/40 to-void/50" aria-hidden />
+        <div className="absolute inset-0 bg-void/40" aria-hidden />
+        <div className="absolute inset-0 bg-gradient-to-b from-void/75 via-void/45 to-void/80" aria-hidden />
+        <div className="absolute inset-0 bg-gradient-to-r from-void/55 via-void/35 to-void/65" aria-hidden />
         <div className="pointer-events-none absolute inset-0 grain opacity-15" aria-hidden />
 
         <div className={`relative z-10 ${pageWrapClass} pb-16 pt-16 md:pb-20 md:pt-20 lg:pb-24 lg:pt-24`}>
-        <Reveal className="mb-10 text-center md:mb-12 lg:text-left">
-          <p className="font-garamond text-xs tracking-[0.35em] uppercase text-gold-dim">The Club</p>
-          <h1 className="mt-4 font-bebas text-4xl leading-[0.95] tracking-wide text-mist md:text-5xl lg:text-6xl">
-            Stop Practicing Alone.
-            <br />
-            <span className="text-gold">Start Playing Like a Real Drummer.</span>
-          </h1>
-        </Reveal>
-        <div className="grid gap-6 lg:grid-cols-2 lg:gap-8">
-          <Reveal className="h-full">
-            <PosterPanel>
-              <div className="space-y-6">
-                <p className="font-bebas text-xl tracking-wide text-mist md:text-2xl">
-                  Practical Drumming is a mastermind club that
-                </p>
-                <BulletList items={mastermindBullets} compact />
-                <Prose className="text-mist/80">
-                  Includes 2× weekly collaboration calls for feedback, clarity, and progress.
-                </Prose>
-              </div>
-            </PosterPanel>
+          <Reveal className="mx-auto max-w-3xl text-center">
+            <p className="font-garamond text-[0.7rem] tracking-[0.32em] uppercase text-gold/75 md:text-xs">
+              Membership
+            </p>
+            <h1 className="mt-4 font-bebas text-[clamp(2.25rem,6vw,4rem)] leading-[0.95] tracking-[0.04em] text-mist">
+              Inside the{' '}
+              <span className="text-gold">Mastermind Club</span>
+            </h1>
+            <p className="mx-auto mt-6 max-w-2xl font-garamond text-lg leading-relaxed text-mist/75 md:text-xl">
+              Practical Drumming is a private mastermind led by{' '}
+              <Link to="/about" className="text-gold underline decoration-gold/35 underline-offset-2 transition hover:text-mist">
+                Mike Malinin
+              </Link>
+              —a live weekly room where serious drummers get mentorship, honest critique, and professional
+              conversation you won&apos;t find on YouTube.
+            </p>
+            <p className="mx-auto mt-5 max-w-xl font-garamond text-base leading-relaxed text-mist/60 md:text-lg">
+              Mike facilitates every mastermind session, bringing decades of touring, recording, and industry
+              experience into a membership built for drummers who show up ready to grow.
+            </p>
+            <div className="mt-10 flex flex-col items-stretch justify-center gap-4 sm:flex-row sm:items-center">
+              <Link to="/apply" className={`${primaryBtnClass} min-h-12 px-9 text-sm md:min-h-14 md:px-12`}>
+                Book a Call
+              </Link>
+              <Link to="/about" className={`${ghostBtnClass} min-h-12 px-8 text-sm md:px-10`}>
+                About Mike
+              </Link>
+            </div>
           </Reveal>
-          <Reveal delay={0.06} className="h-full">
-            <PosterPanel>
-              <div className="space-y-5">
-                <p className="font-bebas text-xl tracking-wide text-mist md:text-2xl">
-                  The 4 phases of your development
-                </p>
-                <ol className="space-y-6">
-                  {phases.map((p) => (
-                    <li key={p.n} className="flex gap-4 border-b border-white/[0.06] pb-5 last:border-0 last:pb-0">
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-gold/35 bg-gold/5 font-garamond text-lg text-gold">
-                        {p.n}
-                      </div>
-                      <div>
-                        <p className="font-bebas text-xl tracking-[0.08em] text-mist md:text-2xl">{p.title}</p>
-                        <p className="mt-1.5 font-garamond text-sm leading-relaxed text-mist/70 md:text-base">
-                          {p.body}
-                        </p>
-                      </div>
-                    </li>
-                  ))}
-                </ol>
+        </div>
+      </section>
+
+      {/* What is a mastermind club */}
+      <section className="relative overflow-hidden border-t border-white/[0.06] bg-void py-14 md:py-16 lg:pb-28 lg:pt-20">
+        <ClubAnimatedBackground density="light" />
+        <div className={`relative z-10 ${pageWrapClass}`}>
+        <div className={twoColClass}>
+          <div className="w-full">
+            <SectionHeading
+              eyebrow="The model"
+              title={
+                <>
+                  What Is a <span className="text-gold">Mastermind Club?</span>
+                </>
+              }
+              subtitle="A small group of peers learning together—with a leader who’s already walked the path."
+            />
+            <Reveal delay={0.06} className="mt-8 space-y-5 text-center lg:mt-10 lg:text-left">
+              <Prose>
+                In business, a mastermind is a curated group that meets regularly so members can share
+                challenges, get perspective, and grow faster than they would alone. The facilitator keeps the
+                room focused and brings experience the group can lean on.
+              </Prose>
+              <Prose>
+                The Practical Drumming Mastermind Club applies that same idea to drumming: a limited membership,
+                live weekly calls, honest feedback, and access to professionals who&apos;ve toured, recorded,
+                and built real careers—not just taught online.
+              </Prose>
+              <p className="font-bebas text-xl tracking-wide text-gold md:text-2xl">
+                It&apos;s not a video library.
+                <br />
+                <span className="text-mist">It&apos;s a room you show up to.</span>
+              </p>
+              <Prose>
+                Courses deliver content once. A mastermind stays with you as your playing, gigs, and goals
+                evolve—because the conversation continues every week.
+              </Prose>
+            </Reveal>
+          </div>
+          <Reveal delay={0.1} className="flex w-full justify-center">
+            <figure className="w-full max-w-lg">
+              <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-void shadow-[0_16px_48px_-16px_rgba(0,0,0,0.85)] ring-1 ring-white/10">
+                <img
+                  src="/home2-mastermind-zoom.png"
+                  alt="Live mastermind video call with drummers"
+                  className="aspect-[4/3] w-full object-cover object-center"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <div
+                  className="pointer-events-none absolute inset-0 bg-gradient-to-t from-void/40 via-transparent to-void/10"
+                  aria-hidden
+                />
               </div>
-            </PosterPanel>
+              <figcaption className="mt-4 text-center font-garamond text-xs tracking-[0.22em] uppercase text-mist/50 lg:text-left">
+                Live group calls · Open Q&amp;A · Member participation
+              </figcaption>
+            </figure>
           </Reveal>
         </div>
         </div>
       </section>
 
-      {/* Mike */}
+      {/* How the club runs */}
+      <SectionShell alt>
+        <div className="grid gap-6 lg:grid-cols-2 lg:gap-8">
+          <Reveal className="h-full">
+            <div className="flex h-full flex-col justify-center rounded-2xl border border-gold/25 bg-charcoal/55 p-8 md:p-10">
+              <SectionHeading eyebrow="How it works" title="What Membership Looks Like Week to Week" />
+              <div className="mt-6 space-y-5">
+                <Prose>
+                  <strong className="font-medium text-mist/85">Live call.</strong> Members join a weekly
+                  mastermind session—camera optional, questions encouraged. Mike leads deep dives, answers
+                  member submissions, and hosts guest pros when scheduled.
+                </Prose>
+                <Prose>
+                  <strong className="font-medium text-mist/85">Between sessions.</strong> Use the private
+                  community to share clips, get feedback, and stay connected with players who are working at
+                  a high level—not chasing likes.
+                </Prose>
+                <Prose>
+                  <strong className="font-medium text-mist/85">Anytime access.</strong> Replays and past
+                  sessions live in the member vault so you can catch up or review a topic when it matters to
+                  your playing right now.
+                </Prose>
+                <Prose className="text-mist/65">
+                  New members are welcomed on a short onboarding call so you know how to participate from day
+                  one. Membership stays active month to month while you&apos;re in the club.
+                </Prose>
+              </div>
+            </div>
+          </Reveal>
+          <Reveal delay={0.06} className="h-full">
+            <div className="flex h-full flex-col justify-center rounded-2xl border border-white/10 bg-charcoal/40 p-8 md:p-10">
+              <p className="font-bebas text-xl tracking-wide text-mist md:text-2xl">Topics we dig into together</p>
+              <p className="mt-2 font-garamond text-sm text-mist/55 md:text-base">
+                Sessions follow what members need—not a fixed syllabus that ignores your real life behind the
+                kit.
+              </p>
+              <div className="mt-6">
+                <BulletList items={sessionTopics} />
+              </div>
+            </div>
+          </Reveal>
+        </div>
+      </SectionShell>
+
+      {/* Member benefits — club-specific detail */}
+      <section className="relative overflow-hidden border-t border-white/[0.06] bg-void">
+        <ClubBenefitsBackground />
+
+        <div className={`relative z-10 ${pageWrapClass} py-14 md:py-16 lg:py-20`}>
+          <SectionHeading
+            eyebrow="Member benefits"
+            title="What You Get as a Member"
+            subtitle="Concrete access—not a vague promise to “level up.”"
+            align="center"
+          />
+          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:mt-12 lg:gap-5">
+            {clubBenefits.map((item, i) => (
+              <Reveal key={item.title} delay={i * 0.04}>
+                <BenefitCard title={item.title} body={item.body} />
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Who it's for + club photo */}
+      <SectionShell>
+        <div className={twoColClass}>
+          <Reveal delay={0.1} className="order-2 flex w-full justify-center lg:order-1">
+            <figure className="w-full max-w-lg">
+              <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-void shadow-[0_16px_48px_-16px_rgba(0,0,0,0.85)] ring-1 ring-white/10">
+                <img
+                  src="/club-inside-membership.png"
+                  alt="Drummers in a live mastermind session"
+                  className="aspect-[4/3] w-full object-cover object-center"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <div
+                  className="pointer-events-none absolute inset-0 bg-gradient-to-t from-void/40 via-transparent to-void/10"
+                  aria-hidden
+                />
+              </div>
+            </figure>
+          </Reveal>
+          <div className="order-1 w-full lg:order-2">
+            <SectionHeading
+              eyebrow="Fit"
+              title="Who the Club Is Built For"
+              subtitle="Membership is selective so the room stays serious and useful for everyone in it."
+            />
+            <Reveal delay={0.06} className="mt-8 lg:mt-10">
+              <BulletList items={whoItsFor} />
+              <Prose className="mt-6">
+                If you&apos;re looking for a cheap library of random lessons, this isn&apos;t it. If you want a
+                consistent place to improve with direct access to pros and peers who care about your
+                progress—that&apos;s the club.
+              </Prose>
+            </Reveal>
+          </div>
+        </div>
+      </SectionShell>
+
+      {/* Mike as club leader — brief, links to about */}
       <SectionShell alt>
         <div className={twoColClass}>
           <div className="w-full">
             <SectionHeading
-              eyebrow="Your mentor"
+              eyebrow="Your host"
               title={
                 <>
-                  Learn From Someone Who&apos;s{' '}
-                  <span className="text-gold">Actually Done It</span>
+                  Led by <span className="text-gold">Mike Malinin</span>
                 </>
               }
+              subtitle="Mike facilitates every mastermind session and sets the tone for the room."
             />
-            <Reveal delay={0.06} className="mt-8 space-y-6">
+            <Reveal delay={0.06} className="mt-8 space-y-5 text-center lg:mt-10 lg:text-left">
               <Prose>
-                When you join The Club, you&apos;re not learning from a random internet instructor.
+                Members work directly with Mike on weekly calls—bringing real playing, real questions, and real
+                career goals. He draws on decades of arena touring, platinum records, studio work, and teaching
+                to give feedback that holds up on stage and in the booth.
               </Prose>
-              <Prose>You&apos;re getting mentorship from a professional drummer who has:</Prose>
-              <BulletList items={mikeCredentials} compact />
               <Prose>
-                You&apos;ll gain insights most drummers never get access to — from groove, feel,
-                dynamics, creativity, professionalism, touring, recording, mindset, and musical
-                decision-making.
+                Guest drummers join when the group needs a specific perspective (touring, sessions, genres,
+                business). The club is built around Mike&apos;s network and standards—not a rotating cast of
+                anonymous instructors.
               </Prose>
+              <p className="pt-1">
+                <Link
+                  to="/about"
+                  className="inline-flex font-garamond text-xs tracking-[0.22em] uppercase text-gold underline decoration-gold/35 underline-offset-4 transition hover:text-mist"
+                >
+                  Full bio &amp; background
+                </Link>
+              </p>
             </Reveal>
           </div>
           <Reveal delay={0.1} className="flex w-full justify-center">
             <figure className={portraitSizeClass}>
-              <div className="relative aspect-[4/5] overflow-hidden rounded-[1.75rem] border border-white/10 bg-charcoal/80 shadow-[0_24px_80px_-20px_rgba(0,0,0,0.9)] ring-1 ring-white/10 backdrop-blur-[2px]">
+              <div className="relative aspect-[4/5] overflow-hidden rounded-[1.75rem] border border-white/10 bg-charcoal/80 shadow-[0_24px_80px_-20px_rgba(0,0,0,0.9)] ring-1 ring-white/10 backdrop-blur-sm">
                 <img
                   src="/about-mike-tanya.png"
                   alt="Mike Malinin behind the drum kit for Tanya Tucker"
@@ -320,146 +396,74 @@ export function ClubPage() {
                   aria-hidden
                 />
               </div>
-              <figcaption className="mt-4 text-center font-garamond text-xs tracking-[0.22em] uppercase text-mist/50">
-                Mike Malinin — bandleader &amp; mentor
-              </figcaption>
             </figure>
           </Reveal>
         </div>
       </SectionShell>
 
-      {/* What makes different */}
-      <SectionShell>
-        <SectionHeading
-          eyebrow="The difference"
-          title="What Makes This Different?"
-          subtitle="Most online drum programs give you information. The Club gives you transformation."
-        />
-        <div className="mt-10 grid gap-6 lg:mt-12 lg:grid-cols-2 lg:gap-8">
-          <Reveal delay={0.04}>
-            <PosterPanel>
-              <div className="space-y-5">
-                <p className="font-bebas text-xl tracking-wide text-mist md:text-2xl">Built around:</p>
-                <BulletList items={differentiators} compact />
-                <Prose className="text-mist/80">
-                  Instead of endlessly consuming videos and hoping you improve, you&apos;ll follow a
-                  structured path designed to create measurable progress.
-                </Prose>
-              </div>
-            </PosterPanel>
-          </Reveal>
-          <Reveal delay={0.08}>
-            <div className="grid h-full gap-6 sm:grid-cols-2 lg:grid-cols-1">
-              <PosterPanel className="min-h-0">
-                <div className="space-y-4">
-                  <p className="font-bebas text-lg tracking-wide text-mist md:text-xl">Stop feeling:</p>
-                  <BulletList items={stopFeeling} compact />
-                </div>
-              </PosterPanel>
-              <PosterPanel className="min-h-0">
-                <div className="space-y-4">
-                  <p className="font-bebas text-lg tracking-wide text-gold md:text-xl">Start feeling:</p>
-                  <BulletList items={startFeeling} compact />
-                </div>
-              </PosterPanel>
-            </div>
-          </Reveal>
-        </div>
-      </SectionShell>
-
-      {/* Inside The Club */}
-      <SectionShell alt>
-        <SectionHeading
-          eyebrow="Membership"
-          title="Inside The Club"
-          subtitle="Weekly coaching, exclusive content, and community."
-        />
-        <Reveal delay={0.06} className="mt-10 lg:mt-12">
-          <figure>
-            <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-charcoal/80 shadow-[0_24px_80px_-24px_rgba(0,0,0,0.85)] ring-1 ring-gold/15">
-              <img
-                src="/club-inside-membership.png"
-                alt="Arena stage with drums, live mentorship on screen, and club community icons"
-                className="aspect-[16/10] w-full object-cover object-center sm:aspect-[2/1]"
-                loading="lazy"
-                decoding="async"
-              />
-              <div
-                className="pointer-events-none absolute inset-0 bg-gradient-to-t from-void/45 via-transparent to-void/10"
-                aria-hidden
-              />
-            </div>
-            <figcaption className="mt-4 text-center font-garamond text-xs tracking-[0.22em] uppercase text-mist/50">
-              Live coaching · Exclusive content · A curated community
-            </figcaption>
-          </figure>
-        </Reveal>
-        <div className="mt-12 grid gap-8 md:grid-cols-2 md:gap-x-12 md:gap-y-10 lg:gap-x-16">
-          {insideClub.map((item, i) => (
-            <Reveal key={item.title} delay={0.04 + i * 0.04}>
-              <HighlightBlock title={item.title} body={item.body} />
-            </Reveal>
-          ))}
-        </div>
-      </SectionShell>
-
-      {/* CTA */}
-      <section className="relative overflow-hidden border-t border-gold/15 bg-charcoal/25 py-14 md:py-16 lg:py-20">
-        <SectionGridOverlay />
+      {/* Culture in the room — unique to club page */}
+      <SectionShell className="overflow-hidden py-16 md:py-20 lg:py-24">
         <div
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_80%_50%,rgba(201,165,92,0.08),transparent_65%)]"
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_55%_at_50%_45%,rgba(201,165,92,0.14),transparent_65%)]"
           aria-hidden
         />
+        <div className="relative mx-auto max-w-3xl text-center">
+          <SectionHeading
+            eyebrow="The room"
+            title="How We Show Up Together"
+            align="center"
+          />
+          <Reveal delay={0.06} className="mt-10 space-y-5 lg:mt-12">
+            <Prose>
+              Masterminds only work when people participate honestly. In this club, that means asking the
+              question you&apos;d hesitate to post publicly, sharing a take that isn&apos;t perfect yet, and
+              giving peers the same respect you want back.
+            </Prose>
+            <Prose>
+              Mike keeps sessions focused and constructive—no dunking, no guru worship, no pretending everyone
+              is already a pro. The standard is simple: show up prepared to learn and help others improve.
+            </Prose>
+            <p className="font-garamond text-base italic tracking-wide text-mist md:text-lg">
+              Small enough to know names. Serious enough to change how you play.
+            </p>
+          </Reveal>
+        </div>
+      </SectionShell>
+
+      {/* CTA — club-specific */}
+      <section className="relative overflow-hidden border-t border-gold/15 bg-void py-32 pb-36 md:py-44 md:pb-48 lg:py-52 lg:pb-56">
         <div className={`relative z-10 ${pageWrapClass}`}>
-          <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-14 xl:gap-20">
-            <Reveal className="order-2 lg:order-1">
-              <figure className="mx-auto w-full">
-                <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-void/40 shadow-[0_24px_80px_-24px_rgba(0,0,0,0.85)] ring-1 ring-gold/15">
-                  <img
-                    src="/club-cta-case.png"
-                    alt="Practical Drumming Mastermind Club road case with Mike Malinin"
-                    className="aspect-square w-full object-cover object-center"
-                    loading="lazy"
-                    decoding="async"
-                  />
-                  <div
-                    className="pointer-events-none absolute inset-0 bg-gradient-to-t from-void/35 via-transparent to-transparent"
-                    aria-hidden
-                  />
-                </div>
-                <figcaption className="mt-4 text-center font-garamond text-xs tracking-[0.22em] uppercase text-mist/45">
-                  Curated. Personal. Exclusive.
-                </figcaption>
-              </figure>
+          <div className={twoColClass}>
+            <Reveal delay={0.1} className="order-2 flex w-full items-center justify-center lg:order-1">
+              <ClubCtaAnimation />
             </Reveal>
 
-            <div className="order-1 flex flex-col items-center gap-8 text-center lg:order-2 lg:items-start lg:text-left">
-              <Reveal className="flex w-full flex-col items-center lg:items-start">
-                <h2 className="font-bebas text-[clamp(2.25rem,5vw,3.5rem)] leading-[0.95] tracking-[0.03em]">
-                  <span className="text-mist">Your Next Level </span>
-                  <span className="text-gold">Starts Here</span>
-                </h2>
-                <div className="mt-6 space-y-5">
-                  <Prose className="text-mist/65">
-                    The fastest way to grow as a drummer is to learn from someone who&apos;s already
-                    walked the path.
-                  </Prose>
-                  <Prose className="text-mist/65">
-                    The Club gives you the structure, mentorship, accountability, and community to
-                    become the drummer you know you can be.
-                  </Prose>
-                  <p className="font-bebas text-lg tracking-wide text-gold md:text-xl">
-                    Join today — build real confidence, groove, and musicianship.
-                  </p>
-                </div>
+            <div className="order-1 w-full lg:order-2">
+              <SectionHeading
+                eyebrow="Next step"
+                title="See If the Club Is Right for You"
+              />
+              <Reveal delay={0.06} className="mt-8 space-y-5 text-center lg:mt-10 lg:text-left">
+                <Prose>
+                  We keep membership capped so live sessions stay interactive and the community stays tight.
+                  Book a short call to talk through your goals, how the mastermind runs, and whether this is
+                  the right fit before you join.
+                </Prose>
+                <Prose className="text-mist/65">
+                  No pressure to enroll on the spot—the call is to make sure you&apos;re stepping into the
+                  right room.
+                </Prose>
               </Reveal>
-              <Reveal delay={0.08}>
+              <Reveal delay={0.1} className="mt-10 flex flex-col items-center gap-5 lg:items-start">
                 <Link
                   to="/apply"
                   className={`${primaryBtnClass} min-h-14 px-10 text-sm md:min-h-16 md:px-14 md:text-base`}
                 >
-                  Apply for Membership
+                  Book a Call
                 </Link>
+                <p className="text-center font-garamond text-sm italic text-mist/50 md:text-base lg:text-left">
+                  Limited membership · Application required
+                </p>
               </Reveal>
             </div>
           </div>

@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
+import { ClubCtaAnimation } from '../components/club/ClubCtaAnimation'
 import { JoinClubBackground } from '../components/JoinClubBackground'
 import { Reveal } from '../components/Reveal'
 import { pageWrapClass, SectionShell } from '../components/SectionShell'
@@ -419,29 +420,7 @@ export function HomePage2() {
         <div className={`relative z-10 ${pageWrapClass}`}>
           <div className={twoColClass}>
             <Reveal delay={0.1} className="order-2 flex w-full items-center justify-center lg:order-1">
-              <figure className="mx-auto w-full max-w-[13.75rem] sm:max-w-[15.625rem] lg:max-w-[17.5rem]">
-                <div className="relative aspect-[4/5] overflow-hidden rounded-[1.75rem] border border-white/10 bg-void shadow-[0_24px_80px_-20px_rgba(0,0,0,0.9)] ring-1 ring-white/10">
-                  <img
-                    src="/about-mike.png"
-                    alt="Mike Malinin speaking at an event"
-                    className="absolute inset-0 h-full w-full object-cover object-[center_15%]"
-                    loading="lazy"
-                    decoding="async"
-                  />
-                  <div
-                    className="pointer-events-none absolute inset-0 bg-gradient-to-t from-void/50 via-transparent to-void/10"
-                    aria-hidden
-                  />
-                </div>
-                <figcaption className="mt-4 text-center font-garamond text-xs tracking-[0.22em] uppercase">
-                  <Link
-                    to="/about"
-                    className="text-mist/50 underline decoration-mist/25 underline-offset-4 transition hover:text-gold"
-                  >
-                    Mike Malinin
-                  </Link>
-                </figcaption>
-              </figure>
+              <ClubCtaAnimation />
             </Reveal>
             <div className="order-1 w-full lg:order-2">
               <SectionHeading
