@@ -25,11 +25,20 @@ export default async function handler(req, res) {
 
     const apiKey = process.env.LIVEKIT_API_KEY
     const apiSecret = process.env.LIVEKIT_API_SECRET
-    const url = process.env.VITE_LIVEKIT_URL || process.env.LIVEKIT_URL || null
+    // Serverless: prefer LIVEKIT_URL; VITE_LIVEKIT_URL works if mirrored in Vercel env.
+    const url = process.env.LIVEKIT_URL || process.env.VITE_LIVEKIT_URL || null
 
     if (!apiKey || !apiSecret) {
       // Mock mode: no LiveKit credentials. Room page shows a graceful notice.
-      return res.status(200).json({ ok: true, mock: true, token: null, url })
+      return res.status(200).json({ ok: true, mock: true, token: null, url: null })
+    }
+
+    if (!url) {
+      return res.status(503).json({
+        ok: false,
+        error:
+          'LiveKit URL missing. Set LIVEKIT_URL or VITE_LIVEKIT_URL in Vercel (Production + Preview), then redeploy.',
+      })
     }
 
     // Ensure the room exists with a capacity cap (2–12 people). createRoom is

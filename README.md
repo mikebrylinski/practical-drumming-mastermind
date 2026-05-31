@@ -39,11 +39,35 @@ server-only and must never be exposed to the browser.
 | Variable | Scope | Purpose |
 | --- | --- | --- |
 | `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` | client | Supabase (RLS-enforced) |
-| `VITE_LIVEKIT_URL` | client | LiveKit websocket URL |
+| `VITE_LIVEKIT_URL` | client (+ build) | LiveKit websocket URL (`wss://…`) |
+| `LIVEKIT_URL` | server | Same URL for `/api/livekit/token` (set on Vercel) |
 | `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` | server | Privileged serverless ops |
 | `LIVEKIT_API_KEY` / `LIVEKIT_API_SECRET` | server | Mint LiveKit JWTs |
 | `RESEND_API_KEY` / `EMAIL_FROM` | server | Transactional email |
 | `PUBLIC_BASE_URL` | server | Links inside emails |
+
+## Vercel deployment (LiveKit + API)
+
+The production site needs env vars in the [Vercel project settings](https://vercel.com/docs/projects/environment-variables) — a local `.env` is **not** uploaded with git.
+
+For video rooms, add all of these to **Production** and **Preview**, then **redeploy** (required so `VITE_LIVEKIT_URL` is baked into the client build):
+
+| Variable | Example |
+| --- | --- |
+| `LIVEKIT_API_KEY` | From [LiveKit Cloud](https://cloud.livekit.io) → Project → Keys |
+| `LIVEKIT_API_SECRET` | Same keys page |
+| `VITE_LIVEKIT_URL` | `wss://your-project.livekit.cloud` |
+| `LIVEKIT_URL` | Same as `VITE_LIVEKIT_URL` (server token route) |
+
+CLI (from project root, with values in `.env`):
+
+```bash
+vercel env pull   # optional: download remote env
+# Or add each var in the Vercel dashboard, then:
+vercel --prod     # production redeploy
+```
+
+If rooms still show “credentials not configured”, open `/api/livekit/token` in the browser network tab: `mock: true` means missing API keys; a 503 means keys exist but `LIVEKIT_URL` / `VITE_LIVEKIT_URL` is missing.
 
 ## Supabase setup
 
