@@ -33,6 +33,27 @@
   }
 }
 
+@keyframes crm-hot-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.35), 0 0 18px -4px rgba(239, 68, 68, 0.55);
+  }
+  50% {
+    box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.55), 0 0 34px -2px rgba(239, 68, 68, 0.8);
+  }
+}
+
+.crm-hot-glow {
+  animation: crm-hot-glow 2.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .crm-hot-glow {
+    animation: none;
+    box-shadow: 0 0 18px -4px rgba(239, 68, 68, 0.55);
+  }
+}
+
 @keyframes ambient-glow {
   0%,
   100% {
@@ -199,6 +220,26 @@
   .club-benefits-ring,
   .club-benefits-flow,
   .club-benefits-column {
+    animation: none;
+  }
+}
+
+@keyframes credibility-carousel {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.credibility-carousel-track {
+  animation: credibility-carousel 36s linear infinite;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .credibility-carousel-track {
     animation: none;
   }
 }

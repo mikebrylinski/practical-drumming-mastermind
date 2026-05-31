@@ -1,4 +1,5 @@
-import { memberNavItems } from './mockData'
+import { Link } from 'react-router-dom'
+import { memberNavItems, memberNavRoutes } from './mockData'
 import { MembersIcon } from './MembersIcons'
 
 type MembersSidebarProps = {
@@ -27,19 +28,25 @@ export function MembersSidebar({ activeId = 'dashboard', mobileOpen, onClose }: 
           <ul className="space-y-0.5">
             {memberNavItems.map(({ id, label, icon }) => {
               const active = id === activeId
+              const route = memberNavRoutes[id]
+              const cls = `flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left font-garamond text-base transition ${
+                active
+                  ? 'bg-gold/15 text-gold'
+                  : 'text-mist/60 hover:bg-white/5 hover:text-mist'
+              }`
               return (
                 <li key={id}>
-                  <button
-                    type="button"
-                    className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left font-garamond text-base transition ${
-                      active
-                        ? 'bg-gold/15 text-gold'
-                        : 'text-mist/60 hover:bg-white/5 hover:text-mist'
-                    }`}
-                  >
-                    <MembersIcon name={icon} className="size-[1.125rem] shrink-0" />
-                    {label}
-                  </button>
+                  {route ? (
+                    <Link to={route} onClick={onClose} className={cls}>
+                      <MembersIcon name={icon} className="size-[1.125rem] shrink-0" />
+                      {label}
+                    </Link>
+                  ) : (
+                    <button type="button" className={cls}>
+                      <MembersIcon name={icon} className="size-[1.125rem] shrink-0" />
+                      {label}
+                    </button>
+                  )}
                 </li>
               )
             })}

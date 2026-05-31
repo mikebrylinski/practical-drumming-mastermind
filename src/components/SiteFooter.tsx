@@ -36,7 +36,9 @@ export function SiteFooter() {
           aria-hidden
         />
         <p className="mt-8 text-center font-garamond text-[0.65rem] uppercase tracking-[0.28em] text-mist/50 md:text-xs">
-          Copyright 2026 Mike Malinin. All Rights Reserved.
+          Copyright 2026 Mike Malinin.
+          <br />
+          All Rights Reserved.
         </p>
       </div>
     </footer>

@@ -28,4 +28,4 @@ export const initialBookCallAnswers: BookCallAnswers = {
   instagram: '',
 }
 
-export type BookCallPhase = 'intro' | 'questions' | 'booking' | 'confirmed'
+export type BookCallPhase = 'intro' | 'schedule' | 'questions' | 'confirmed'

@@ -188,7 +188,7 @@ export function HomePage2() {
               transition={{ delay: 0.08, duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
               className="order-1 lg:order-2"
             >
-              <div className="hero-visual relative mx-auto w-full max-w-sm lg:ml-auto lg:max-w-md">
+              <div className="hero-visual relative mx-auto w-3/4 max-w-[17rem] sm:w-full sm:max-w-sm lg:ml-auto lg:max-w-md">
                 <div className="relative aspect-[4/5] overflow-hidden rounded-[1.75rem] bg-charcoal/80 shadow-[0_24px_80px_-20px_rgba(0,0,0,0.9)] ring-1 ring-white/10 backdrop-blur-[2px] sm:aspect-[5/6]">
                   <img
                     src="/home2-hero-community.png"
@@ -419,10 +419,10 @@ export function HomePage2() {
         <JoinClubBackground />
         <div className={`relative z-10 ${pageWrapClass}`}>
           <div className={twoColClass}>
-            <Reveal delay={0.1} className="order-2 flex w-full items-center justify-center lg:order-1">
+            <Reveal delay={0.1} className="order-1 flex w-full items-center justify-center lg:order-1">
               <ClubCtaAnimation />
             </Reveal>
-            <div className="order-1 w-full lg:order-2">
+            <div className="order-2 w-full lg:order-2">
               <SectionHeading
                 eyebrow="Join the club"
                 title="Get In The Right Environment."

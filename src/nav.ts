@@ -5,4 +5,4 @@ export const siteNav = [
   { to: '/apply', label: 'Book a Call' },
 ] as const
 
-export const membersPath = '/members' as const
+export const membersPath = '/dashboard' as const

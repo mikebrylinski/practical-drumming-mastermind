@@ -1,7 +1,14 @@
 import express from 'express'
 import cors from 'cors'
-import applyHandler from './routes/apply.js'
 import contactHandler from './routes/contact.js'
+// Vercel serverless functions reused directly for local dev parity.
+import applyHandler from '../api/apply.js'
+import leadsEventHandler from '../api/leads/event.js'
+import emailSendHandler from '../api/email/send.js'
+import bookingsCreateHandler from '../api/bookings/create.js'
+import bookingsCancelHandler from '../api/bookings/cancel.js'
+import livekitTokenHandler from '../api/livekit/token.js'
+import crmActionHandler from '../api/crm/action.js'
 
 const app = express()
 const PORT = Number(process.env.API_PORT) || 3003
@@ -24,6 +31,13 @@ app.use(express.json({ limit: '256kb' }))
 
 app.post('/api/apply', applyHandler)
 app.post('/api/contact', contactHandler)
+app.post('/api/leads/event', leadsEventHandler)
+app.post('/api/email/send', emailSendHandler)
+app.post('/api/bookings/create', bookingsCreateHandler)
+app.post('/api/bookings/cancel', bookingsCancelHandler)
+app.post('/api/livekit/token', livekitTokenHandler)
+app.get('/api/livekit/token', livekitTokenHandler)
+app.post('/api/crm/action', crmActionHandler)
 
 const server = app.listen(PORT, () => {
   console.log(`Practical Drumming API listening on http://localhost:${PORT}`)

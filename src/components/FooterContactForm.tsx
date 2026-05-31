@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
+import { trackLeadEvent } from '../lib/leads/track'
 
 const inputClass =
   'mt-1.5 w-full border border-white/10 bg-void/80 px-3 py-2 font-garamond text-sm text-mist placeholder:text-mist/30 outline-none transition focus:border-gold/50 focus:ring-1 focus:ring-gold/30'
@@ -20,6 +21,7 @@ export function FooterContactForm() {
         body: JSON.stringify({ name, email, message }),
       })
       if (!res.ok) throw new Error('Request failed')
+      trackLeadEvent('form_submit', { type: 'contact', email })
       setStatus('success')
       setName('')
       setEmail('')
@@ -39,7 +41,7 @@ export function FooterContactForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-3">
-      <p className="font-garamond text-[0.7rem] tracking-[0.28em] uppercase text-gold/75">
+      <p className="text-center font-garamond text-[0.7rem] tracking-[0.28em] uppercase text-gold/75">
         Get in touch
       </p>
       <div className="grid gap-3 sm:grid-cols-2">
@@ -81,13 +83,15 @@ export function FooterContactForm() {
           Something went wrong. Please try again or use the Apply page.
         </p>
       ) : null}
-      <button
-        type="submit"
-        disabled={status === 'submitting'}
-        className="inline-flex min-h-10 items-center justify-center rounded-full border border-gold/40 bg-gold/10 px-6 font-garamond text-xs tracking-[0.2em] uppercase text-gold transition hover:border-gold hover:bg-gold/20 disabled:opacity-50"
-      >
-        {status === 'submitting' ? 'Sending…' : 'Send message'}
-      </button>
+      <div className="flex justify-center">
+        <button
+          type="submit"
+          disabled={status === 'submitting'}
+          className="inline-flex min-h-10 items-center justify-center rounded-full border border-gold/40 bg-gold/10 px-6 font-garamond text-xs tracking-[0.2em] uppercase text-gold transition hover:border-gold hover:bg-gold/20 disabled:opacity-50"
+        >
+          {status === 'submitting' ? 'Sending…' : 'Send message'}
+        </button>
+      </div>
     </form>
   )
 }

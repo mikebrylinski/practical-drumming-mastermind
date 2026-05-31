@@ -13,6 +13,11 @@ dist
 dist-ssr
 *.local
 
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
 # Application submissions (local MVP store)
 data/applications.json
 data/contacts.json

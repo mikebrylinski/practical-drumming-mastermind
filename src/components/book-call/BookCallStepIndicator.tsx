@@ -3,7 +3,7 @@ import type { BookCallPhase } from './types'
 const STEPS = [
   { key: 'intro', label: 'Welcome' },
   { key: 'questions', label: 'Questions' },
-  { key: 'booking', label: 'Schedule' },
+  { key: 'schedule', label: 'Schedule' },
   { key: 'confirmed', label: 'Confirmed' },
 ] as const
 
@@ -13,7 +13,7 @@ function phaseToIndex(phase: BookCallPhase) {
       return 0
     case 'questions':
       return 1
-    case 'booking':
+    case 'schedule':
       return 2
     case 'confirmed':
       return 3
@@ -29,7 +29,7 @@ export function BookCallStepIndicator({ phase, questionStep = 0 }: BookCallStepI
   const activeIndex = phaseToIndex(phase)
 
   return (
-    <nav aria-label="Booking progress" className="mb-10 md:mb-12">
+    <nav aria-label="Booking progress" className="mb-8 px-1 sm:mb-10 md:mb-12">
       <ol className="flex items-start justify-center gap-0">
         {STEPS.map((step, i) => {
           const done = i < activeIndex
@@ -92,11 +92,14 @@ export function BookCallStepIndicator({ phase, questionStep = 0 }: BookCallStepI
         })}
       </ol>
 
-      {phase === 'questions' ? (
-        <p className="mt-4 text-center font-garamond text-xs tracking-[0.2em] text-mist/45 uppercase">
-          Question {questionStep + 1} of 5
-        </p>
-      ) : null}
+      <p
+        className={`mt-4 min-h-[1.25rem] text-center font-garamond text-xs tracking-[0.2em] uppercase ${
+          phase === 'questions' ? 'text-mist/45' : 'invisible'
+        }`}
+        aria-hidden={phase !== 'questions'}
+      >
+        Question {questionStep + 1} of 5
+      </p>
     </nav>
   )
 }

@@ -5,6 +5,9 @@ import { TextLogo } from './TextLogo'
 import { PersonIcon } from './PersonIcon'
 import { SiteFooter } from './SiteFooter'
 import { membersPath, siteNav } from '../nav'
+import { useLeadTracking } from '../lib/leads/useLeadTracking'
+import { trackLeadEvent } from '../lib/leads/track'
+import { useAuth } from '../lib/auth/AuthProvider'
 
 function HamburgerIcon({ open }: { open: boolean }) {
   return (
@@ -32,6 +35,9 @@ export function SiteLayout() {
   const { pathname } = useLocation()
   const isMembersArea = pathname.startsWith(membersPath)
   const [menuOpen, setMenuOpen] = useState(false)
+  useLeadTracking()
+  const { isAuthed, isAdmin } = useAuth()
+  const accountPath = isAuthed ? '/dashboard' : '/login'
 
   useEffect(() => {
     setMenuOpen(false)
@@ -81,6 +87,9 @@ export function SiteLayout() {
                 <Link
                   key={to}
                   to={to}
+                  onClick={() => {
+                    if (to === '/apply') trackLeadEvent('booking_click', { source: 'nav' })
+                  }}
                   className={`relative font-garamond text-sm uppercase tracking-[0.2em] text-mist/55 transition-colors hover:text-gold ${
                     active ? 'text-gold' : ''
                   }`}
@@ -95,12 +104,22 @@ export function SiteLayout() {
                 </Link>
               )
             })}
+            {isAdmin ? (
+              <Link
+                to="/admin"
+                className={`relative font-garamond text-sm uppercase tracking-[0.2em] transition-colors hover:text-gold ${
+                  pathname.startsWith('/admin') ? 'text-gold' : 'text-mist/55'
+                }`}
+              >
+                Admin
+              </Link>
+            ) : null}
             <Link
-              to={membersPath}
-              aria-label="Members sign in"
-              aria-current={pathname === membersPath ? 'page' : undefined}
+              to={accountPath}
+              aria-label={isAuthed ? 'Member dashboard' : 'Members sign in'}
+              aria-current={pathname === accountPath ? 'page' : undefined}
               className={`ml-1 flex min-h-10 min-w-10 items-center justify-center rounded-full border transition ${
-                pathname === membersPath
+                pathname === accountPath
                   ? 'border-gold/50 bg-gold/15 text-gold'
                   : 'border-white/12 bg-charcoal/40 text-mist/70 hover:border-gold/35 hover:bg-charcoal/70 hover:text-gold'
               }`}
@@ -147,7 +166,10 @@ export function SiteLayout() {
                   >
                     <Link
                       to={to}
-                      onClick={() => setMenuOpen(false)}
+                      onClick={() => {
+                        if (to === '/apply') trackLeadEvent('booking_click', { source: 'nav-mobile' })
+                        setMenuOpen(false)
+                      }}
                       className={`block border-b border-white/[0.06] py-4 text-center font-garamond text-lg uppercase tracking-[0.22em] transition-colors ${
                         active ? 'text-gold' : 'text-mist/75 hover:text-gold'
                       }`}
@@ -162,19 +184,28 @@ export function SiteLayout() {
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.22, duration: 0.28 }}
-              className="mt-auto pt-6"
+              className="mt-auto flex flex-col gap-3 pt-6"
             >
+              {isAdmin ? (
+                <Link
+                  to="/admin"
+                  onClick={() => setMenuOpen(false)}
+                  className={`flex min-h-12 w-full items-center justify-center rounded-full border font-garamond text-sm tracking-[0.2em] uppercase transition ${
+                    pathname.startsWith('/admin')
+                      ? 'border-gold/50 bg-gold/15 text-gold'
+                      : 'border-gold/40 text-gold hover:bg-gold/10'
+                  }`}
+                >
+                  Admin
+                </Link>
+              ) : null}
               <Link
-                to={membersPath}
+                to={accountPath}
                 onClick={() => setMenuOpen(false)}
-                className={`flex min-h-14 w-full items-center justify-center gap-2.5 rounded-full font-garamond text-sm tracking-[0.2em] uppercase transition ${
-                  pathname === membersPath
-                    ? 'bg-gold text-void'
-                    : 'bg-gold text-void hover:bg-gold/90'
-                }`}
+                className="flex min-h-14 w-full items-center justify-center gap-2.5 rounded-full bg-gold font-garamond text-sm tracking-[0.2em] uppercase text-void transition hover:bg-gold/90"
               >
                 <PersonIcon className="size-5" />
-                Members
+                {isAuthed ? 'Dashboard' : 'Members'}
               </Link>
             </motion.div>
           </motion.div>

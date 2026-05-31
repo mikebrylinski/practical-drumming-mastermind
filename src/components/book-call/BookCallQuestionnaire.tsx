@@ -58,24 +58,27 @@ export function BookCallQuestionnaire({
   }
 
   return (
-    <div className="mx-auto w-full max-w-lg">
-      <div
-        className="mb-8 h-0.5 w-full overflow-hidden rounded-full bg-white/10"
-        role="progressbar"
-        aria-valuenow={step + 1}
-        aria-valuemin={1}
-        aria-valuemax={5}
-        aria-label={`Question ${step + 1} of 5`}
-      >
+    <div className="mx-auto w-full max-w-3xl px-1 sm:px-0">
+      <div className="flex min-h-[26rem] flex-col overflow-hidden rounded-xl border border-white/10 bg-charcoal/40 shadow-2xl sm:min-h-[28rem]">
         <div
-          className="h-full rounded-full bg-gold transition-[width] duration-300 ease-out"
-          style={{ width: `${progress}%` }}
-        />
-      </div>
+          className="h-1 w-full bg-white/10"
+          role="progressbar"
+          aria-valuenow={step + 1}
+          aria-valuemin={1}
+          aria-valuemax={5}
+          aria-label={`Question ${step + 1} of 5`}
+        >
+          <div
+            className="h-full rounded-full bg-gold transition-[width] duration-300 ease-out"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
 
+        <div className="flex flex-1 flex-col p-6 sm:p-8 md:p-10">
+          <div className="flex min-h-[17rem] flex-1 flex-col sm:min-h-[19rem]">
       {step === 0 ? (
         <fieldset className="border-0 p-0">
-          <legend className="mb-6 block w-full text-center font-bebas text-2xl tracking-wide text-mist md:text-3xl">
+          <legend className="mb-8 block w-full font-bebas text-[clamp(1.5rem,4vw,2.25rem)] leading-tight tracking-wide text-mist">
             Where are you currently at as a drummer?
           </legend>
           <div className="space-y-3">
@@ -95,7 +98,7 @@ export function BookCallQuestionnaire({
 
       {step === 1 ? (
         <fieldset className="border-0 p-0">
-          <legend className="mb-6 block w-full text-center font-bebas text-2xl tracking-wide text-mist md:text-3xl">
+          <legend className="mb-8 block w-full font-bebas text-[clamp(1.5rem,4vw,2.25rem)] leading-tight tracking-wide text-mist">
             What are you trying to achieve most right now?
           </legend>
           <div className="space-y-2">
@@ -130,7 +133,7 @@ export function BookCallQuestionnaire({
 
       {step === 2 ? (
         <div>
-          <h2 className="mb-6 text-center font-bebas text-2xl tracking-wide text-mist md:text-3xl">
+          <h2 className="mb-8 font-bebas text-[clamp(1.5rem,4vw,2.25rem)] leading-tight tracking-wide text-mist">
             What&apos;s your biggest frustration right now?
           </h2>
           <textarea
@@ -145,7 +148,7 @@ export function BookCallQuestionnaire({
 
       {step === 3 ? (
         <fieldset className="border-0 p-0">
-          <legend className="mb-6 block w-full text-center font-bebas text-2xl tracking-wide text-mist md:text-3xl">
+          <legend className="mb-8 block w-full font-bebas text-[clamp(1.5rem,4vw,2.25rem)] leading-tight tracking-wide text-mist">
             How serious are you about improving this year?
           </legend>
           <div className="space-y-3">
@@ -178,7 +181,7 @@ export function BookCallQuestionnaire({
 
       {step === 4 ? (
         <div>
-          <h2 className="mb-6 text-center font-bebas text-2xl tracking-wide text-mist md:text-3xl">
+          <h2 className="mb-8 font-bebas text-[clamp(1.5rem,4vw,2.25rem)] leading-tight tracking-wide text-mist">
             Let&apos;s get your contact info.
           </h2>
           <div className="space-y-5">
@@ -213,24 +216,26 @@ export function BookCallQuestionnaire({
           </div>
         </div>
       ) : null}
+          </div>
 
-      <div className="mt-10 flex items-center justify-between gap-4">
-        <button
-          type="button"
-          onClick={onBack}
-          disabled={step === 0}
-          className="font-garamond text-sm tracking-[0.12em] text-mist/50 uppercase transition hover:text-mist disabled:invisible"
-        >
-          Back
-        </button>
-        <button
-          type="button"
-          onClick={onNext}
-          disabled={submitting || !canAdvance}
-          className="inline-flex min-h-11 items-center justify-center rounded-full bg-gold px-8 font-garamond text-xs tracking-[0.2em] uppercase text-void transition hover:bg-gold/90 disabled:opacity-50"
-        >
-          {submitting ? 'Submitting…' : isLast ? 'Submit & Continue' : 'Next'}
-        </button>
+          <div className="mt-auto flex shrink-0 items-center justify-between gap-4 border-t border-white/10 pt-8">
+          <button
+            type="button"
+            onClick={onBack}
+            className="font-garamond text-sm tracking-[0.12em] text-mist/50 uppercase transition hover:text-mist"
+          >
+            Back
+          </button>
+          <button
+            type="button"
+            onClick={onNext}
+            disabled={submitting || !canAdvance}
+            className="inline-flex min-h-11 items-center justify-center rounded-full bg-gold px-8 font-garamond text-xs tracking-[0.2em] uppercase text-void transition hover:bg-gold/90 disabled:opacity-50"
+          >
+            {submitting ? 'Saving…' : isLast ? 'Choose a time' : 'Next'}
+          </button>
+          </div>
+        </div>
       </div>
     </div>
   )
