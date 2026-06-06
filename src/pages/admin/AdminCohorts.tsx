@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { AppCard, AdminShell } from '../../components/app/AdminShell'
+import { useAuth } from '../../lib/auth/AuthProvider'
+import { ConfirmDialog, useConfirm } from '../../components/ui/ConfirmDialog'
 import { DateTimePicker } from '../../components/ui/DateTimePicker'
 import { supabase } from '../../lib/supabase/client'
 import { cohortRoomName, slugify } from '../../lib/slug'
@@ -11,18 +13,20 @@ const inputClass =
   'rounded-lg border border-white/12 bg-charcoal/50 px-3 py-2 font-garamond text-sm text-mist outline-none focus:border-gold/45'
 
 export function AdminCohorts() {
+  const { useSeedData } = useAuth()
   const [cohorts, setCohorts] = useState<Cohort[]>(() =>
-    supabase ? [] : buildDemoCohorts(),
+    useSeedData ? buildDemoCohorts() : [],
   )
-  const [loading, setLoading] = useState(Boolean(supabase))
+  const [loading, setLoading] = useState(!useSeedData)
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
   const [startsAt, setStartsAt] = useState('')
   const [room, setRoom] = useState('')
   const [busy, setBusy] = useState(false)
+  const { confirm, dialogProps } = useConfirm()
 
   const load = useCallback(() => {
-    if (!supabase) {
+    if (useSeedData || !supabase) {
       setLoading(false)
       return
     }
@@ -35,7 +39,7 @@ export function AdminCohorts() {
         setCohorts((data as Cohort[]) ?? [])
         setLoading(false)
       })
-  }, [])
+  }, [useSeedData])
 
   useEffect(() => {
     load()
@@ -53,7 +57,7 @@ export function AdminCohorts() {
       livekit_room_name,
     }
     try {
-      if (supabase) {
+      if (supabase && !useSeedData) {
         await supabase.from('cohorts').insert(row)
         load()
       } else {
@@ -71,8 +75,15 @@ export function AdminCohorts() {
     }
   }
 
-  async function removeCohort(id: string) {
-    if (supabase) {
+  async function removeCohort(id: string, cohortName: string) {
+    const ok = await confirm({
+      title: 'Delete cohort?',
+      message: `"${cohortName}" and its room link will be removed. This cannot be undone.`,
+      confirmLabel: 'Delete',
+      danger: true,
+    })
+    if (!ok) return
+    if (supabase && !useSeedData) {
       await supabase.from('cohorts').delete().eq('id', id)
       load()
     } else {
@@ -145,7 +156,7 @@ export function AdminCohorts() {
                     <h3 className="font-garamond text-lg font-medium text-mist">{c.name}</h3>
                     <button
                       type="button"
-                      onClick={() => removeCohort(c.id)}
+                      onClick={() => removeCohort(c.id, c.name)}
                       className="shrink-0 font-garamond text-xs text-mist/40 transition hover:text-red-300"
                     >
                       Delete
@@ -176,6 +187,7 @@ export function AdminCohorts() {
           )}
         </div>
       </div>
+      <ConfirmDialog {...dialogProps} />
     </AdminShell>
   )
 }

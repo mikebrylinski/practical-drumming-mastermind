@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { AppCard, AppShell } from '../../components/app/AppShell'
+import { ConfirmDialog, useConfirm } from '../../components/ui/ConfirmDialog'
+import { formatDateTime } from '../../lib/datetime'
 import { supabase } from '../../lib/supabase/client'
 import { useAuth } from '../../lib/auth/AuthProvider'
 import type { Booking } from '../../lib/supabase/types'
@@ -26,13 +28,14 @@ const statusColor: Record<Booking['status'], string> = {
 }
 
 export function MyBookingsPage() {
-  const { session, mockMode } = useAuth()
-  const [bookings, setBookings] = useState<Booking[]>(mockMode ? MOCK_BOOKINGS : [])
-  const [loading, setLoading] = useState(Boolean(supabase))
+  const { session, useSeedData } = useAuth()
+  const [bookings, setBookings] = useState<Booking[]>(useSeedData ? MOCK_BOOKINGS : [])
+  const [loading, setLoading] = useState(!useSeedData)
   const [busyId, setBusyId] = useState<string | null>(null)
+  const { confirm, dialogProps } = useConfirm()
 
   const load = useCallback(() => {
-    if (!supabase || !session?.user) return
+    if (useSeedData || !supabase || !session?.user) return
     setLoading(true)
     supabase
       .from('bookings')
@@ -43,13 +46,21 @@ export function MyBookingsPage() {
         if (data) setBookings(data as Booking[])
         setLoading(false)
       })
-  }, [session])
+  }, [session, useSeedData])
 
   useEffect(() => {
     load()
   }, [load])
 
   async function cancel(id: string) {
+    const ok = await confirm({
+      title: 'Cancel this call?',
+      message: 'You can always book another time afterwards.',
+      confirmLabel: 'Cancel call',
+      cancelLabel: 'Keep it',
+      danger: true,
+    })
+    if (!ok) return
     setBusyId(id)
     try {
       await fetch('/api/bookings/cancel', {
@@ -57,7 +68,7 @@ export function MyBookingsPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ bookingId: id }),
       })
-      if (mockMode) {
+      if (useSeedData) {
         setBookings((prev) =>
           prev.map((b) => (b.id === id ? { ...b, status: 'cancelled' } : b)),
         )
@@ -93,7 +104,7 @@ export function MyBookingsPage() {
             <AppCard key={b.id} className="flex flex-wrap items-center justify-between gap-4">
               <div className="min-w-0">
                 <p className="font-garamond text-base text-mist">
-                  {b.starts_at ? new Date(b.starts_at).toLocaleString() : 'Scheduled call'}
+                  {b.starts_at ? formatDateTime(b.starts_at) : 'Scheduled call'}
                 </p>
                 <p className={`mt-1 font-garamond text-xs uppercase tracking-[0.16em] ${statusColor[b.status]}`}>
                   {b.status}
@@ -123,6 +134,7 @@ export function MyBookingsPage() {
           ))}
         </div>
       )}
+      <ConfirmDialog {...dialogProps} />
     </AppShell>
   )
 }

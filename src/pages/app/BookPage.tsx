@@ -4,6 +4,7 @@ import { AppShell } from '../../components/app/AppShell'
 import { supabase } from '../../lib/supabase/client'
 import { useAuth } from '../../lib/auth/AuthProvider'
 import { trackLeadEvent } from '../../lib/leads/track'
+import { formatDateTime, timeZoneLabel } from '../../lib/datetime'
 import { loadSlots as loadStoredSlots, markSlotBooked } from '../../lib/booking/slotStore'
 import type { AvailabilitySlot } from '../../lib/supabase/types'
 
@@ -66,13 +67,7 @@ function HostCard({
         {selectedSlot ? (
           <li className="flex items-start gap-2.5 text-gold">
             <span aria-hidden>▦</span>
-            {new Date(selectedSlot.starts_at).toLocaleString(undefined, {
-              weekday: 'long',
-              month: 'long',
-              day: 'numeric',
-              hour: 'numeric',
-              minute: '2-digit',
-            })}
+            {formatDateTime(selectedSlot.starts_at)}
           </li>
         ) : null}
       </ul>
@@ -231,13 +226,7 @@ export function BookPage() {
       // the booking page and shows as "Booked" in admin availability.
       if (!supabase) markSlotBooked(selected.id)
       setConfirmed({
-        dateLabel: new Date(selected.starts_at).toLocaleString(undefined, {
-          weekday: 'long',
-          month: 'long',
-          day: 'numeric',
-          hour: 'numeric',
-          minute: '2-digit',
-        }),
+        dateLabel: formatDateTime(selected.starts_at),
         roomName: json.booking?.livekit_room_name ?? null,
       })
     } catch (err) {
@@ -403,7 +392,7 @@ export function BookPage() {
           </div>
 
           <div className="lg:border-l lg:border-white/10 lg:pl-6">
-            <h3 className="mb-3 font-garamond text-sm tracking-[0.14em] text-mist/60 uppercase">
+            <h3 className="mb-1 font-garamond text-sm tracking-[0.14em] text-mist/60 uppercase">
               {selectedDay
                 ? new Date(daySlots[0]?.starts_at ?? Date.now()).toLocaleDateString(undefined, {
                     weekday: 'long',
@@ -412,6 +401,13 @@ export function BookPage() {
                   })
                 : 'Select a day'}
             </h3>
+            {selectedDay && daySlots.length > 0 && timeZoneLabel() ? (
+              <p className="mb-3 font-garamond text-xs tracking-[0.08em] text-gold/70">
+                Shown in your local time zone ({timeZoneLabel()})
+              </p>
+            ) : (
+              <div className="mb-3" />
+            )}
             <div className="flex max-h-[24rem] flex-col gap-2 overflow-y-auto pr-1">
               {daySlots.length === 0 ? (
                 <p className="font-garamond text-sm text-mist/40">No times on this day.</p>

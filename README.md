@@ -28,6 +28,9 @@ Every integration degrades gracefully:
 - **No Supabase keys** → the app runs in mock mode. Auth is mocked (enter as
   Admin or Member from `/login`), and data views show seeded fixtures so the
   CRM, booking, and dashboards are fully explorable.
+- **`VITE_DEMO_LOGIN=true`** → shows the same seed-data chooser on `/login` even
+  when Supabase is configured (for production reviewers). Choosing Member or
+  Admin loads built-in demo fixtures instead of live database rows.
 - **No LiveKit keys** → `/room/:roomName` shows a graceful placeholder.
 - **No Resend key** → emails are skipped but still logged to `email_logs`.
 

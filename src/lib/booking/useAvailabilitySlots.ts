@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useAuth } from '../auth/AuthProvider'
 import { supabase } from '../supabase/client'
 import { loadSlots as loadStoredSlots } from './slotStore'
 import type { AvailabilitySlot } from '../supabase/types'
@@ -8,13 +9,14 @@ export function dayKey(d: Date): string {
 }
 
 export function useAvailabilitySlots(slug: string) {
+  const { useSeedData } = useAuth()
   const [slots, setSlots] = useState<AvailabilitySlot[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     let active = true
     async function load() {
-      if (!supabase) {
+      if (useSeedData || !supabase) {
         if (active) {
           const now = Date.now()
           setSlots(
@@ -44,7 +46,7 @@ export function useAvailabilitySlots(slug: string) {
     return () => {
       active = false
     }
-  }, [slug])
+  }, [slug, useSeedData])
 
   const slotsByDay = useMemo(() => {
     const map = new Map<string, AvailabilitySlot[]>()

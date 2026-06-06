@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { STAGE_THEME, heatBand, HEAT_THEME } from '../../lib/crm/scoring'
+import { formatDateTime } from '../../lib/datetime'
 import type { CRMLead } from '../../lib/crm/types'
 import { LeadTimeline } from './LeadTimeline'
 
@@ -71,7 +72,7 @@ export function LeadDetail({
           </div>
           <div>
             <dt className="text-mist/40">Last activity</dt>
-            <dd className="text-mist/80">{new Date(lead.lastActivity).toLocaleString()}</dd>
+            <dd className="text-mist/80">{formatDateTime(lead.lastActivity)}</dd>
           </div>
         </dl>
       </div>

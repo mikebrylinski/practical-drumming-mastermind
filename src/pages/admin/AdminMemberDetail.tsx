@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { AppCard, AdminShell } from '../../components/app/AdminShell'
 import { supabase } from '../../lib/supabase/client'
+import { formatDateTime } from '../../lib/datetime'
 import type { Booking, Profile } from '../../lib/supabase/types'
 
 export function AdminMemberDetail() {
@@ -68,7 +69,7 @@ export function AdminMemberDetail() {
               <ul className="mt-3 space-y-2">
                 {bookings.map((b) => (
                   <li key={b.id} className="font-garamond text-sm text-mist/65">
-                    {b.starts_at ? new Date(b.starts_at).toLocaleString() : 'Call'} — {b.status}
+                    {b.starts_at ? formatDateTime(b.starts_at) : 'Call'} — {b.status}
                   </li>
                 ))}
               </ul>

@@ -36,8 +36,11 @@ export function SiteLayout() {
   const isMembersArea = pathname.startsWith(membersPath)
   const [menuOpen, setMenuOpen] = useState(false)
   useLeadTracking()
-  const { isAuthed, isAdmin } = useAuth()
+  const { isAuthed, isAdmin, mockMode, demoLoginEnabled } = useAuth()
+  const showDemoEntry = mockMode || demoLoginEnabled
   const accountPath = isAuthed ? '/dashboard' : '/login'
+  const memberLoginPath = showDemoEntry ? '/login?role=member' : '/login'
+  const adminLoginPath = '/login?role=admin'
 
   useEffect(() => {
     setMenuOpen(false)
@@ -113,9 +116,16 @@ export function SiteLayout() {
               >
                 Admin
               </Link>
+            ) : showDemoEntry && !isAuthed ? (
+              <Link
+                to={adminLoginPath}
+                className="relative font-garamond text-sm uppercase tracking-[0.2em] text-mist/55 transition-colors hover:text-gold"
+              >
+                Admin
+              </Link>
             ) : null}
             <Link
-              to={accountPath}
+              to={isAuthed ? accountPath : memberLoginPath}
               aria-label={isAuthed ? 'Member dashboard' : 'Members sign in'}
               aria-current={pathname === accountPath ? 'page' : undefined}
               className={`ml-1 flex min-h-10 min-w-10 items-center justify-center rounded-full border transition ${
@@ -198,14 +208,22 @@ export function SiteLayout() {
                 >
                   Admin
                 </Link>
+              ) : showDemoEntry && !isAuthed ? (
+                <Link
+                  to={adminLoginPath}
+                  onClick={() => setMenuOpen(false)}
+                  className="flex min-h-12 w-full items-center justify-center rounded-full border border-gold/40 font-garamond text-sm tracking-[0.2em] uppercase text-gold transition hover:bg-gold/10"
+                >
+                  Admin preview
+                </Link>
               ) : null}
               <Link
-                to={accountPath}
+                to={isAuthed ? accountPath : memberLoginPath}
                 onClick={() => setMenuOpen(false)}
                 className="flex min-h-14 w-full items-center justify-center gap-2.5 rounded-full bg-gold font-garamond text-sm tracking-[0.2em] uppercase text-void transition hover:bg-gold/90"
               >
                 <PersonIcon className="size-5" />
-                {isAuthed ? 'Dashboard' : 'Members'}
+                {isAuthed ? 'Dashboard' : showDemoEntry ? 'Member preview' : 'Members'}
               </Link>
             </motion.div>
           </motion.div>

@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { markSlotBooked } from '../../lib/booking/slotStore'
 import { supabase } from '../../lib/supabase/client'
+import { formatDateTime } from '../../lib/datetime'
 import { trackLeadEvent } from '../../lib/leads/track'
 import type { AvailabilitySlot } from '../../lib/supabase/types'
 import { SectionGridOverlay } from '../SectionGridOverlay'
@@ -43,6 +44,12 @@ export function BookCallFlow() {
     null,
   )
 
+  // Reset scroll to the top of the page on every step/phase change. React
+  // Router only resets scroll on route changes, not on these in-page steps.
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
+  }, [phase, step])
+
   function patchAnswers(patch: Partial<BookCallAnswers>) {
     setAnswers((prev) => ({ ...prev, ...patch }))
   }
@@ -83,13 +90,7 @@ export function BookCallFlow() {
 
       setSelectedSlot(slot)
       setConfirmed({
-        dateLabel: new Date(slot.starts_at).toLocaleString(undefined, {
-          weekday: 'long',
-          month: 'long',
-          day: 'numeric',
-          hour: 'numeric',
-          minute: '2-digit',
-        }),
+        dateLabel: formatDateTime(slot.starts_at),
         roomName: bookJson.booking?.livekit_room_name ?? null,
       })
       setPhase('confirmed')
@@ -120,7 +121,13 @@ export function BookCallFlow() {
 
   function handleSlotSelect(slot: AvailabilitySlot) {
     trackLeadEvent('booking_click', { source: 'apply-scheduler', slotId: slot.id })
-    void submitApplication(slot)
+    setSubmitError(false)
+    setSelectedSlot(slot)
+  }
+
+  function handleConfirmBooking() {
+    if (!selectedSlot || submitting) return
+    void submitApplication(selectedSlot)
   }
 
   function resetFlow() {
@@ -199,6 +206,7 @@ export function BookCallFlow() {
               <BookCallScheduler
                 selectedSlot={selectedSlot}
                 onSelectSlot={handleSlotSelect}
+                onConfirm={handleConfirmBooking}
                 onBack={() => {
                   setSubmitError(false)
                   setPhase('questions')

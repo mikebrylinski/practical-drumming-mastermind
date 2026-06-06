@@ -1,16 +1,19 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { AppCard, AppShell } from '../../components/app/AppShell'
+import { useAuth } from '../../lib/auth/AuthProvider'
 import { supabase } from '../../lib/supabase/client'
+import { formatDateTime } from '../../lib/datetime'
 import { buildUpcomingDemoSessions } from '../../lib/demo/cohorts'
 import type { Session } from '../../lib/supabase/types'
 
 export function SessionsPage() {
+  const { useSeedData } = useAuth()
   const [sessions, setSessions] = useState<Session[]>(buildUpcomingDemoSessions)
-  const [loading, setLoading] = useState(Boolean(supabase))
+  const [loading, setLoading] = useState(!useSeedData)
 
   useEffect(() => {
-    if (!supabase) return
+    if (useSeedData || !supabase) return
     let active = true
     supabase
       .from('sessions')
@@ -24,7 +27,7 @@ export function SessionsPage() {
     return () => {
       active = false
     }
-  }, [])
+  }, [useSeedData])
 
   return (
     <AppShell eyebrow="Live" title="Sessions" subtitle="Upcoming live classroom sessions.">
@@ -40,7 +43,7 @@ export function SessionsPage() {
                 <h3 className="font-garamond text-lg font-medium text-mist">{s.title}</h3>
                 {s.scheduled_at ? (
                   <p className="mt-1 font-garamond text-sm text-mist/50">
-                    {new Date(s.scheduled_at).toLocaleString()}
+                    {formatDateTime(s.scheduled_at)}
                   </p>
                 ) : null}
               </div>

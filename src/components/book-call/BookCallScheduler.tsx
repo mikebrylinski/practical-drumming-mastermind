@@ -1,11 +1,13 @@
 import { BookingCalendarPicker } from '../booking/BookingCalendarPicker'
 import { DEFAULT_SLUG } from '../../lib/booking/slotStore'
+import { formatDateTime, timeZoneLabel } from '../../lib/datetime'
 import type { AvailabilitySlot } from '../../lib/supabase/types'
 import { CheckCircleIcon, ClockIcon, UsersIcon, VideoIcon } from './icons'
 
 type BookCallSchedulerProps = {
   selectedSlot: AvailabilitySlot | null
   onSelectSlot: (slot: AvailabilitySlot) => void
+  onConfirm?: () => void
   onBack?: () => void
   submitting?: boolean
 }
@@ -19,18 +21,12 @@ const sidebarPoints = [
 export function BookCallScheduler({
   selectedSlot,
   onSelectSlot,
+  onConfirm,
   onBack,
   submitting = false,
 }: BookCallSchedulerProps) {
-  const dateLabel = selectedSlot
-    ? new Date(selectedSlot.starts_at).toLocaleString(undefined, {
-        weekday: 'long',
-        month: 'long',
-        day: 'numeric',
-        hour: 'numeric',
-        minute: '2-digit',
-      })
-    : null
+  const dateLabel = selectedSlot ? formatDateTime(selectedSlot.starts_at) : null
+  const tzLabel = timeZoneLabel()
 
   return (
     <div className="mx-auto grid w-full max-w-6xl gap-10 px-1 sm:px-0 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)] lg:gap-12">
@@ -51,14 +47,34 @@ export function BookCallScheduler({
         <p className="mt-3 font-garamond text-base leading-relaxed text-mist/55">
           Thanks for sharing your answers. Choose from Mike&apos;s open slots to lock in your call.
         </p>
-        {submitting ? (
-          <p className="mt-4 font-garamond text-sm text-gold/90">Confirming your booking…</p>
-        ) : null}
         {dateLabel ? (
-          <p className="mt-4 rounded-lg border border-gold/30 bg-gold/5 px-4 py-3 font-garamond text-sm text-gold">
-            Selected: {dateLabel}
+          <div className="mt-4 rounded-lg border border-gold/30 bg-gold/5 px-4 py-4">
+            <p className="font-garamond text-xs tracking-[0.16em] text-gold/70 uppercase">
+              Confirm your time
+            </p>
+            <p className="mt-1.5 font-garamond text-base text-gold">{dateLabel}</p>
+            {tzLabel ? (
+              <p className="mt-0.5 font-garamond text-xs text-mist/45">
+                Shown in your local time zone ({tzLabel})
+              </p>
+            ) : null}
+            <button
+              type="button"
+              onClick={onConfirm}
+              disabled={submitting}
+              className="mt-4 flex min-h-11 w-full items-center justify-center rounded-full bg-gold px-6 font-garamond text-sm tracking-[0.14em] text-void uppercase transition hover:bg-gold/90 disabled:opacity-60"
+            >
+              {submitting ? 'Confirming…' : 'Confirm booking'}
+            </button>
+            <p className="mt-2 text-center font-garamond text-xs text-mist/45">
+              Or pick another time below.
+            </p>
+          </div>
+        ) : (
+          <p className="mt-4 font-garamond text-sm text-mist/45">
+            Select a time below to continue.
           </p>
-        ) : null}
+        )}
         <ul className="mt-8 space-y-6">
           {sidebarPoints.map(({ Icon, title, subtitle }) => (
             <li key={title} className="flex gap-4">

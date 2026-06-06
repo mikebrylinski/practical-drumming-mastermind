@@ -28,10 +28,10 @@ const SEEDS: CohortSeed[] = [
     description:
       'Twelve-week flagship mentorship cohort with Mike — weekly live coaching, song breakdowns, and accountability.',
     room: 'cohort-spring-mastermind',
-    startsInDays: -21,
+    startsInDays: -56,
     nextSessionInMin: 12, // within the live window → shows "Live now"
-    pastSessions: 3,
-    upcomingSessions: 6,
+    pastSessions: 8,
+    upcomingSessions: 8,
     titles: [
       'Building Confidence Behind the Kit',
       'Dynamics & Ghost Notes',
@@ -39,6 +39,10 @@ const SEEDS: CohortSeed[] = [
       'Playing in the Pocket to a Click',
       'Song Breakdown Lab',
       'Fills That Serve the Music',
+      'Touring Mindset & Stage Craft',
+      'Recording-Ready Drum Takes',
+      'Building Your Practice Routine',
+      'Member Video Critique Night',
     ],
   },
   {
@@ -46,10 +50,10 @@ const SEEDS: CohortSeed[] = [
     name: 'Foundations Circle',
     description: 'Entry cohort for new members building core technique, timing, and reading.',
     room: 'cohort-foundations-circle',
-    startsInDays: -7,
+    startsInDays: -28,
     nextSessionInMin: 2 * 24 * 60, // ~2 days out
-    pastSessions: 1,
-    upcomingSessions: 6,
+    pastSessions: 4,
+    upcomingSessions: 8,
     titles: [
       'Grip, Stroke & Posture',
       'Single & Double Stroke Rolls',
@@ -57,6 +61,10 @@ const SEEDS: CohortSeed[] = [
       'Your First Groove',
       'Reading Basic Notation',
       'Coordination Warm-ups',
+      'Paradiddles in Practice',
+      'Building Speed Cleanly',
+      'Foot Technique Fundamentals',
+      'Putting It All Together',
     ],
   },
   {
@@ -64,10 +72,10 @@ const SEEDS: CohortSeed[] = [
     name: 'Groove & Pocket Lab',
     description: 'Weekly feel-focused workshop on time, subdivision, and making any groove breathe.',
     room: 'cohort-groove-pocket-lab',
-    startsInDays: -3,
+    startsInDays: -35,
     nextSessionInMin: 4 * 24 * 60, // ~4 days out
-    pastSessions: 1,
-    upcomingSessions: 6,
+    pastSessions: 5,
+    upcomingSessions: 8,
     titles: [
       'Where the Pocket Lives',
       'Pushing & Pulling Time',
@@ -75,6 +83,10 @@ const SEEDS: CohortSeed[] = [
       'Half-Time Feels',
       'Shuffle & Swing',
       'Playing Less, Saying More',
+      'Funk & Sixteenth-Note Grooves',
+      'Backbeat Placement',
+      'Grooving with a Bass Player',
+      'Feel Across Genres',
     ],
   },
   {
@@ -85,7 +97,7 @@ const SEEDS: CohortSeed[] = [
     startsInDays: 7,
     nextSessionInMin: 6 * 24 * 60, // ~6 days out
     pastSessions: 0,
-    upcomingSessions: 6,
+    upcomingSessions: 8,
     titles: [
       'Four-Way Coordination Systems',
       'Ostinato Soloing',
@@ -93,6 +105,10 @@ const SEEDS: CohortSeed[] = [
       'Polyrhythms 3:4 & 4:5',
       'Trading Fours',
       'Open-Ended Improvisation',
+      'Metric Modulation',
+      'Linear Drumming Concepts',
+      'Brushes & Texture',
+      'Composing Drum Parts',
     ],
   },
 ]

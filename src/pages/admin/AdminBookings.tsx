@@ -1,7 +1,10 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { AppCard, AdminShell } from '../../components/app/AdminShell'
+import { useAuth } from '../../lib/auth/AuthProvider'
+import { ConfirmDialog, useConfirm } from '../../components/ui/ConfirmDialog'
 import { DateTimePicker } from '../../components/ui/DateTimePicker'
+import { formatDateTime } from '../../lib/datetime'
 import { supabase } from '../../lib/supabase/client'
 import type { Booking } from '../../lib/supabase/types'
 
@@ -33,8 +36,9 @@ const statusColor: Record<Booking['status'], string> = {
 }
 
 export function AdminBookings() {
-  const [bookings, setBookings] = useState<Booking[]>(supabase ? [] : MOCK)
-  const [loading, setLoading] = useState(Boolean(supabase))
+  const { useSeedData } = useAuth()
+  const [bookings, setBookings] = useState<Booking[]>(useSeedData ? MOCK : [])
+  const [loading, setLoading] = useState(!useSeedData)
   const [busyId, setBusyId] = useState<string | null>(null)
   const [showForm, setShowForm] = useState(false)
   const [name, setName] = useState('')
@@ -42,6 +46,7 @@ export function AdminBookings() {
   const [startsAt, setStartsAt] = useState('')
   const [creating, setCreating] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const { confirm, dialogProps } = useConfirm()
 
   const load = useCallback(() => {
     if (!supabase) {
@@ -57,7 +62,7 @@ export function AdminBookings() {
         setBookings((data as Booking[]) ?? [])
         setLoading(false)
       })
-  }, [])
+  }, [useSeedData])
 
   useEffect(() => {
     load()
@@ -77,7 +82,7 @@ export function AdminBookings() {
         status: 'confirmed' as const,
         livekit_room_name: room,
       }
-      if (supabase) {
+      if (supabase && !useSeedData) {
         const { error: insErr } = await supabase.from('bookings').insert(row)
         if (insErr) throw new Error(insErr.message)
         load()
@@ -107,6 +112,14 @@ export function AdminBookings() {
   }
 
   async function cancel(id: string) {
+    const ok = await confirm({
+      title: 'Cancel this booking?',
+      message: 'The guest will lose access to the call. This cannot be undone.',
+      confirmLabel: 'Cancel booking',
+      cancelLabel: 'Keep it',
+      danger: true,
+    })
+    if (!ok) return
     setBusyId(id)
     try {
       await fetch('/api/bookings/cancel', {
@@ -114,7 +127,7 @@ export function AdminBookings() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ bookingId: id }),
       })
-      if (supabase) load()
+      if (supabase && !useSeedData) load()
       else
         setBookings((prev) =>
           prev.map((b) => (b.id === id ? { ...b, status: 'cancelled' } : b)),
@@ -208,7 +221,7 @@ export function AdminBookings() {
               {bookings.map((b) => (
                 <tr key={b.id} className="border-t border-white/[0.06]">
                   <td className="px-5 py-3 text-mist">
-                    {b.starts_at ? new Date(b.starts_at).toLocaleString() : '—'}
+                    {b.starts_at ? formatDateTime(b.starts_at) : '—'}
                   </td>
                   <td className="px-5 py-3 text-mist/65">
                     {b.name || '—'}
@@ -251,6 +264,7 @@ export function AdminBookings() {
           </table>
         </div>
       )}
+      <ConfirmDialog {...dialogProps} />
     </AdminShell>
   )
 }

@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { CredibilityIconRow } from '../components/home/CredibilityIconRow'
 import { Reveal } from '../components/Reveal'
+import { Seo } from '../components/Seo'
 import { SectionGridOverlay } from '../components/SectionGridOverlay'
 import { pageWrapClass, SectionShell } from '../components/SectionShell'
 
@@ -197,6 +198,13 @@ function HighlightGrid({
 export function AboutPage() {
   return (
     <article className="bg-void">
+      <Seo
+        title="About Mike Malinin"
+        description="Mike Malinin — former Goo Goo Dolls and Tanya Tucker drummer behind the Diamond-certified hit 'Iris,' a Modern Drummer cover feature, and a Guitar Center RockWalk honoree. The story behind Practical Drumming."
+        image="/about-mike-practical.png"
+        canonicalPath="/about"
+        type="profile"
+      />
       {/* Hero — credibility from original home */}
       <section className="relative overflow-hidden border-b border-white/[0.06]">
         <div
@@ -210,17 +218,17 @@ export function AboutPage() {
 
         <div className={`relative z-10 ${pageWrapClass} py-14 md:py-16 lg:py-20`}>
           <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)] lg:items-center lg:gap-12 xl:gap-16">
-            <div className="flex w-full flex-col justify-center lg:self-center">
-              <SectionHeading
-                eyebrow="About"
-                title={
-                  <>
-                    5 billion streams. Diamond &amp; platinum records.{' '}
-                    <span className="text-gold">The world&apos;s biggest stages.</span>
-                  </>
-                }
-                subtitle="Former Goo Goo Dolls / Tanya Tucker drummer — anchoring some of the most dominant records and live spectacles in modern rock."
-              />
+            <div className="flex w-full flex-col justify-center text-center lg:self-center lg:text-left">
+              <h1 className="font-bebas text-[clamp(2.75rem,7vw,4.5rem)] leading-[0.92] tracking-[0.03em] text-mist">
+                About <span className="text-gold">Mike Malinin</span>
+              </h1>
+              <p className="mt-3 font-bebas text-[clamp(1.4rem,3.4vw,2.1rem)] leading-tight tracking-[0.02em] text-mist/90">
+                5 billion streams. Diamond &amp; platinum records. The world&apos;s biggest stages.
+              </p>
+              <p className="mt-3 font-garamond text-lg leading-snug text-mist/65 md:text-xl">
+                Former Goo Goo Dolls / Tanya Tucker drummer — anchoring some of the most dominant
+                records and live spectacles in modern rock.
+              </p>
             </div>
             <CredibilityIconRow />
           </div>
@@ -332,6 +340,97 @@ export function AboutPage() {
         <HighlightGrid items={tanyaHighlights} />
       </SectionShell>
 
+      <SectionShell>
+        <Reveal className="w-full text-center lg:text-left">
+          <SectionHeading
+            eyebrow="Honors & Recognition"
+            title="Modern Drummer Cover & the Guitar Center RockWalk"
+          />
+          <Prose className="mt-5 lg:max-w-3xl">
+            Beyond the records and the stages, Mike Malinin&apos;s impact on the drumming world has
+            been recognized by the institutions that define the craft — from the pages of the
+            instrument&apos;s most respected magazine to a permanent place among rock&apos;s greats in
+            Hollywood.
+          </Prose>
+        </Reveal>
+
+        <div className="mt-10 grid gap-10 lg:mt-12 lg:grid-cols-2 lg:gap-12 xl:gap-16">
+          <Reveal>
+            <div className="flex w-full flex-col gap-6 lg:flex-row lg:items-start lg:gap-7">
+              <figure className="mx-auto w-full max-w-[12rem] shrink-0 sm:max-w-[13rem]">
+                <div className={`relative overflow-hidden ${portraitFrameClass} aspect-[3/4] w-full`}>
+                  <img
+                    src="/about-modern-drummer.png"
+                    alt="Mike Malinin featured on the cover of Modern Drummer magazine"
+                    className="absolute inset-0 h-full w-full object-cover object-center"
+                    loading="lazy"
+                    decoding="async"
+                    onError={(e) => {
+                      e.currentTarget.src = '/about-mike-practical.png'
+                    }}
+                  />
+                </div>
+                <figcaption className="mt-3 text-center font-garamond text-xs tracking-[0.22em] uppercase text-mist/50">
+                  Modern Drummer — cover feature
+                </figcaption>
+              </figure>
+              <div className="text-center lg:text-left">
+                <h3 className="font-bebas text-xl tracking-wide text-gold md:text-2xl">
+                  On the Cover of Modern Drummer
+                </h3>
+                <p className="mt-2.5 font-garamond text-sm leading-relaxed text-mist/65 md:text-base">
+                  <em className="text-mist/85">Modern Drummer</em> is the definitive global
+                  publication for the instrument, and a cover feature is one of the highest honors a
+                  player can receive. Mike earned that spotlight not for flash, but for feel — the
+                  pocket, dynamics, and song-first musicality that turned tracks like
+                  &ldquo;Iris&rdquo; into generational hits.
+                </p>
+                <p className="mt-2.5 font-garamond text-sm leading-relaxed text-mist/65 md:text-base">
+                  The feature placed him among the elite drummers whose approach shapes how the next
+                  generation thinks about playing for the music — exactly the philosophy at the core
+                  of Practical Drumming.
+                </p>
+              </div>
+            </div>
+          </Reveal>
+
+          <Reveal delay={0.06}>
+            <div className="flex w-full flex-col gap-6 lg:flex-row lg:items-start lg:gap-7">
+              <figure className="mx-auto w-full max-w-[12rem] shrink-0 sm:max-w-[13rem]">
+                <div className={`relative overflow-hidden ${portraitFrameClass} aspect-[3/4] w-full`}>
+                  <img
+                    src="/about-cta-rockwalk.png"
+                    alt="Mike Malinin at his Guitar Center RockWalk induction beside his handprint plaque in Hollywood"
+                    className="absolute inset-0 h-full w-full object-cover object-center"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </div>
+                <figcaption className="mt-3 text-center font-garamond text-xs tracking-[0.22em] uppercase text-mist/50">
+                  Guitar Center RockWalk — Hollywood
+                </figcaption>
+              </figure>
+              <div className="text-center lg:text-left">
+                <h3 className="font-bebas text-xl tracking-wide text-gold md:text-2xl">
+                  Guitar Center RockWalk Honoree
+                </h3>
+                <p className="mt-2.5 font-garamond text-sm leading-relaxed text-mist/65 md:text-base">
+                  The Guitar Center RockWalk of Fame in Hollywood immortalizes the musicians who have
+                  shaped popular music, capturing their handprints alongside legends like Jimi
+                  Hendrix, Eddie Van Halen, and Stevie Wonder. As part of the Goo Goo Dolls, Mike was
+                  inducted with his bandmates — his handprints set in stone on the world&apos;s most
+                  famous music boulevard.
+                </p>
+                <p className="mt-2.5 font-garamond text-sm leading-relaxed text-mist/65 md:text-base">
+                  It&apos;s the kind of recognition reserved for artists whose work defines an era —
+                  and a testament to the rock-solid drumming that powered five billion streams.
+                </p>
+              </div>
+            </div>
+          </Reveal>
+        </div>
+      </SectionShell>
+
       <section className="relative overflow-hidden border-t border-gold/15 bg-charcoal/25 py-14 md:py-16 lg:py-20">
         <SectionGridOverlay />
         <div
@@ -344,9 +443,9 @@ export function AboutPage() {
               <div className="flex w-full flex-col items-center justify-center text-center">
                 <AboutFigure
                   aspect="portrait"
-                  src="/about-cta-rockwalk.png"
-                  alt="Mike Malinin at Guitar Center RockWalk induction with handprint plaque"
-                  caption="Guitar Center RockWalk — Hollywood"
+                  src="/about-hero-crowd.png"
+                  alt="Mike Malinin performing for a packed crowd"
+                  caption="From the world's biggest stages to your kit"
                   captionCenter
                   className={portraitSizeClass}
                 />

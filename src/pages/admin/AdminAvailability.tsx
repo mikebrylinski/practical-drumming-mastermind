@@ -1,6 +1,14 @@
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react'
 import { AppCard, AdminShell } from '../../components/app/AdminShell'
+import { useAuth } from '../../lib/auth/AuthProvider'
+import { ConfirmDialog, useConfirm } from '../../components/ui/ConfirmDialog'
 import { TimePicker } from '../../components/ui/TimePicker'
+import {
+  MIKE_TIME_ZONE,
+  formatInTimeZone,
+  timeZoneLabel,
+  zonedWallTimeToUtcISO,
+} from '../../lib/datetime'
 import { supabase } from '../../lib/supabase/client'
 import {
   addSlots as addStoredSlots,
@@ -23,10 +31,11 @@ function dayKey(d: Date): string {
 }
 
 export function AdminAvailability() {
+  const { useSeedData } = useAuth()
   const [slots, setSlots] = useState<AvailabilitySlot[]>(() =>
-    supabase ? [] : loadStoredSlots(),
+    useSeedData ? loadStoredSlots() : [],
   )
-  const [loading, setLoading] = useState(Boolean(supabase))
+  const [loading, setLoading] = useState(!useSeedData)
   const [slug, setSlug] = useState('discovery-call')
   const [viewMonth, setViewMonth] = useState<Date>(() => {
     const d = new Date()
@@ -41,9 +50,10 @@ export function AdminAvailability() {
   const [endTime, setEndTime] = useState('16:00')
   const [duration, setDuration] = useState(30)
   const [busy, setBusy] = useState(false)
+  const { confirm, dialogProps } = useConfirm()
 
   const load = useCallback(() => {
-    if (!supabase) {
+    if (useSeedData || !supabase) {
       setSlots(loadStoredSlots())
       setLoading(false)
       return
@@ -57,7 +67,7 @@ export function AdminAvailability() {
         setSlots((data as AvailabilitySlot[]) ?? [])
         setLoading(false)
       })
-  }, [])
+  }, [useSeedData])
 
   useEffect(() => {
     load()
@@ -96,30 +106,33 @@ export function AdminAvailability() {
     setViewMonth((m) => new Date(m.getFullYear(), m.getMonth() + delta, 1))
   }
 
-  // Build discrete bookable slots across the [start, stop) window.
+  // Build discrete bookable slots across the [start, stop) window. The entered
+  // start/stop times are interpreted as Central Time (Mike's zone), not the
+  // admin's local zone, so availability is consistent wherever Mike logs in.
   function buildWindowSlots(): { starts_at: string; ends_at: string }[] {
     if (!selectedDate) return []
     const [sh, sm] = startTime.split(':').map(Number)
     const [eh, em] = endTime.split(':').map(Number)
-    const windowStart = new Date(selectedDate)
-    windowStart.setHours(sh, sm, 0, 0)
-    let windowEnd = new Date(selectedDate)
-    windowEnd.setHours(eh, em, 0, 0)
-    const step = Math.max(duration, 5) * 60000
+    const year = selectedDate.getFullYear()
+    const month = selectedDate.getMonth()
+    const day = selectedDate.getDate()
+    const stepMin = Math.max(duration, 5)
+    const startMin = sh * 60 + sm
+    let endMin = eh * 60 + em
     // If stop is at or before start, create a single slot of `duration`.
-    if (windowEnd.getTime() <= windowStart.getTime()) {
-      windowEnd = new Date(windowStart.getTime() + step)
-    }
+    if (endMin <= startMin) endMin = startMin + stepMin
+    const toIso = (totalMin: number) =>
+      zonedWallTimeToUtcISO(
+        year,
+        month,
+        day,
+        Math.floor(totalMin / 60),
+        totalMin % 60,
+        MIKE_TIME_ZONE,
+      )
     const out: { starts_at: string; ends_at: string }[] = []
-    for (
-      let cur = windowStart.getTime();
-      cur + step <= windowEnd.getTime() + 1;
-      cur += step
-    ) {
-      out.push({
-        starts_at: new Date(cur).toISOString(),
-        ends_at: new Date(cur + step).toISOString(),
-      })
+    for (let cur = startMin; cur + stepMin <= endMin + 0.5; cur += stepMin) {
+      out.push({ starts_at: toIso(cur), ends_at: toIso(cur + stepMin) })
     }
     return out
   }
@@ -131,7 +144,7 @@ export function AdminAvailability() {
     if (windowSlots.length === 0) return
     setBusy(true)
     try {
-      if (supabase) {
+      if (supabase && !useSeedData) {
         await supabase
           .from('availability_slots')
           .insert(windowSlots.map((w) => ({ slug, ...w })))
@@ -158,7 +171,14 @@ export function AdminAvailability() {
   }
 
   async function removeSlot(id: string) {
-    if (supabase) {
+    const ok = await confirm({
+      title: 'Remove this slot?',
+      message: 'This time slot will no longer be bookable.',
+      confirmLabel: 'Remove',
+      danger: true,
+    })
+    if (!ok) return
+    if (supabase && !useSeedData) {
       await supabase.from('availability_slots').delete().eq('id', id)
       load()
     } else {
@@ -281,6 +301,10 @@ export function AdminAvailability() {
                   })
                 : 'Select a day'}
             </h3>
+            <p className="mt-1 font-garamond text-xs tracking-[0.1em] text-gold/70 uppercase">
+              Times are Central Time ({timeZoneLabel(selectedDate ?? new Date(), MIKE_TIME_ZONE)} ·
+              Mike&apos;s zone)
+            </p>
 
             <form onSubmit={addSlot} className="mt-4 space-y-3">
               <div className="flex flex-wrap items-end gap-2">
@@ -335,10 +359,7 @@ export function AdminAvailability() {
                     className="flex items-center justify-between gap-3 rounded-lg border border-white/10 bg-charcoal/50 px-4 py-2.5"
                   >
                     <span className="font-garamond text-sm text-mist">
-                      {new Date(s.starts_at).toLocaleTimeString(undefined, {
-                        hour: 'numeric',
-                        minute: '2-digit',
-                      })}
+                      {formatInTimeZone(s.starts_at, MIKE_TIME_ZONE)}
                     </span>
                     <div className="flex items-center gap-3">
                       <span
@@ -365,6 +386,7 @@ export function AdminAvailability() {
           </AppCard>
         </div>
       )}
+      <ConfirmDialog {...dialogProps} />
     </AdminShell>
   )
 }

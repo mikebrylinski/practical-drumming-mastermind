@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { AppCard, AdminShell } from '../../components/app/AdminShell'
+import { useAuth } from '../../lib/auth/AuthProvider'
 import { supabase } from '../../lib/supabase/client'
 import { getLeads } from '../../lib/crm/getLeads'
 import { HEAT_THEME, STAGE_THEME, heatBand, type Stage } from '../../lib/crm/scoring'
@@ -107,6 +108,7 @@ function Kpi({
 const STAGE_ORDER: Stage[] = ['cold', 'warm', 'hot', 'converted']
 
 export function AdminHome() {
+  const { useSeedData } = useAuth()
   const [leads, setLeads] = useState<CRMLead[]>([])
   const [bookings, setBookings] = useState<Booking[]>([])
   const [applications, setApplications] = useState<Application[]>([])
@@ -116,11 +118,11 @@ export function AdminHome() {
   useEffect(() => {
     let active = true
     async function load() {
-      const leadData = await getLeads()
+      const leadData = await getLeads({ useSeedData })
       if (!active) return
       setLeads(leadData)
 
-      if (supabase) {
+      if (supabase && !useSeedData) {
         const [members, emails, recentBookings, recentApps] = await Promise.all([
           supabase.from('profiles').select('id', { count: 'exact', head: true }),
           supabase.from('email_logs').select('id', { count: 'exact', head: true }),
@@ -153,7 +155,7 @@ export function AdminHome() {
     return () => {
       active = false
     }
-  }, [])
+  }, [useSeedData])
 
   const metrics = useMemo(() => {
     const stageCounts: Record<Stage, number> = { cold: 0, warm: 0, hot: 0, converted: 0 }

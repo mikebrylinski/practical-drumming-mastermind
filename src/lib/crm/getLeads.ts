@@ -32,8 +32,8 @@ function blankLead(
  * applications into derived CRMLead objects. Computes intentScore, stage and
  * lastActivity. Falls back to mock data when Supabase is unconfigured.
  */
-export async function getLeads(): Promise<CRMLead[]> {
-  if (!supabase) return mockLeads()
+export async function getLeads(opts?: { useSeedData?: boolean }): Promise<CRMLead[]> {
+  if (!supabase || opts?.useSeedData) return mockLeads()
 
   const [profilesRes, eventsRes, bookingsRes, applicationsRes] = await Promise.all([
     supabase.from('profiles').select('*'),

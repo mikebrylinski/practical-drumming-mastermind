@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { AppCard, AppShell } from '../../components/app/AppShell'
+import { useAuth } from '../../lib/auth/AuthProvider'
 import { supabase } from '../../lib/supabase/client'
 import { cohortRoomName } from '../../lib/slug'
+import { formatDateTime } from '../../lib/datetime'
 import {
   buildDemoRoster,
   demoSessionsForCohort,
@@ -46,7 +48,7 @@ const levelTheme: Record<RosterMember['level'], string> = {
 
 function formatWhen(iso: string | null): string {
   if (!iso) return 'TBA'
-  return new Date(iso).toLocaleString(undefined, {
+  return formatDateTime(iso, {
     weekday: 'short',
     month: 'short',
     day: 'numeric',
@@ -57,20 +59,21 @@ function formatWhen(iso: string | null): string {
 
 export function CohortDetailPage() {
   const { cohortId = '' } = useParams()
+  const { useSeedData } = useAuth()
   const [cohort, setCohort] = useState<Cohort | undefined>(() =>
-    supabase ? undefined : findDemoCohort(cohortId),
+    useSeedData ? findDemoCohort(cohortId) : undefined,
   )
   const [sessions, setSessions] = useState<Session[]>(() =>
-    supabase ? [] : demoSessionsForCohort(cohortId),
+    useSeedData ? demoSessionsForCohort(cohortId) : [],
   )
   const [roster, setRoster] = useState<RosterMember[]>(() =>
-    supabase ? [] : buildDemoRoster(cohortId),
+    useSeedData ? buildDemoRoster(cohortId) : [],
   )
-  const [loading, setLoading] = useState(Boolean(supabase))
+  const [loading, setLoading] = useState(!useSeedData)
   const [rsvps, setRsvps] = useState<Set<string>>(loadRsvps)
 
   useEffect(() => {
-    if (!supabase) return
+    if (useSeedData || !supabase) return
     const sb = supabase
     let active = true
     async function load() {
@@ -107,7 +110,7 @@ export function CohortDetailPage() {
     return () => {
       active = false
     }
-  }, [cohortId])
+  }, [cohortId, useSeedData])
 
   const toggleRsvp = useCallback((sessionId: string) => {
     setRsvps((prev) => {

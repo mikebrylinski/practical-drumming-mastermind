@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { dayKey, useAvailabilitySlots } from '../../lib/booking/useAvailabilitySlots'
+import { timeZoneLabel } from '../../lib/datetime'
 import type { AvailabilitySlot } from '../../lib/supabase/types'
 
 const WEEKDAYS = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
@@ -124,7 +125,7 @@ export function BookingCalendarPicker({ slug, onSelectSlot }: BookingCalendarPic
       </div>
 
       <div className="border-t border-white/10 pt-4 md:border-t-0 md:border-l md:pt-0 md:pl-6">
-        <h3 className="mb-3 font-garamond text-sm tracking-[0.14em] text-mist/60 uppercase">
+        <h3 className="mb-1 font-garamond text-sm tracking-[0.14em] text-mist/60 uppercase">
           {selectedDay
             ? new Date(daySlots[0]?.starts_at ?? Date.now()).toLocaleDateString(undefined, {
                 weekday: 'long',
@@ -133,6 +134,13 @@ export function BookingCalendarPicker({ slug, onSelectSlot }: BookingCalendarPic
               })
             : 'Select a day'}
         </h3>
+        {selectedDay && daySlots.length > 0 && timeZoneLabel() ? (
+          <p className="mb-3 font-garamond text-xs tracking-[0.08em] text-gold/70">
+            Shown in your local time zone ({timeZoneLabel()})
+          </p>
+        ) : (
+          <div className="mb-3" />
+        )}
         <div className="flex max-h-[22rem] flex-col gap-2 overflow-y-auto pr-1">
           {daySlots.length === 0 ? (
             <p className="font-garamond text-sm text-mist/40">No times on this day.</p>

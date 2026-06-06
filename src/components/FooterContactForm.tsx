@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { trackLeadEvent } from '../lib/leads/track'
+import { getRecaptchaToken, isRecaptchaEnabled } from '../lib/recaptcha'
 
 const inputClass =
   'mt-1.5 w-full border border-white/10 bg-void/80 px-3 py-2 font-garamond text-sm text-mist placeholder:text-mist/30 outline-none transition focus:border-gold/50 focus:ring-1 focus:ring-gold/30'
@@ -15,10 +16,11 @@ export function FooterContactForm() {
     e.preventDefault()
     setStatus('submitting')
     try {
+      const recaptchaToken = await getRecaptchaToken('contact')
       const res = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, message }),
+        body: JSON.stringify({ name, email, message, recaptchaToken }),
       })
       if (!res.ok) throw new Error('Request failed')
       trackLeadEvent('form_submit', { type: 'contact', email })
@@ -92,6 +94,29 @@ export function FooterContactForm() {
           {status === 'submitting' ? 'Sending…' : 'Send message'}
         </button>
       </div>
+      {isRecaptchaEnabled() ? (
+        <p className="text-center font-garamond text-[0.65rem] leading-relaxed text-mist/35">
+          Protected by reCAPTCHA. Google&apos;s{' '}
+          <a
+            href="https://policies.google.com/privacy"
+            target="_blank"
+            rel="noreferrer"
+            className="underline decoration-mist/20 underline-offset-2 hover:text-mist/55"
+          >
+            Privacy Policy
+          </a>{' '}
+          and{' '}
+          <a
+            href="https://policies.google.com/terms"
+            target="_blank"
+            rel="noreferrer"
+            className="underline decoration-mist/20 underline-offset-2 hover:text-mist/55"
+          >
+            Terms
+          </a>{' '}
+          apply.
+        </p>
+      ) : null}
     </form>
   )
 }

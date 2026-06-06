@@ -7,6 +7,7 @@ import { getLeads } from '../../lib/crm/getLeads'
 import { applyFilters, defaultFilters, type LeadFilterState } from '../../lib/crm/filters'
 import { STAGE_THEME, heatBand, HEAT_THEME } from '../../lib/crm/scoring'
 import type { CRMLead } from '../../lib/crm/types'
+import { useAuth } from '../../lib/auth/AuthProvider'
 import { supabase } from '../../lib/supabase/client'
 
 type SortKey = 'score' | 'recent'
@@ -52,6 +53,7 @@ function LeadRow({
 }
 
 export function LeadsPage() {
+  const { useSeedData } = useAuth()
   const [leads, setLeads] = useState<CRMLead[]>([])
   const [loading, setLoading] = useState(true)
   const [filters, setFilters] = useState<LeadFilterState>(defaultFilters)
@@ -62,7 +64,7 @@ export function LeadsPage() {
   useEffect(() => {
     let active = true
     function refresh() {
-      getLeads().then((data) => {
+      getLeads({ useSeedData }).then((data) => {
         if (!active) return
         setLeads(data)
         setSelectedId((prev) => prev ?? data[0]?.userId ?? null)
@@ -72,8 +74,10 @@ export function LeadsPage() {
     refresh()
 
     const sb = supabase
-    if (!sb) return () => {
-      active = false
+    if (!sb || useSeedData) {
+      return () => {
+        active = false
+      }
     }
 
     // Chunk 7: live CRM updates via Supabase Realtime.
@@ -94,7 +98,7 @@ export function LeadsPage() {
       window.clearTimeout(timer)
       sb.removeChannel(channel)
     }
-  }, [])
+  }, [useSeedData])
 
   const visible = useMemo(() => {
     const filtered = applyFilters(leads, filters)
@@ -130,7 +134,7 @@ export function LeadsPage() {
             className={`size-2 rounded-full ${live ? 'animate-pulse bg-emerald-400' : 'bg-mist/40'}`}
             aria-hidden
           />
-          {live ? 'Live' : supabase ? 'Offline' : 'Demo'}
+          {useSeedData ? 'Demo' : live ? 'Live' : 'Offline'}
         </span>
       }
     >

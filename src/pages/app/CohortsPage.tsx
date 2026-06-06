@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { AppShell } from '../../components/app/AppShell'
+import { useAuth } from '../../lib/auth/AuthProvider'
 import { supabase } from '../../lib/supabase/client'
 import { cohortRoomName } from '../../lib/slug'
+import { formatDateTime } from '../../lib/datetime'
 import { buildDemoCohorts, buildDemoSessions } from '../../lib/demo/cohorts'
 import type { Cohort, Session } from '../../lib/supabase/types'
 
@@ -71,7 +73,7 @@ function CohortCard({ cohort, sessions }: { cohort: Cohort; sessions: Session[] 
             <dt className="text-mist/40">Next session</dt>
             <dd className="truncate text-mist/70">
               {next?.scheduled_at
-                ? new Date(next.scheduled_at).toLocaleString(undefined, {
+                ? formatDateTime(next.scheduled_at, {
                     month: 'short',
                     day: 'numeric',
                     hour: 'numeric',
@@ -106,12 +108,13 @@ function CohortCard({ cohort, sessions }: { cohort: Cohort; sessions: Session[] 
 }
 
 export function CohortsPage() {
+  const { useSeedData } = useAuth()
   const [cohorts, setCohorts] = useState<Cohort[]>(buildDemoCohorts)
   const [sessions, setSessions] = useState<Session[]>(buildDemoSessions)
-  const [loading, setLoading] = useState(Boolean(supabase))
+  const [loading, setLoading] = useState(!useSeedData)
 
   useEffect(() => {
-    if (!supabase) return
+    if (useSeedData || !supabase) return
     let active = true
     async function load() {
       const [{ data: c }, { data: s }] = await Promise.all([
@@ -127,7 +130,7 @@ export function CohortsPage() {
     return () => {
       active = false
     }
-  }, [])
+  }, [useSeedData])
 
   const liveCount = useMemo(
     () => cohorts.filter((c) => isLive(nextSessionFor(c.id, sessions))).length,

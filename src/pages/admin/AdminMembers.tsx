@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { AdminShell } from '../../components/app/AdminShell'
+import { useAuth } from '../../lib/auth/AuthProvider'
 import { supabase } from '../../lib/supabase/client'
 import type { Profile } from '../../lib/supabase/types'
 
@@ -11,11 +12,12 @@ const MOCK_MEMBERS: Profile[] = [
 ]
 
 export function AdminMembers() {
+  const { useSeedData } = useAuth()
   const [members, setMembers] = useState<Profile[]>(MOCK_MEMBERS)
-  const [loading, setLoading] = useState(Boolean(supabase))
+  const [loading, setLoading] = useState(!useSeedData)
 
   useEffect(() => {
-    if (!supabase) return
+    if (useSeedData || !supabase) return
     let active = true
     supabase
       .from('profiles')
@@ -29,7 +31,7 @@ export function AdminMembers() {
     return () => {
       active = false
     }
-  }, [])
+  }, [useSeedData])
 
   return (
     <AdminShell eyebrow="Admin" title="Members" wide>

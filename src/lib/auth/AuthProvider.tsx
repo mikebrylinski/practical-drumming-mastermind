@@ -8,6 +8,7 @@ import {
   type ReactNode,
 } from 'react'
 import type { Session } from '@supabase/supabase-js'
+import { isDemoLoginEnabled, SEED_DATA_SESSION_KEY, seedSignInAsAdmin } from '../demo/flags'
 import { isSupabaseConfigured, supabase } from '../supabase/client'
 import { setLeadUserId } from '../leads/track'
 import type { Profile, Role } from '../supabase/types'
@@ -21,11 +22,18 @@ type AuthContextValue = {
   role: Role | null
   isAuthed: boolean
   isAdmin: boolean
+  /** True when Supabase keys are absent (full mock auth). */
   mockMode: boolean
+  /** True when exploring with built-in seed data (mock mode or VITE_DEMO_LOGIN session). */
+  useSeedData: boolean
+  demoLoginEnabled: boolean
+  /** Demo build: seed login always uses admin role so both dashboards are reachable. */
+  seedSignInAsAdmin: boolean
   signInWithPassword: (email: string, password: string) => Promise<AuthResult>
   signUp: (email: string, password: string, fullName: string) => Promise<AuthResult>
   signInWithOtp: (email: string) => Promise<AuthResult>
   signOut: () => Promise<void>
+  enterSeedDataLogin: (role: Role) => Promise<void>
   setMockRole: (role: Role) => void
 }
 
@@ -40,12 +48,30 @@ const MOCK_PROFILE: Profile = {
   role: 'admin',
 }
 
+function readStoredSeedRole(): Role | null {
+  try {
+    const raw = sessionStorage.getItem(SEED_DATA_SESSION_KEY)
+    return raw === 'admin' || raw === 'member' ? raw : null
+  } catch {
+    return null
+  }
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const mockMode = !isSupabaseConfigured
-  const [loading, setLoading] = useState(!mockMode)
+  const demoLoginEnabled = isDemoLoginEnabled
+  const forceAdminSeed = seedSignInAsAdmin(mockMode)
+  const storedSeedRole = readStoredSeedRole()
+  const [seedDataActive, setSeedDataActive] = useState(
+    () => demoLoginEnabled && storedSeedRole !== null,
+  )
+  const useSeedData = seedDataActive
+  const [loading, setLoading] = useState(mockMode ? false : !seedDataActive)
   const [session, setSession] = useState<Session | null>(null)
-  const [profile, setProfile] = useState<Profile | null>(mockMode ? MOCK_PROFILE : null)
-  const [mockRole, setMockRole] = useState<Role>('admin')
+  const [profile, setProfile] = useState<Profile | null>(seedDataActive ? MOCK_PROFILE : null)
+  const [mockRole, setMockRole] = useState<Role>(
+    () => (forceAdminSeed ? 'admin' : storedSeedRole) ?? 'admin',
+  )
 
   const loadProfile = useCallback(async (userId: string, fallbackEmail?: string) => {
     if (!supabase) return
@@ -82,6 +108,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { data: sub } = supabase.auth.onAuthStateChange((_event, nextSession) => {
       setSession(nextSession)
       if (nextSession?.user) {
+        setSeedDataActive(false)
+        try {
+          sessionStorage.removeItem(SEED_DATA_SESSION_KEY)
+        } catch {
+          /* no-op */
+        }
         void loadProfile(nextSession.user.id, nextSession.user.email ?? undefined)
       } else {
         setProfile(null)
@@ -92,7 +124,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       active = false
       sub.subscription.unsubscribe()
     }
-  }, [mockMode, loadProfile])
+  }, [useSeedData, loadProfile])
 
   const signInWithPassword = useCallback(
     async (email: string, password: string): Promise<AuthResult> => {
@@ -126,15 +158,56 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const signOut = useCallback(async () => {
-    if (!supabase) return
+    setSeedDataActive(false)
+    try {
+      sessionStorage.removeItem(SEED_DATA_SESSION_KEY)
+    } catch {
+      /* no-op */
+    }
+    if (!supabase) {
+      setProfile(null)
+      setSession(null)
+      return
+    }
     await supabase.auth.signOut()
     setProfile(null)
     setSession(null)
   }, [])
 
-  const effectiveProfile = mockMode
-    ? { ...MOCK_PROFILE, role: mockRole }
-    : profile
+  const updateMockRole = useCallback(
+    (role: Role) => {
+      const effectiveRole = forceAdminSeed ? 'admin' : role
+      setMockRole(effectiveRole)
+      if (seedDataActive) {
+        try {
+          sessionStorage.setItem(SEED_DATA_SESSION_KEY, effectiveRole)
+        } catch {
+          /* no-op */
+        }
+      }
+    },
+    [forceAdminSeed, seedDataActive],
+  )
+
+  const enterSeedDataLogin = useCallback(
+    async (role: Role) => {
+      const effectiveRole = forceAdminSeed ? 'admin' : role
+      if (supabase) await supabase.auth.signOut()
+      setSession(null)
+      setMockRole(effectiveRole)
+      setProfile(MOCK_PROFILE)
+      setSeedDataActive(true)
+      try {
+        sessionStorage.setItem(SEED_DATA_SESSION_KEY, effectiveRole)
+      } catch {
+        /* no-op */
+      }
+      setLoading(false)
+    },
+    [forceAdminSeed],
+  )
+
+  const effectiveProfile = useSeedData ? { ...MOCK_PROFILE, role: mockRole } : profile
 
   useEffect(() => {
     setLeadUserId(session?.user?.id ?? null)
@@ -146,24 +219,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       session,
       profile: effectiveProfile,
       role: effectiveProfile?.role ?? null,
-      isAuthed: mockMode ? true : Boolean(session),
+      isAuthed: useSeedData ? true : Boolean(session),
       isAdmin: effectiveProfile?.role === 'admin',
       mockMode,
+      useSeedData,
+      demoLoginEnabled,
+      seedSignInAsAdmin: forceAdminSeed,
       signInWithPassword,
       signUp,
       signInWithOtp,
       signOut,
-      setMockRole,
+      enterSeedDataLogin,
+      setMockRole: updateMockRole,
     }),
     [
       loading,
       session,
       effectiveProfile,
       mockMode,
+      useSeedData,
+      demoLoginEnabled,
+      forceAdminSeed,
       signInWithPassword,
       signUp,
       signInWithOtp,
       signOut,
+      enterSeedDataLogin,
+      updateMockRole,
     ],
   )
 

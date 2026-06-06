@@ -1,4 +1,5 @@
 import { Reveal } from '../components/Reveal'
+import { Seo } from '../components/Seo'
 
 const faqs = [
   {
@@ -26,6 +27,11 @@ const faqs = [
 export function FaqPage() {
   return (
     <article className="mx-auto w-full max-w-6xl px-5 py-20 md:px-8 md:py-28">
+      <Seo
+        title="FAQ"
+        description="Frequently asked questions about the Practical Drumming Mastermind Club with Mike Malinin."
+        canonicalPath="/faq"
+      />
       <Reveal>
         <p className="font-garamond text-xs tracking-[0.35em] uppercase text-gold-dim">FAQ</p>
         <h1 className="mt-4 font-bebas text-4xl text-mist md:text-5xl lg:text-6xl">

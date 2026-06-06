@@ -6,6 +6,7 @@ import { MembersRoadmap } from './MembersRoadmap'
 import { MembersIcon, PlayIcon } from './MembersIcons'
 import { buildDemoCohorts, buildDemoSessions } from '../../lib/demo/cohorts'
 import { cohortRoomName } from '../../lib/slug'
+import { formatDateTime } from '../../lib/datetime'
 import { communityPosts, directoryMembers, vaultVideos } from './mockData'
 
 const goldBtn =
@@ -136,7 +137,7 @@ export function MembersDashboard() {
           </div>
           <p className="mt-3 text-center font-garamond text-sm text-mist/55 sm:mt-4 sm:text-base">
             {session?.scheduled_at
-              ? new Date(session.scheduled_at).toLocaleString(undefined, {
+              ? formatDateTime(session.scheduled_at, {
                   weekday: 'long',
                   month: 'short',
                   day: 'numeric',
@@ -176,7 +177,7 @@ export function MembersDashboard() {
               </p>
               <p className="pt-1 font-garamond text-sm text-mist/45">
                 {session?.scheduled_at
-                  ? new Date(session.scheduled_at).toLocaleString(undefined, {
+                  ? formatDateTime(session.scheduled_at, {
                       month: 'long',
                       day: 'numeric',
                       hour: 'numeric',

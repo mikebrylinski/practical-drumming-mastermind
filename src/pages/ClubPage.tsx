@@ -4,6 +4,7 @@ import { ClubAnimatedBackground } from '../components/club/ClubAnimatedBackgroun
 import { ClubBenefitsBackground } from '../components/club/ClubBenefitsBackground'
 import { ClubCtaAnimation } from '../components/club/ClubCtaAnimation'
 import { Reveal } from '../components/Reveal'
+import { Seo } from '../components/Seo'
 import { pageWrapClass, SectionShell } from '../components/SectionShell'
 
 const clubBenefits: { title: string; body: ReactNode }[] = [
@@ -138,6 +139,11 @@ function BulletList({
 export function ClubPage() {
   return (
     <article className="bg-void">
+      <Seo
+        title="The Mastermind Club"
+        description="Inside the Practical Drumming Mastermind Club: weekly live calls, video feedback, a private community, and direct mentorship from Mike Malinin."
+        canonicalPath="/club"
+      />
       {/* Hero — club-specific, not home repeat */}
       <section className="relative overflow-hidden border-b border-white/[0.06]">
         <div

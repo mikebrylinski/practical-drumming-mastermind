@@ -3,7 +3,7 @@ import { AppCard, AppShell } from '../../components/app/AppShell'
 import { useAuth } from '../../lib/auth/AuthProvider'
 
 export function ProfilePage() {
-  const { profile, mockMode, role, setMockRole, signOut } = useAuth()
+  const { profile, useSeedData, role, setMockRole, signOut, seedSignInAsAdmin } = useAuth()
   const navigate = useNavigate()
 
   async function handleSignOut() {
@@ -31,7 +31,7 @@ export function ProfilePage() {
           </dl>
         </AppCard>
 
-        {mockMode ? (
+        {useSeedData && !seedSignInAsAdmin ? (
           <AppCard>
             <p className="font-garamond text-xs tracking-[0.2em] text-gold uppercase">
               Demo role switch

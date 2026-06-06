@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { AdminShell } from '../../components/app/AdminShell'
+import { useAuth } from '../../lib/auth/AuthProvider'
 import { supabase } from '../../lib/supabase/client'
 import type { Application, ApplicationStatus } from '../../lib/supabase/types'
 
@@ -40,11 +41,12 @@ const statusColor: Record<ApplicationStatus, string> = {
 }
 
 export function AdminApplications() {
+  const { useSeedData } = useAuth()
   const [apps, setApps] = useState<Application[]>(MOCK_APPS)
-  const [loading, setLoading] = useState(Boolean(supabase))
+  const [loading, setLoading] = useState(!useSeedData)
 
   useEffect(() => {
-    if (!supabase) return
+    if (useSeedData || !supabase) return
     let active = true
     supabase
       .from('applications')
@@ -58,7 +60,7 @@ export function AdminApplications() {
     return () => {
       active = false
     }
-  }, [])
+  }, [useSeedData])
 
   async function updateStatus(id: string, status: ApplicationStatus) {
     setApps((prev) => prev.map((a) => (a.id === id ? { ...a, status } : a)))

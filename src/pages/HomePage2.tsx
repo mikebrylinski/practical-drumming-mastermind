@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import { ClubCtaAnimation } from '../components/club/ClubCtaAnimation'
 import { JoinClubBackground } from '../components/JoinClubBackground'
 import { Reveal } from '../components/Reveal'
+import { Seo } from '../components/Seo'
 import { pageWrapClass, SectionShell } from '../components/SectionShell'
 
 const inlineLinkClass =
@@ -110,6 +111,11 @@ function FeatureCard({ title, body }: { title: string; body: ReactNode }) {
 export function HomePage2() {
   return (
     <div className="bg-void">
+      <Seo
+        title="Drumming Mastermind with Mike Malinin"
+        description="Practical Drumming Mastermind Club — live weekly mentorship with Mike Malinin, former Goo Goo Dolls drummer. Technique, touring, recording, and career growth for serious drummers."
+        canonicalPath="/"
+      />
       {/* Hero — two-column, matches Home */}
       <section className="relative flex min-h-[calc(100svh-4.5rem)] flex-col overflow-hidden border-b border-white/[0.06] bg-void md:min-h-[calc(100svh-5rem)]">
         <div

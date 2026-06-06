@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from 'react'
+import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import type { NavigateFunction } from 'react-router-dom'
 import '@livekit/components-styles'
@@ -11,7 +11,7 @@ import {
   useParticipants,
   useTracks,
 } from '@livekit/components-react'
-import { Track } from 'livekit-client'
+import { DisconnectReason, MediaDeviceFailure, Room, Track } from 'livekit-client'
 import { useAuth } from '../../lib/auth/AuthProvider'
 import {
   ConnectionStrengthMeter,
@@ -41,8 +41,66 @@ function VideoStage() {
   )
 }
 
-function ChatScaffold() {
-  const [open, setOpen] = useState(false)
+const dockButtonClass =
+  'rounded-full border border-white/15 bg-black/60 px-4 py-2 font-garamond text-xs tracking-[0.14em] text-mist/80 uppercase backdrop-blur transition hover:border-gold/40'
+
+const dockPanelClass =
+  'absolute bottom-20 right-4 z-30 flex h-80 w-72 max-w-[calc(100vw-2rem)] flex-col rounded-xl border border-white/10 bg-charcoal/95 backdrop-blur'
+
+async function copyToClipboard(text: string) {
+  try {
+    await navigator.clipboard.writeText(text)
+    return
+  } catch {
+    // Fallback for browsers / contexts without the async clipboard API.
+    const ta = document.createElement('textarea')
+    ta.value = text
+    ta.style.position = 'fixed'
+    ta.style.opacity = '0'
+    document.body.appendChild(ta)
+    ta.select()
+    try {
+      document.execCommand('copy')
+    } catch {
+      /* no-op */
+    }
+    document.body.removeChild(ta)
+  }
+}
+
+function InviteButton() {
+  const [copied, setCopied] = useState(false)
+
+  async function invite() {
+    const url = window.location.href
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: 'Join my video room', url })
+        return
+      } catch {
+        // User dismissed the share sheet — fall through to copy.
+      }
+    }
+    await copyToClipboard(url)
+    setCopied(true)
+    window.setTimeout(() => setCopied(false), 2000)
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={invite}
+      className="pointer-events-auto rounded-full border border-gold/40 bg-gold/10 px-4 py-1.5 font-garamond text-xs tracking-[0.14em] text-gold uppercase backdrop-blur transition hover:bg-gold/20"
+    >
+      {copied ? 'Link copied' : 'Invite'}
+    </button>
+  )
+}
+
+/** Right-side dock: a People (participant list) panel and a local chat panel. */
+function RoomDock() {
+  const [panel, setPanel] = useState<'none' | 'people' | 'chat'>('none')
+  const participants = useParticipants()
   const [messages, setMessages] = useState<{ id: number; text: string }[]>([])
   const [draft, setDraft] = useState('')
 
@@ -54,18 +112,55 @@ function ChatScaffold() {
     setDraft('')
   }
 
+  function toggle(next: 'people' | 'chat') {
+    setPanel((cur) => (cur === next ? 'none' : next))
+  }
+
   return (
-    <>
-      <button
-        type="button"
-        onClick={() => setOpen((o) => !o)}
-        className="rounded-full border border-white/15 bg-black/60 px-4 py-2 font-garamond text-xs tracking-[0.14em] text-mist/80 uppercase backdrop-blur transition hover:border-gold/40"
-      >
-        {open ? 'Hide chat' : 'Chat'}
+    <div className="flex items-center gap-2">
+      <button type="button" onClick={() => toggle('people')} className={dockButtonClass}>
+        People · {participants.length}
       </button>
-      {open ? (
-        <div className="absolute bottom-20 right-4 z-30 flex h-80 w-72 flex-col rounded-xl border border-white/10 bg-charcoal/95 backdrop-blur">
-          <div className="border-b border-white/10 px-4 py-2.5 font-garamond text-xs tracking-[0.16em] text-mist/60 uppercase">
+      <button type="button" onClick={() => toggle('chat')} className={dockButtonClass}>
+        {panel === 'chat' ? 'Hide chat' : 'Chat'}
+      </button>
+
+      {panel === 'people' ? (
+        <div className={dockPanelClass}>
+          <div className="hidden border-b border-white/10 px-4 py-2.5 font-garamond text-xs tracking-[0.16em] text-mist/60 uppercase sm:block">
+            In this room
+          </div>
+          <ul className="flex-1 space-y-1 overflow-y-auto p-2">
+            {participants.map((p) => (
+              <li
+                key={p.identity}
+                className="flex items-center justify-between rounded-lg px-3 py-1.5"
+              >
+                <span className="truncate font-garamond text-sm text-mist/80">
+                  {p.name || p.identity}
+                  {p.isLocal ? ' (you)' : ''}
+                </span>
+                <span className="flex shrink-0 items-center gap-1.5">
+                  <span
+                    className={`size-1.5 rounded-full ${p.isMicrophoneEnabled ? 'bg-emerald-400' : 'bg-white/25'}`}
+                    title={p.isMicrophoneEnabled ? 'Mic on' : 'Mic off'}
+                    aria-hidden
+                  />
+                  <span
+                    className={`size-1.5 rounded-full ${p.isCameraEnabled ? 'bg-emerald-400' : 'bg-white/25'}`}
+                    title={p.isCameraEnabled ? 'Camera on' : 'Camera off'}
+                    aria-hidden
+                  />
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+
+      {panel === 'chat' ? (
+        <div className={dockPanelClass}>
+          <div className="hidden border-b border-white/10 px-4 py-2.5 font-garamond text-xs tracking-[0.16em] text-mist/60 uppercase sm:block">
             Room chat
           </div>
           <div className="flex-1 space-y-2 overflow-y-auto p-3">
@@ -98,7 +193,7 @@ function ChatScaffold() {
           </form>
         </div>
       ) : null}
-    </>
+    </div>
   )
 }
 
@@ -145,15 +240,16 @@ function RoomTopBar({
 }) {
   return (
     <div className="pointer-events-none absolute inset-x-0 top-0 z-30 flex items-start justify-between gap-3 p-4">
-      <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center gap-2 sm:gap-3">
         <BackButton navigate={navigate} />
         <div className="pointer-events-auto flex items-center gap-3 rounded-full border border-white/10 bg-black/60 px-4 py-1.5 backdrop-blur">
-          <span className="font-garamond text-xs tracking-[0.16em] text-mist/70 uppercase">
+          <span className="hidden font-garamond text-xs tracking-[0.16em] text-mist/70 uppercase sm:inline">
             {roomName}
           </span>
-          <span className="h-3 w-px bg-white/15" aria-hidden />
+          <span className="hidden h-3 w-px bg-white/15 sm:block" aria-hidden />
           <ParticipantCount max={max} />
         </div>
+        <InviteButton />
       </div>
       <div className="pointer-events-auto">
         <ConnectionStrengthMeter />
@@ -168,6 +264,20 @@ export function RoomPage() {
   const navigate = useNavigate()
   const [state, setState] = useState<TokenState>({ status: 'loading' })
 
+  // A single, stable Room instance for this page. Re-using one instance (rather
+  // than letting LiveKitRoom create a new one on every render) prevents the
+  // connect/disconnect race that surfaces on iOS Chrome as
+  // "Client initiated disconnect".
+  const room = useMemo(() => new Room(), [])
+
+  // Identity/name must be stable across renders so the token effect below does
+  // not re-fire (which would re-connect mid-disconnect). A random guest id is
+  // generated once and kept in a ref instead of being recomputed each run.
+  const userId = session?.user?.id
+  const guestIdRef = useRef(`guest-${Math.random().toString(36).slice(2, 8)}`)
+  const identity = userId ?? guestIdRef.current
+  const displayName = profile?.full_name || profile?.email || 'Guest'
+
   useEffect(() => {
     let active = true
     async function getToken() {
@@ -178,8 +288,8 @@ export function RoomPage() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             room: roomName,
-            identity: session?.user?.id ?? `guest-${Math.random().toString(36).slice(2, 8)}`,
-            name: profile?.full_name || profile?.email || 'Guest',
+            identity,
+            name: displayName,
           }),
         })
       } catch {
@@ -233,7 +343,7 @@ export function RoomPage() {
     return () => {
       active = false
     }
-  }, [roomName, session, profile])
+  }, [roomName, identity, displayName])
 
   if (state.status === 'loading') {
     return (
@@ -291,12 +401,20 @@ export function RoomPage() {
   return (
     <div className="relative min-h-svh bg-void" data-lk-theme="default">
       <LiveKitRoom
+        room={room}
         token={state.token}
         serverUrl={state.url}
         connect
         video
         audio
         onError={(err) => {
+          // A "client initiated disconnect" is a transient connect/disconnect
+          // race (notably on iOS Chrome), not a real failure — ignore it so we
+          // don't tear down the room the user is trying to join.
+          if (/client initiated disconnect/i.test(err.message)) {
+            console.warn('LiveKit transient disconnect ignored:', err.message)
+            return
+          }
           const full = /full|exceed|maximum|capacity/i.test(err.message)
           setState({
             status: 'error',
@@ -305,7 +423,21 @@ export function RoomPage() {
               : `LiveKit: ${err.message}`,
           })
         }}
-        onDisconnected={() => navigate('/dashboard', { replace: true })}
+        onMediaDeviceFailure={(failure) => {
+          setState({
+            status: 'error',
+            message:
+              failure === MediaDeviceFailure.PermissionDenied
+                ? 'Camera/microphone access is blocked. Enable it for this site in your browser settings, then reload.'
+                : 'Could not access your camera or microphone. Make sure no other app is using it, then reload.',
+          })
+        }}
+        onDisconnected={(reason) => {
+          // Only leave the page on a genuine, user/server-initiated disconnect.
+          // The transient client-initiated race should not bounce the user out.
+          if (reason === DisconnectReason.CLIENT_INITIATED) return
+          navigate('/dashboard', { replace: true })
+        }}
         style={{ height: '100svh' }}
       >
         <RoomTopBar roomName={roomName} max={state.max} navigate={navigate} />
@@ -314,7 +446,7 @@ export function RoomPage() {
         </div>
         <div className="absolute inset-x-0 bottom-0 z-20 flex items-center justify-between gap-3 p-3">
           <ControlBar variation="minimal" />
-          <ChatScaffold />
+          <RoomDock />
         </div>
         <RoomAudioRenderer />
       </LiveKitRoom>
@@ -333,7 +465,7 @@ function RoomTopBarMock({
     <div className="absolute inset-x-0 top-0 z-30 flex items-start justify-between gap-3 p-4">
       <div className="flex items-center gap-3">
         <BackButton navigate={navigate} />
-        <div className="rounded-full border border-white/10 bg-black/60 px-4 py-1.5 backdrop-blur">
+        <div className="hidden rounded-full border border-white/10 bg-black/60 px-4 py-1.5 backdrop-blur sm:block">
           <span className="font-garamond text-xs tracking-[0.16em] text-mist/70 uppercase">
             {roomName}
           </span>
