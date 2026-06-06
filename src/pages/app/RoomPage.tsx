@@ -12,8 +12,10 @@ import {
   useTracks,
 } from '@livekit/components-react'
 import {
-  createLocalTracks,
   DisconnectReason,
+  LocalAudioTrack,
+  LocalTrack,
+  LocalVideoTrack,
   MediaDeviceFailure,
   Room,
   Track,
@@ -226,7 +228,7 @@ function ParticipantCount({ max }: { max: number }) {
 function permissionHelpMessage(err: unknown): string {
   const msg = err instanceof Error ? err.message : String(err)
   if (/not allowed by the user agent|NotAllowedError|permission/i.test(msg)) {
-    return 'Camera/microphone access must be started from your tap. Tap Join again and allow access when prompted. If you previously blocked it, enable camera & mic for this site in Chrome settings.'
+    return 'Camera/microphone was blocked. Tap Allow below and accept the browser prompt. If you don’t see a prompt, open Chrome → ⋮ → Settings → Site settings → Camera/Microphone and allow this site.'
   }
   if (/NotFoundError|device not found/i.test(msg)) {
     return 'No camera or microphone was found on this device.'
@@ -234,18 +236,39 @@ function permissionHelpMessage(err: unknown): string {
   return msg || 'Could not join the room. Please try again.'
 }
 
+function mediaStreamToLocalTracks(stream: MediaStream): LocalTrack[] {
+  const tracks: LocalTrack[] = []
+  for (const mediaTrack of stream.getVideoTracks()) {
+    tracks.push(new LocalVideoTrack(mediaTrack, undefined, true))
+  }
+  for (const mediaTrack of stream.getAudioTracks()) {
+    tracks.push(new LocalAudioTrack(mediaTrack, undefined, true))
+  }
+  return tracks
+}
+
 function PreJoinLobby({
   roomName,
+  mediaReady,
+  mediaVideo,
+  previewStream,
   joining,
   joinError,
-  onJoinVideo,
-  onJoinAudioOnly,
+  onAllowVideo,
+  onAllowAudioOnly,
+  onJoinRoom,
+  onResetMedia,
 }: {
   roomName: string
+  mediaReady: boolean
+  mediaVideo: boolean
+  previewStream: MediaStream | null
   joining: boolean
   joinError: string | null
-  onJoinVideo: () => void
-  onJoinAudioOnly: () => void
+  onAllowVideo: () => void
+  onAllowAudioOnly: () => void
+  onJoinRoom: () => void
+  onResetMedia: () => void
 }) {
   return (
     <div className="flex min-h-svh flex-col items-center justify-center gap-6 bg-void px-6 text-center">
@@ -253,32 +276,72 @@ function PreJoinLobby({
         <p className="font-garamond text-xs tracking-[0.2em] text-gold uppercase">Video room</p>
         <h1 className="font-bebas text-4xl tracking-wide text-mist">{roomName}</h1>
         <p className="font-garamond text-sm leading-relaxed text-mist/60">
-          Tap join to connect. On mobile browsers, camera and microphone must be started from your
-          tap — not automatically on page load.
+          {mediaReady
+            ? 'Devices are ready. Tap join room to connect.'
+            : 'Step 1: allow camera & microphone. Step 2: join the room. Mobile browsers require two separate taps.'}
         </p>
       </div>
+
+      {mediaReady && previewStream && mediaVideo ? (
+        <video
+          ref={(el) => {
+            if (el && el.srcObject !== previewStream) el.srcObject = previewStream
+          }}
+          autoPlay
+          playsInline
+          muted
+          className="aspect-video w-full max-w-sm rounded-xl border border-white/10 bg-charcoal/40 object-cover"
+        />
+      ) : null}
+
+      {mediaReady ? (
+        <p className="font-garamond text-sm text-emerald-400/90">
+          {mediaVideo ? 'Camera & microphone ready' : 'Microphone ready'}
+        </p>
+      ) : null}
 
       {joinError ? (
         <p className="max-w-md font-garamond text-sm text-red-400/90">{joinError}</p>
       ) : null}
 
       <div className="flex w-full max-w-sm flex-col gap-3">
-        <button
-          type="button"
-          disabled={joining}
-          onClick={onJoinVideo}
-          className="flex min-h-12 items-center justify-center rounded-full bg-gold px-6 font-garamond text-sm tracking-[0.16em] uppercase text-void transition hover:bg-gold/90 disabled:opacity-50"
-        >
-          {joining ? 'Joining…' : 'Join with camera & mic'}
-        </button>
-        <button
-          type="button"
-          disabled={joining}
-          onClick={onJoinAudioOnly}
-          className="font-garamond text-xs tracking-[0.14em] text-mist/50 uppercase transition hover:text-gold disabled:opacity-50"
-        >
-          Join audio only
-        </button>
+        {mediaReady ? (
+          <>
+            <button
+              type="button"
+              disabled={joining}
+              onClick={onJoinRoom}
+              className="flex min-h-12 items-center justify-center rounded-full bg-gold px-6 font-garamond text-sm tracking-[0.16em] uppercase text-void transition hover:bg-gold/90 disabled:opacity-50"
+            >
+              {joining ? 'Joining room…' : 'Join room'}
+            </button>
+            <button
+              type="button"
+              disabled={joining}
+              onClick={onResetMedia}
+              className="font-garamond text-xs tracking-[0.14em] text-mist/50 uppercase transition hover:text-gold disabled:opacity-50"
+            >
+              Change devices
+            </button>
+          </>
+        ) : (
+          <>
+            <button
+              type="button"
+              onClick={onAllowVideo}
+              className="flex min-h-12 items-center justify-center rounded-full bg-gold px-6 font-garamond text-sm tracking-[0.16em] uppercase text-void transition hover:bg-gold/90"
+            >
+              Allow camera & microphone
+            </button>
+            <button
+              type="button"
+              onClick={onAllowAudioOnly}
+              className="font-garamond text-xs tracking-[0.14em] text-mist/50 uppercase transition hover:text-gold"
+            >
+              Allow microphone only
+            </button>
+          </>
+        )}
       </div>
 
       <Link
@@ -340,6 +403,11 @@ export function RoomPage() {
   const [joined, setJoined] = useState(false)
   const [joining, setJoining] = useState(false)
   const [joinError, setJoinError] = useState<string | null>(null)
+  const [mediaReady, setMediaReady] = useState(false)
+  const [mediaVideo, setMediaVideo] = useState(true)
+  const [previewStream, setPreviewStream] = useState<MediaStream | null>(null)
+  const pendingTracksRef = useRef<LocalTrack[]>([])
+  const previewStreamRef = useRef<MediaStream | null>(null)
 
   // A single, stable Room instance for this page. Re-using one instance (rather
   // than letting LiveKitRoom create a new one on every render) prevents the
@@ -423,25 +491,56 @@ export function RoomPage() {
   }, [roomName, identity, displayName])
 
   useEffect(() => {
+    previewStreamRef.current = previewStream
+  }, [previewStream])
+
+  useEffect(() => {
     return () => {
+      pendingTracksRef.current.forEach((track) => track.stop())
+      pendingTracksRef.current = []
+      previewStreamRef.current?.getTracks().forEach((track) => track.stop())
       void room.disconnect()
     }
   }, [room])
 
-  async function joinWithMedia(video: boolean) {
-    if (state.status !== 'ready' || joining || joined) return
+  function stopPendingMedia() {
+    pendingTracksRef.current.forEach((track) => track.stop())
+    pendingTracksRef.current = []
+    previewStream?.getTracks().forEach((track) => track.stop())
+    setPreviewStream(null)
+    setMediaReady(false)
+  }
+
+  /** Step 1 — must not call setState before getUserMedia (iOS Chrome gesture chain). */
+  function allowMedia(video: boolean) {
+    if (!navigator.mediaDevices?.getUserMedia) {
+      setJoinError('Camera/microphone is not available in this browser context. Use HTTPS.')
+      return
+    }
+
+    navigator.mediaDevices
+      .getUserMedia({ audio: true, video: video || false })
+      .then((stream) => {
+        pendingTracksRef.current = mediaStreamToLocalTracks(stream)
+        setMediaVideo(video)
+        setPreviewStream(video ? stream : null)
+        setMediaReady(true)
+        setJoinError(null)
+      })
+      .catch((err) => {
+        setJoinError(permissionHelpMessage(err))
+      })
+  }
+
+  async function joinRoom() {
+    if (state.status !== 'ready' || !mediaReady || joining || joined) return
     setJoining(true)
     setJoinError(null)
     try {
-      // iOS Chrome requires getUserMedia inside a user-gesture handler. We
-      // create tracks here (one getUserMedia call) then connect — LiveKit must
-      // not auto-enable devices after an async token fetch.
-      const tracks = await createLocalTracks({
-        audio: true,
-        video: video ? { facingMode: 'user' } : false,
-      })
       await room.connect(state.url, state.token)
-      await Promise.all(tracks.map((track) => room.localParticipant.publishTrack(track)))
+      await Promise.all(
+        pendingTracksRef.current.map((track) => room.localParticipant.publishTrack(track)),
+      )
       setJoined(true)
     } catch (err) {
       try {
@@ -512,10 +611,18 @@ export function RoomPage() {
     return (
       <PreJoinLobby
         roomName={roomName}
+        mediaReady={mediaReady}
+        mediaVideo={mediaVideo}
+        previewStream={previewStream}
         joining={joining}
         joinError={joinError}
-        onJoinVideo={() => void joinWithMedia(true)}
-        onJoinAudioOnly={() => void joinWithMedia(false)}
+        onAllowVideo={() => allowMedia(true)}
+        onAllowAudioOnly={() => allowMedia(false)}
+        onJoinRoom={() => void joinRoom()}
+        onResetMedia={() => {
+          stopPendingMedia()
+          setJoinError(null)
+        }}
       />
     )
   }
