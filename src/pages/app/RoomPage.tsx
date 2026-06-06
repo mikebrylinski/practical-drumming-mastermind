@@ -11,7 +11,13 @@ import {
   useParticipants,
   useTracks,
 } from '@livekit/components-react'
-import { DisconnectReason, MediaDeviceFailure, Room, Track } from 'livekit-client'
+import {
+  createLocalTracks,
+  DisconnectReason,
+  MediaDeviceFailure,
+  Room,
+  Track,
+} from 'livekit-client'
 import { useAuth } from '../../lib/auth/AuthProvider'
 import {
   ConnectionStrengthMeter,
@@ -217,6 +223,74 @@ function ParticipantCount({ max }: { max: number }) {
   )
 }
 
+function permissionHelpMessage(err: unknown): string {
+  const msg = err instanceof Error ? err.message : String(err)
+  if (/not allowed by the user agent|NotAllowedError|permission/i.test(msg)) {
+    return 'Camera/microphone access must be started from your tap. Tap Join again and allow access when prompted. If you previously blocked it, enable camera & mic for this site in Chrome settings.'
+  }
+  if (/NotFoundError|device not found/i.test(msg)) {
+    return 'No camera or microphone was found on this device.'
+  }
+  return msg || 'Could not join the room. Please try again.'
+}
+
+function PreJoinLobby({
+  roomName,
+  joining,
+  joinError,
+  onJoinVideo,
+  onJoinAudioOnly,
+}: {
+  roomName: string
+  joining: boolean
+  joinError: string | null
+  onJoinVideo: () => void
+  onJoinAudioOnly: () => void
+}) {
+  return (
+    <div className="flex min-h-svh flex-col items-center justify-center gap-6 bg-void px-6 text-center">
+      <div className="max-w-md space-y-3">
+        <p className="font-garamond text-xs tracking-[0.2em] text-gold uppercase">Video room</p>
+        <h1 className="font-bebas text-4xl tracking-wide text-mist">{roomName}</h1>
+        <p className="font-garamond text-sm leading-relaxed text-mist/60">
+          Tap join to connect. On mobile browsers, camera and microphone must be started from your
+          tap — not automatically on page load.
+        </p>
+      </div>
+
+      {joinError ? (
+        <p className="max-w-md font-garamond text-sm text-red-400/90">{joinError}</p>
+      ) : null}
+
+      <div className="flex w-full max-w-sm flex-col gap-3">
+        <button
+          type="button"
+          disabled={joining}
+          onClick={onJoinVideo}
+          className="flex min-h-12 items-center justify-center rounded-full bg-gold px-6 font-garamond text-sm tracking-[0.16em] uppercase text-void transition hover:bg-gold/90 disabled:opacity-50"
+        >
+          {joining ? 'Joining…' : 'Join with camera & mic'}
+        </button>
+        <button
+          type="button"
+          disabled={joining}
+          onClick={onJoinAudioOnly}
+          className="font-garamond text-xs tracking-[0.14em] text-mist/50 uppercase transition hover:text-gold disabled:opacity-50"
+        >
+          Join audio only
+        </button>
+      </div>
+
+      <Link
+        to="/dashboard"
+        className="font-garamond text-sm text-mist/45 underline transition hover:text-gold"
+      >
+        Back to dashboard
+      </Link>
+    </div>
+  )
+}
+
 function BackButton({ navigate }: { navigate: NavigateFunction }) {
   return (
     <button
@@ -263,6 +337,9 @@ export function RoomPage() {
   const { profile, session } = useAuth()
   const navigate = useNavigate()
   const [state, setState] = useState<TokenState>({ status: 'loading' })
+  const [joined, setJoined] = useState(false)
+  const [joining, setJoining] = useState(false)
+  const [joinError, setJoinError] = useState<string | null>(null)
 
   // A single, stable Room instance for this page. Re-using one instance (rather
   // than letting LiveKitRoom create a new one on every render) prevents the
@@ -345,6 +422,39 @@ export function RoomPage() {
     }
   }, [roomName, identity, displayName])
 
+  useEffect(() => {
+    return () => {
+      void room.disconnect()
+    }
+  }, [room])
+
+  async function joinWithMedia(video: boolean) {
+    if (state.status !== 'ready' || joining || joined) return
+    setJoining(true)
+    setJoinError(null)
+    try {
+      // iOS Chrome requires getUserMedia inside a user-gesture handler. We
+      // create tracks here (one getUserMedia call) then connect — LiveKit must
+      // not auto-enable devices after an async token fetch.
+      const tracks = await createLocalTracks({
+        audio: true,
+        video: video ? { facingMode: 'user' } : false,
+      })
+      await room.connect(state.url, state.token)
+      await Promise.all(tracks.map((track) => room.localParticipant.publishTrack(track)))
+      setJoined(true)
+    } catch (err) {
+      try {
+        await room.disconnect()
+      } catch {
+        /* no-op */
+      }
+      setJoinError(permissionHelpMessage(err))
+    } finally {
+      setJoining(false)
+    }
+  }
+
   if (state.status === 'loading') {
     return (
       <div className="flex min-h-svh items-center justify-center bg-void">
@@ -398,43 +508,49 @@ export function RoomPage() {
     )
   }
 
+  if (!joined) {
+    return (
+      <PreJoinLobby
+        roomName={roomName}
+        joining={joining}
+        joinError={joinError}
+        onJoinVideo={() => void joinWithMedia(true)}
+        onJoinAudioOnly={() => void joinWithMedia(false)}
+      />
+    )
+  }
+
   return (
     <div className="relative min-h-svh bg-void" data-lk-theme="default">
       <LiveKitRoom
         room={room}
         token={state.token}
         serverUrl={state.url}
-        connect
-        video
-        audio
+        connect={false}
+        video={false}
+        audio={false}
         onError={(err) => {
-          // A "client initiated disconnect" is a transient connect/disconnect
-          // race (notably on iOS Chrome), not a real failure — ignore it so we
-          // don't tear down the room the user is trying to join.
           if (/client initiated disconnect/i.test(err.message)) {
             console.warn('LiveKit transient disconnect ignored:', err.message)
             return
           }
           const full = /full|exceed|maximum|capacity/i.test(err.message)
-          setState({
-            status: 'error',
-            message: full
+          setJoined(false)
+          setJoinError(
+            full
               ? `This room is full (max ${state.max} people). Try again once someone leaves.`
-              : `LiveKit: ${err.message}`,
-          })
+              : permissionHelpMessage(err),
+          )
         }}
         onMediaDeviceFailure={(failure) => {
-          setState({
-            status: 'error',
-            message:
-              failure === MediaDeviceFailure.PermissionDenied
-                ? 'Camera/microphone access is blocked. Enable it for this site in your browser settings, then reload.'
-                : 'Could not access your camera or microphone. Make sure no other app is using it, then reload.',
-          })
+          setJoined(false)
+          setJoinError(
+            failure === MediaDeviceFailure.PermissionDenied
+              ? 'Camera/microphone access is blocked. Enable it for this site in your browser settings, then tap Join again.'
+              : 'Could not access your camera or microphone. Make sure no other app is using it, then try again.',
+          )
         }}
         onDisconnected={(reason) => {
-          // Only leave the page on a genuine, user/server-initiated disconnect.
-          // The transient client-initiated race should not bounce the user out.
           if (reason === DisconnectReason.CLIENT_INITIATED) return
           navigate('/dashboard', { replace: true })
         }}
