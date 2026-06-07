@@ -27,6 +27,7 @@ import {
   ConnectionStrengthMeter,
   StrengthMeterView,
 } from '../../components/room/ConnectionStrengthMeter'
+import { AdminRecordControl } from '../../components/room/AdminRecordControl'
 
 const DEFAULT_MAX_PARTICIPANTS = 12
 
@@ -289,10 +290,14 @@ function GestureActionButton({
 function mediaStreamToLocalTracks(stream: MediaStream): LocalTrack[] {
   const tracks: LocalTrack[] = []
   for (const mediaTrack of stream.getVideoTracks()) {
-    tracks.push(new LocalVideoTrack(mediaTrack, undefined, true))
+    const track = new LocalVideoTrack(mediaTrack, IOS_VIDEO_CONSTRAINTS, true)
+    track.source = Track.Source.Camera
+    tracks.push(track)
   }
   for (const mediaTrack of stream.getAudioTracks()) {
-    tracks.push(new LocalAudioTrack(mediaTrack, undefined, true))
+    const track = new LocalAudioTrack(mediaTrack, undefined, true)
+    track.source = Track.Source.Microphone
+    tracks.push(track)
   }
   return tracks
 }
@@ -362,12 +367,18 @@ function JoinedRoom({
   max,
   navigate,
   onLeave,
+  isAdmin,
+  session,
+  demoAdmin,
 }: {
   room: Room
   roomName: string
   max: number
   navigate: NavigateFunction
   onLeave: (message: string) => void
+  isAdmin: boolean
+  session: ReturnType<typeof useAuth>['session']
+  demoAdmin: boolean
 }) {
   useEffect(() => {
     const handleDisconnected = (reason?: DisconnectReason) => {
@@ -394,7 +405,14 @@ function JoinedRoom({
   return (
     <RoomContext.Provider value={room}>
       <div className="relative min-h-svh bg-void" data-lk-theme="default" style={{ height: '100svh' }}>
-        <RoomTopBar roomName={roomName} max={max} navigate={navigate} />
+        <RoomTopBar
+          roomName={roomName}
+          max={max}
+          navigate={navigate}
+          isAdmin={isAdmin}
+          session={session}
+          demoAdmin={demoAdmin}
+        />
         <div className="h-[calc(100svh-5rem)] p-4 pt-16">
           <VideoStage />
         </div>
@@ -424,10 +442,16 @@ function RoomTopBar({
   roomName,
   max,
   navigate,
+  isAdmin,
+  session,
+  demoAdmin,
 }: {
   roomName: string
   max: number
   navigate: NavigateFunction
+  isAdmin: boolean
+  session: ReturnType<typeof useAuth>['session']
+  demoAdmin: boolean
 }) {
   return (
     <div className="pointer-events-none absolute inset-x-0 top-0 z-30 flex items-start justify-between gap-3 p-4">
@@ -442,7 +466,10 @@ function RoomTopBar({
         </div>
         <InviteButton />
       </div>
-      <div className="pointer-events-auto">
+      <div className="flex flex-col items-end gap-2">
+        {isAdmin ? (
+          <AdminRecordControl roomName={roomName} session={session} demoAdmin={demoAdmin} />
+        ) : null}
         <ConnectionStrengthMeter />
       </div>
     </div>
@@ -451,7 +478,7 @@ function RoomTopBar({
 
 export function RoomPage() {
   const { roomName = '' } = useParams()
-  const { profile, session } = useAuth()
+  const { profile, session, isAdmin, useSeedData, mockMode } = useAuth()
   const navigate = useNavigate()
   const [state, setState] = useState<TokenState>({ status: 'loading' })
   const [joined, setJoined] = useState(false)
@@ -465,6 +492,7 @@ export function RoomPage() {
   const guestIdRef = useRef(`guest-${Math.random().toString(36).slice(2, 8)}`)
   const identity = userId ?? guestIdRef.current
   const displayName = profile?.full_name || profile?.email || 'Guest'
+  const demoAdmin = isAdmin && (useSeedData || mockMode)
 
   useEffect(() => {
     let active = true
@@ -555,7 +583,9 @@ export function RoomPage() {
       })
       const tracks = mediaStreamToLocalTracks(stream)
       await connect(state.url, state.token)
-      await Promise.all(tracks.map((track) => room.localParticipant.publishTrack(track)))
+      await Promise.all(
+        tracks.map((track) => room.localParticipant.publishTrack(track, { source: track.source })),
+      )
       setJoined(true)
     } catch (err) {
       try {
@@ -653,6 +683,9 @@ export function RoomPage() {
       max={state.max}
       navigate={navigate}
       onLeave={leaveRoom}
+      isAdmin={isAdmin}
+      session={session}
+      demoAdmin={demoAdmin}
     />
   )
 }

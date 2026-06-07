@@ -276,6 +276,41 @@ drop policy if exists lead_events_admin on public.lead_events;
 create policy lead_events_admin on public.lead_events
   for select using (public.is_admin());
 
+-- session_recordings: saved LiveKit room composite recordings.
+create table if not exists public.session_recordings (
+  id                uuid primary key default gen_random_uuid(),
+  session_id        uuid references public.sessions (id) on delete set null,
+  room_name         text not null,
+  title             text,
+  egress_id         text,
+  status            text not null default 'starting'
+    check (status in ('starting', 'active', 'processing', 'complete', 'failed', 'stopped')),
+  filepath          text,
+  playback_url      text,
+  duration_seconds  int,
+  started_by        uuid references public.profiles (id) on delete set null,
+  started_at        timestamptz not null default now(),
+  ended_at          timestamptz,
+  error_message     text,
+  created_at        timestamptz not null default now()
+);
+
+create index if not exists session_recordings_room_name_idx
+  on public.session_recordings (room_name);
+
+create index if not exists session_recordings_status_idx
+  on public.session_recordings (status);
+
+alter table public.session_recordings enable row level security;
+
+drop policy if exists session_recordings_read on public.session_recordings;
+create policy session_recordings_read on public.session_recordings
+  for select using (auth.role() = 'authenticated');
+
+drop policy if exists session_recordings_admin on public.session_recordings;
+create policy session_recordings_admin on public.session_recordings
+  for all using (public.is_admin()) with check (public.is_admin());
+
 -- ----------------------------------------------------------------------------
 -- Realtime: expose CRM tables to the supabase_realtime publication.
 -- ----------------------------------------------------------------------------

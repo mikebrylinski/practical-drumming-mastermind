@@ -72,6 +72,20 @@ vercel --prod     # production redeploy
 
 If rooms still show “credentials not configured”, open `/api/livekit/token` in the browser network tab: `mock: true` means missing API keys; a 503 means keys exist but `LIVEKIT_URL` / `VITE_LIVEKIT_URL` is missing.
 
+### Admin room recording (LiveKit Egress)
+
+1. Enable **Egress** on your LiveKit Cloud project.
+2. Configure storage — either:
+   - **S3-compatible bucket:** set `LIVEKIT_EGRESS_S3_BUCKET`, `LIVEKIT_EGRESS_S3_ACCESS_KEY`, `LIVEKIT_EGRESS_S3_SECRET`, and optionally `LIVEKIT_EGRESS_S3_REGION` / `LIVEKIT_EGRESS_S3_ENDPOINT` (R2), **or**
+   - **LiveKit Cloud default bucket:** set `LIVEKIT_EGRESS_USE_CLOUD_STORAGE=true` after configuring default storage in the LiveKit dashboard.
+3. Run the latest [supabase/schema.sql](supabase/schema.sql) to create `session_recordings`.
+4. (Recommended) Add a LiveKit webhook pointing to  
+   `https://your-domain.com/api/livekit/egress/webhook` for `egress_ended` events.
+5. Join a room as an **admin** → tap **Record** → **Stop recording** when done.  
+   Saved MP4s show in **Video Vault** (`/vault`) and via “Open saved recording” in the room.
+
+API routes: `POST /api/livekit/egress/start`, `POST /api/livekit/egress/stop`, `GET /api/livekit/egress/status`, `GET /api/recordings/list`.
+
 ## Supabase setup
 
 1. Create a Supabase project; copy the URL + anon key into `VITE_*` and the
@@ -93,7 +107,8 @@ If rooms still show “credentials not configured”, open `/api/livekit/token` 
 - **Booking** — `/book/:slug`, `/api/bookings/create`, `/api/bookings/cancel`,
   admin at `/admin/availability` and `/admin/bookings`.
 - **LiveKit** — `/api/livekit/token`, room at `/room/:roomName` with a live
-  `ConnectionStrengthMeter`.
+  `ConnectionStrengthMeter`. Admins see a **Record** button that starts/stops
+  LiveKit composite egress; completed files appear in the member **Video Vault**.
 - **CRM** — `/admin/leads` (data layer `src/lib/crm/getLeads.ts`): lead list,
   filters, timeline, heatmap, admin actions, and Realtime "LIVE" updates.
 

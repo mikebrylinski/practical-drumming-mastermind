@@ -1,7 +1,10 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { MembersLayout } from '../../components/members/MembersLayout'
 import { PlayIcon } from '../../components/members/MembersIcons'
 import { vaultFilters, vaultVideos, type VaultVideo } from '../../components/members/mockData'
+import { fetchSavedRecordings } from '../../lib/recording/api'
+import { formatRecordingDuration } from '../../lib/recording/types'
+import { formatDate } from '../../lib/datetime'
 
 function VideoCard({ video, onPlay }: { video: VaultVideo; onPlay: (v: VaultVideo) => void }) {
   return (
@@ -47,15 +50,26 @@ function PlayerModal({ video, onClose }: { video: VaultVideo; onClose: () => voi
         onClick={(e) => e.stopPropagation()}
       >
         <div className="relative aspect-video bg-black">
-          <img src={video.thumb} alt="" className="h-full w-full object-cover opacity-70" />
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
-            <span className="flex size-16 items-center justify-center rounded-full bg-gold text-void">
-              <PlayIcon />
-            </span>
-            <span className="font-garamond text-sm tracking-[0.18em] text-mist/70 uppercase">
-              Recording playback
-            </span>
-          </div>
+          {video.playbackUrl ? (
+            <video
+              src={video.playbackUrl}
+              controls
+              playsInline
+              className="h-full w-full object-contain"
+            />
+          ) : (
+            <>
+              <img src={video.thumb} alt="" className="h-full w-full object-cover opacity-70" />
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
+                <span className="flex size-16 items-center justify-center rounded-full bg-gold text-void">
+                  <PlayIcon />
+                </span>
+                <span className="font-garamond text-sm tracking-[0.18em] text-mist/70 uppercase">
+                  Recording playback
+                </span>
+              </div>
+            </>
+          )}
           <button
             type="button"
             onClick={onClose}
@@ -83,10 +97,32 @@ function PlayerModal({ video, onClose }: { video: VaultVideo; onClose: () => voi
 export function VaultPage() {
   const [filter, setFilter] = useState<string>('All')
   const [active, setActive] = useState<VaultVideo | null>(null)
+  const [savedVideos, setSavedVideos] = useState<VaultVideo[]>([])
+
+  useEffect(() => {
+    void fetchSavedRecordings().then((recordings) => {
+      setSavedVideos(
+        recordings
+          .filter((r) => r.playback_url)
+          .map((r) => ({
+            id: r.id,
+            title: r.title || r.room_name,
+            description: `Recorded live session · ${r.room_name}`,
+            category: 'Live session',
+            duration: formatRecordingDuration(r.duration_seconds),
+            date: formatDate(r.started_at, { month: 'short', day: 'numeric', year: 'numeric' }),
+            thumb: '/hero-mike-live.png',
+            playbackUrl: r.playback_url || undefined,
+          })),
+      )
+    })
+  }, [])
+
+  const allVideos = useMemo(() => [...savedVideos, ...vaultVideos], [savedVideos])
 
   const filtered = useMemo(
-    () => (filter === 'All' ? vaultVideos : vaultVideos.filter((v) => v.category === filter)),
-    [filter],
+    () => (filter === 'All' ? allVideos : allVideos.filter((v) => v.category === filter)),
+    [filter, allVideos],
   )
 
   const [featured, ...rest] = filtered

@@ -29,6 +29,7 @@ export const sessionVaultItems = [
 
 export const vaultFilters = [
   'All',
+  'Live session',
   'Touring',
   'Studio',
   'Creativity',
@@ -40,11 +41,12 @@ export const vaultFilters = [
 export type VaultVideo = {
   id: string
   title: string
-  category: (typeof vaultFilters)[number]
+  category: (typeof vaultFilters)[number] | 'Live session'
   duration: string
   thumb: string
   date: string
   description: string
+  playbackUrl?: string
 }
 
 export const vaultVideos: VaultVideo[] = [
