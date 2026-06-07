@@ -5,10 +5,11 @@ import '@livekit/components-styles'
 import {
   ControlBar,
   GridLayout,
-  LiveKitRoom,
   ParticipantTile,
   RoomAudioRenderer,
+  RoomContext,
   useParticipants,
+  useSequentialRoomConnectDisconnect,
   useTracks,
 } from '@livekit/components-react'
 import {
@@ -18,6 +19,7 @@ import {
   LocalVideoTrack,
   MediaDeviceFailure,
   Room,
+  RoomEvent,
   Track,
 } from 'livekit-client'
 import { useAuth } from '../../lib/auth/AuthProvider'
@@ -234,7 +236,7 @@ const IOS_VIDEO_CONSTRAINTS: MediaTrackConstraints = {
 function permissionHelpMessage(err: unknown): string {
   const msg = err instanceof Error ? err.message : String(err)
   if (/not allowed by the user agent|NotAllowedError|permission/i.test(msg)) {
-    return 'Permission blocked. On iPhone: Settings → Chrome → Camera & Microphone → Allow. Then in Chrome tap the lock icon in the address bar → Site settings → allow Camera and Microphone for this site. Come back and tap Allow microphone again.'
+    return 'Permission blocked. On iPhone: Settings → Chrome → Camera & Microphone → Allow, then reload this page and tap Join room again.'
   }
   if (/NotFoundError|device not found/i.test(msg)) {
     return 'No camera or microphone was found on this device.'
@@ -297,105 +299,51 @@ function mediaStreamToLocalTracks(stream: MediaStream): LocalTrack[] {
 
 function PreJoinLobby({
   roomName,
-  micReady,
-  cameraReady,
-  previewStream,
   joining,
   joinError,
-  onAllowMic,
-  onAllowCamera,
-  onJoinRoom,
-  onResetMedia,
+  onJoinWithVideo,
+  onJoinAudioOnly,
 }: {
   roomName: string
-  micReady: boolean
-  cameraReady: boolean
-  previewStream: MediaStream | null
   joining: boolean
   joinError: string | null
-  onAllowMic: () => void
-  onAllowCamera: () => void
-  onJoinRoom: () => void
-  onResetMedia: () => void
+  onJoinWithVideo: () => void
+  onJoinAudioOnly: () => void
 }) {
   const goldBtn =
     'flex min-h-12 w-full items-center justify-center rounded-full bg-gold px-6 font-garamond text-sm tracking-[0.16em] uppercase text-void transition hover:bg-gold/90 disabled:opacity-50'
-
-  let stepHint = 'Step 1: allow microphone. Step 2 (optional): add camera. Step 3: join room.'
-  if (micReady && cameraReady) stepHint = 'Camera & microphone ready. Tap join room.'
-  else if (micReady) stepHint = 'Microphone ready. Add camera or join with audio only.'
+  const ghostBtn =
+    'flex min-h-11 w-full items-center justify-center rounded-full border border-white/15 px-6 font-garamond text-xs tracking-[0.14em] text-mist/70 uppercase transition hover:border-gold/35 hover:text-gold disabled:opacity-50'
 
   return (
     <div className="flex min-h-svh flex-col items-center justify-center gap-6 bg-void px-6 text-center">
       <div className="max-w-md space-y-3">
         <p className="font-garamond text-xs tracking-[0.2em] text-gold uppercase">Video room</p>
         <h1 className="font-bebas text-4xl tracking-wide text-mist">{roomName}</h1>
-        <p className="font-garamond text-sm leading-relaxed text-mist/60">{stepHint}</p>
-      </div>
-
-      {cameraReady && previewStream ? (
-        <video
-          ref={(el) => {
-            if (el && el.srcObject !== previewStream) el.srcObject = previewStream
-          }}
-          autoPlay
-          playsInline
-          muted
-          className="aspect-video w-full max-w-sm rounded-xl border border-white/10 bg-charcoal/40 object-cover"
-        />
-      ) : null}
-
-      {micReady ? (
-        <p className="font-garamond text-sm text-emerald-400/90">
-          {cameraReady ? 'Camera & microphone ready' : 'Microphone ready'}
+        <p className="font-garamond text-sm leading-relaxed text-mist/60">
+          Tap join — camera and microphone are requested once, then you&apos;re in.
         </p>
-      ) : null}
+      </div>
 
       {joinError ? (
         <p className="max-w-md font-garamond text-sm text-red-400/90">{joinError}</p>
       ) : null}
 
       <div className="flex w-full max-w-sm flex-col gap-3">
-        {!micReady ? (
-          <GestureActionButton onGesture={onAllowMic} className={goldBtn}>
-            Allow microphone
-          </GestureActionButton>
-        ) : (
-          <>
-            {!cameraReady ? (
-              <>
-                <GestureActionButton onGesture={onAllowCamera} className={goldBtn}>
-                  Add camera
-                </GestureActionButton>
-                <button
-                  type="button"
-                  disabled={joining}
-                  onClick={onJoinRoom}
-                  className={goldBtn}
-                >
-                  {joining ? 'Joining room…' : 'Join with audio only'}
-                </button>
-              </>
-            ) : (
-              <button
-                type="button"
-                disabled={joining}
-                onClick={onJoinRoom}
-                className={goldBtn}
-              >
-                {joining ? 'Joining room…' : 'Join room'}
-              </button>
-            )}
-            <button
-              type="button"
-              disabled={joining}
-              onClick={onResetMedia}
-              className="font-garamond text-xs tracking-[0.14em] text-mist/50 uppercase transition hover:text-gold disabled:opacity-50"
-            >
-              Start over
-            </button>
-          </>
-        )}
+        <GestureActionButton
+          onGesture={onJoinWithVideo}
+          disabled={joining}
+          className={goldBtn}
+        >
+          {joining ? 'Joining room…' : 'Join room'}
+        </GestureActionButton>
+        <GestureActionButton
+          onGesture={onJoinAudioOnly}
+          disabled={joining}
+          className={ghostBtn}
+        >
+          Join with audio only
+        </GestureActionButton>
       </div>
 
       <Link
@@ -405,6 +353,58 @@ function PreJoinLobby({
         Back to dashboard
       </Link>
     </div>
+  )
+}
+
+function JoinedRoom({
+  room,
+  roomName,
+  max,
+  navigate,
+  onLeave,
+}: {
+  room: Room
+  roomName: string
+  max: number
+  navigate: NavigateFunction
+  onLeave: (message: string) => void
+}) {
+  useEffect(() => {
+    const handleDisconnected = (reason?: DisconnectReason) => {
+      if (reason === DisconnectReason.CLIENT_INITIATED) return
+      navigate('/dashboard', { replace: true })
+    }
+    const handleMediaDevicesError = (err: Error) => {
+      const failure = MediaDeviceFailure.getFailure(err)
+      onLeave(
+        failure === MediaDeviceFailure.PermissionDenied
+          ? 'Camera/microphone access is blocked. Enable it for this site in your browser settings, then tap Join again.'
+          : 'Could not access your camera or microphone. Make sure no other app is using it, then try again.',
+      )
+    }
+
+    room.on(RoomEvent.Disconnected, handleDisconnected)
+    room.on(RoomEvent.MediaDevicesError, handleMediaDevicesError)
+    return () => {
+      room.off(RoomEvent.Disconnected, handleDisconnected)
+      room.off(RoomEvent.MediaDevicesError, handleMediaDevicesError)
+    }
+  }, [room, navigate, onLeave])
+
+  return (
+    <RoomContext.Provider value={room}>
+      <div className="relative min-h-svh bg-void" data-lk-theme="default" style={{ height: '100svh' }}>
+        <RoomTopBar roomName={roomName} max={max} navigate={navigate} />
+        <div className="h-[calc(100svh-5rem)] p-4 pt-16">
+          <VideoStage />
+        </div>
+        <div className="absolute inset-x-0 bottom-0 z-20 flex items-center justify-between gap-3 p-3">
+          <ControlBar variation="minimal" />
+          <RoomDock />
+        </div>
+        <RoomAudioRenderer />
+      </div>
+    </RoomContext.Provider>
   )
 }
 
@@ -457,21 +457,10 @@ export function RoomPage() {
   const [joined, setJoined] = useState(false)
   const [joining, setJoining] = useState(false)
   const [joinError, setJoinError] = useState<string | null>(null)
-  const [micReady, setMicReady] = useState(false)
-  const [cameraReady, setCameraReady] = useState(false)
-  const [previewStream, setPreviewStream] = useState<MediaStream | null>(null)
-  const pendingTracksRef = useRef<LocalTrack[]>([])
-  const previewStreamRef = useRef<MediaStream | null>(null)
 
-  // A single, stable Room instance for this page. Re-using one instance (rather
-  // than letting LiveKitRoom create a new one on every render) prevents the
-  // connect/disconnect race that surfaces on iOS Chrome as
-  // "Client initiated disconnect".
   const room = useMemo(() => new Room(), [])
+  const { connect, disconnect } = useSequentialRoomConnectDisconnect(room)
 
-  // Identity/name must be stable across renders so the token effect below does
-  // not re-fire (which would re-connect mid-disconnect). A random guest id is
-  // generated once and kept in a ref instead of being recomputed each run.
   const userId = session?.user?.id
   const guestIdRef = useRef(`guest-${Math.random().toString(36).slice(2, 8)}`)
   const identity = userId ?? guestIdRef.current
@@ -545,77 +534,51 @@ export function RoomPage() {
   }, [roomName, identity, displayName])
 
   useEffect(() => {
-    previewStreamRef.current = previewStream
-  }, [previewStream])
-
-  useEffect(() => {
     return () => {
-      pendingTracksRef.current.forEach((track) => track.stop())
-      pendingTracksRef.current = []
-      previewStreamRef.current?.getTracks().forEach((track) => track.stop())
-      void room.disconnect()
+      void disconnect?.()
     }
-  }, [room])
+  }, [disconnect])
 
-  function stopPendingMedia() {
-    pendingTracksRef.current.forEach((track) => track.stop())
-    pendingTracksRef.current = []
-    previewStream?.getTracks().forEach((track) => track.stop())
-    setPreviewStream(null)
-    setMicReady(false)
-    setCameraReady(false)
-  }
-
-  function requestUserMedia(constraints: MediaStreamConstraints, onSuccess: (stream: MediaStream) => void) {
+  async function joinWithMedia(includeVideo: boolean) {
+    if (state.status !== 'ready' || joining || joined || !connect) return
     if (!navigator.mediaDevices?.getUserMedia) {
-      setJoinError('Camera/microphone is not available in this browser context. Use HTTPS.')
+      setJoinError('Camera/microphone is not available in this browser. Use HTTPS and a current browser.')
       return
     }
-    navigator.mediaDevices.getUserMedia(constraints).then(onSuccess).catch((err) => {
-      setJoinError(permissionHelpMessage(err))
-    })
-  }
 
-  function allowMicrophone() {
-    requestUserMedia({ audio: true, video: false }, (stream) => {
-      pendingTracksRef.current = mediaStreamToLocalTracks(stream)
-      setMicReady(true)
-      setJoinError(null)
-    })
-  }
-
-  function allowCamera() {
-    requestUserMedia({ audio: false, video: IOS_VIDEO_CONSTRAINTS }, (stream) => {
-      pendingTracksRef.current = [
-        ...pendingTracksRef.current,
-        ...mediaStreamToLocalTracks(stream),
-      ]
-      setCameraReady(true)
-      setPreviewStream(stream)
-      setJoinError(null)
-    })
-  }
-
-  async function joinRoom() {
-    if (state.status !== 'ready' || !micReady || joining || joined) return
     setJoining(true)
     setJoinError(null)
     try {
-      await room.connect(state.url, state.token)
-      await Promise.all(
-        pendingTracksRef.current.map((track) => room.localParticipant.publishTrack(track)),
-      )
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: true,
+        video: includeVideo ? IOS_VIDEO_CONSTRAINTS : false,
+      })
+      const tracks = mediaStreamToLocalTracks(stream)
+      await connect(state.url, state.token)
+      await Promise.all(tracks.map((track) => room.localParticipant.publishTrack(track)))
       setJoined(true)
     } catch (err) {
       try {
-        await room.disconnect()
+        await disconnect?.()
       } catch {
         /* no-op */
       }
-      setJoinError(permissionHelpMessage(err))
+      const msg = err instanceof Error ? err.message : String(err)
+      const full = /full|exceed|maximum|capacity/i.test(msg)
+      setJoinError(
+        full
+          ? `This room is full (max ${state.max} people). Try again once someone leaves.`
+          : permissionHelpMessage(err),
+      )
     } finally {
       setJoining(false)
     }
+  }
+
+  function leaveRoom(message: string) {
+    void disconnect?.()
+    setJoined(false)
+    setJoinError(message)
   }
 
   if (state.status === 'loading') {
@@ -675,69 +638,22 @@ export function RoomPage() {
     return (
       <PreJoinLobby
         roomName={roomName}
-        micReady={micReady}
-        cameraReady={cameraReady}
-        previewStream={previewStream}
         joining={joining}
         joinError={joinError}
-        onAllowMic={allowMicrophone}
-        onAllowCamera={allowCamera}
-        onJoinRoom={() => void joinRoom()}
-        onResetMedia={() => {
-          stopPendingMedia()
-          setJoinError(null)
-        }}
+        onJoinWithVideo={() => void joinWithMedia(true)}
+        onJoinAudioOnly={() => void joinWithMedia(false)}
       />
     )
   }
 
   return (
-    <div className="relative min-h-svh bg-void" data-lk-theme="default">
-      <LiveKitRoom
-        room={room}
-        token={state.token}
-        serverUrl={state.url}
-        connect={false}
-        video={false}
-        audio={false}
-        onError={(err) => {
-          if (/client initiated disconnect/i.test(err.message)) {
-            console.warn('LiveKit transient disconnect ignored:', err.message)
-            return
-          }
-          const full = /full|exceed|maximum|capacity/i.test(err.message)
-          setJoined(false)
-          setJoinError(
-            full
-              ? `This room is full (max ${state.max} people). Try again once someone leaves.`
-              : permissionHelpMessage(err),
-          )
-        }}
-        onMediaDeviceFailure={(failure) => {
-          setJoined(false)
-          setJoinError(
-            failure === MediaDeviceFailure.PermissionDenied
-              ? 'Camera/microphone access is blocked. Enable it for this site in your browser settings, then tap Join again.'
-              : 'Could not access your camera or microphone. Make sure no other app is using it, then try again.',
-          )
-        }}
-        onDisconnected={(reason) => {
-          if (reason === DisconnectReason.CLIENT_INITIATED) return
-          navigate('/dashboard', { replace: true })
-        }}
-        style={{ height: '100svh' }}
-      >
-        <RoomTopBar roomName={roomName} max={state.max} navigate={navigate} />
-        <div className="h-[calc(100svh-5rem)] p-4 pt-16">
-          <VideoStage />
-        </div>
-        <div className="absolute inset-x-0 bottom-0 z-20 flex items-center justify-between gap-3 p-3">
-          <ControlBar variation="minimal" />
-          <RoomDock />
-        </div>
-        <RoomAudioRenderer />
-      </LiveKitRoom>
-    </div>
+    <JoinedRoom
+      room={room}
+      roomName={roomName}
+      max={state.max}
+      navigate={navigate}
+      onLeave={leaveRoom}
+    />
   )
 }
 
