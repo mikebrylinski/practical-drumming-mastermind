@@ -13,14 +13,13 @@ import {
   useTracks,
 } from '@livekit/components-react'
 import {
+  createLocalTracks,
   DisconnectReason,
-  LocalAudioTrack,
-  LocalTrack,
-  LocalVideoTrack,
   MediaDeviceFailure,
   Room,
   RoomEvent,
   Track,
+  type VideoCaptureOptions,
 } from 'livekit-client'
 import { useAuth } from '../../lib/auth/AuthProvider'
 import {
@@ -35,7 +34,7 @@ type TokenState =
   | { status: 'loading' }
   | { status: 'mock' }
   | { status: 'error'; message: string }
-  | { status: 'ready'; token: string; url: string; max: number }
+  | { status: 'ready'; token: string; url: string; max: number; canRecord: boolean }
 
 function VideoStage() {
   const tracks = useTracks(
@@ -228,10 +227,9 @@ function ParticipantCount({ max }: { max: number }) {
   )
 }
 
-const IOS_VIDEO_CONSTRAINTS: MediaTrackConstraints = {
+const IOS_VIDEO_CONSTRAINTS: VideoCaptureOptions = {
   facingMode: 'user',
-  width: { ideal: 640 },
-  height: { ideal: 480 },
+  resolution: { width: 640, height: 480 },
 }
 
 function permissionHelpMessage(err: unknown): string {
@@ -287,19 +285,30 @@ function GestureActionButton({
   )
 }
 
-function mediaStreamToLocalTracks(stream: MediaStream): LocalTrack[] {
-  const tracks: LocalTrack[] = []
-  for (const mediaTrack of stream.getVideoTracks()) {
-    const track = new LocalVideoTrack(mediaTrack, IOS_VIDEO_CONSTRAINTS, true)
-    track.source = Track.Source.Camera
-    tracks.push(track)
+function mediaAuthHeaders(
+  session: ReturnType<typeof useAuth>['session'],
+  demoAdmin: boolean,
+) {
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+  if (session?.access_token) {
+    headers.Authorization = `Bearer ${session.access_token}`
+  } else if (demoAdmin) {
+    headers['X-Demo-Admin'] = 'true'
   }
-  for (const mediaTrack of stream.getAudioTracks()) {
-    const track = new LocalAudioTrack(mediaTrack, undefined, true)
-    track.source = Track.Source.Microphone
-    tracks.push(track)
+  return headers
+}
+
+async function ensureMediaEnabled(room: Room, includeVideo: boolean) {
+  const mic = room.localParticipant.getTrackPublication(Track.Source.Microphone)
+  if (mic?.track && mic.isMuted) {
+    await mic.unmute()
   }
-  return tracks
+  if (includeVideo) {
+    const cam = room.localParticipant.getTrackPublication(Track.Source.Camera)
+    if (cam?.track && cam.isMuted) {
+      await cam.unmute()
+    }
+  }
 }
 
 function PreJoinLobby({
@@ -368,6 +377,7 @@ function JoinedRoom({
   navigate,
   onLeave,
   isAdmin,
+  canRecord,
   session,
   demoAdmin,
 }: {
@@ -377,6 +387,7 @@ function JoinedRoom({
   navigate: NavigateFunction
   onLeave: (message: string) => void
   isAdmin: boolean
+  canRecord: boolean
   session: ReturnType<typeof useAuth>['session']
   demoAdmin: boolean
 }) {
@@ -409,7 +420,7 @@ function JoinedRoom({
           roomName={roomName}
           max={max}
           navigate={navigate}
-          isAdmin={isAdmin}
+          canRecord={canRecord || isAdmin}
           session={session}
           demoAdmin={demoAdmin}
         />
@@ -417,7 +428,7 @@ function JoinedRoom({
           <VideoStage />
         </div>
         <div className="absolute inset-x-0 bottom-0 z-20 flex items-center justify-between gap-3 p-3">
-          <ControlBar variation="minimal" />
+          <ControlBar variation="minimal" saveUserChoices={false} />
           <RoomDock />
         </div>
         <RoomAudioRenderer />
@@ -442,14 +453,14 @@ function RoomTopBar({
   roomName,
   max,
   navigate,
-  isAdmin,
+  canRecord,
   session,
   demoAdmin,
 }: {
   roomName: string
   max: number
   navigate: NavigateFunction
-  isAdmin: boolean
+  canRecord: boolean
   session: ReturnType<typeof useAuth>['session']
   demoAdmin: boolean
 }) {
@@ -465,11 +476,11 @@ function RoomTopBar({
           <ParticipantCount max={max} />
         </div>
         <InviteButton />
-      </div>
-      <div className="flex flex-col items-end gap-2">
-        {isAdmin ? (
+        {canRecord ? (
           <AdminRecordControl roomName={roomName} session={session} demoAdmin={demoAdmin} />
         ) : null}
+      </div>
+      <div className="pointer-events-auto">
         <ConnectionStrengthMeter />
       </div>
     </div>
@@ -498,10 +509,11 @@ export function RoomPage() {
     let active = true
     async function getToken() {
       let res: Response
+      const headers = mediaAuthHeaders(session, demoAdmin)
       try {
         res = await fetch('/api/livekit/token', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers,
           body: JSON.stringify({
             room: roomName,
             identity,
@@ -525,6 +537,7 @@ export function RoomPage() {
         mock?: boolean
         error?: string
         maxParticipants?: number
+        isAdmin?: boolean
       } | null = null
       try {
         json = await res.json()
@@ -553,13 +566,14 @@ export function RoomPage() {
         token: json.token,
         url: json.url,
         max: json.maxParticipants || DEFAULT_MAX_PARTICIPANTS,
+        canRecord: json.isAdmin === true || isAdmin,
       })
     }
     void getToken()
     return () => {
       active = false
     }
-  }, [roomName, identity, displayName])
+  }, [roomName, identity, displayName, session, demoAdmin, isAdmin])
 
   useEffect(() => {
     return () => {
@@ -577,15 +591,13 @@ export function RoomPage() {
     setJoining(true)
     setJoinError(null)
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
+      const tracks = await createLocalTracks({
         audio: true,
         video: includeVideo ? IOS_VIDEO_CONSTRAINTS : false,
       })
-      const tracks = mediaStreamToLocalTracks(stream)
       await connect(state.url, state.token)
-      await Promise.all(
-        tracks.map((track) => room.localParticipant.publishTrack(track, { source: track.source })),
-      )
+      await Promise.all(tracks.map((track) => room.localParticipant.publishTrack(track)))
+      await ensureMediaEnabled(room, includeVideo)
       setJoined(true)
     } catch (err) {
       try {
@@ -684,6 +696,7 @@ export function RoomPage() {
       navigate={navigate}
       onLeave={leaveRoom}
       isAdmin={isAdmin}
+      canRecord={state.canRecord}
       session={session}
       demoAdmin={demoAdmin}
     />

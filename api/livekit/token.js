@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto'
 import { AccessToken, RoomServiceClient } from 'livekit-server-sdk'
+import { resolveIsAdminFromRequest } from './_lib.js'
 
 const MAX_PARTICIPANTS = Number(process.env.LIVEKIT_MAX_PARTICIPANTS) || 12
 
@@ -7,7 +8,7 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') {
     res.setHeader('Access-Control-Allow-Origin', '*')
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Demo-Admin')
     return res.status(204).end()
   }
 
@@ -29,8 +30,8 @@ export default async function handler(req, res) {
     const url = process.env.LIVEKIT_URL || process.env.VITE_LIVEKIT_URL || null
 
     if (!apiKey || !apiSecret) {
-      // Mock mode: no LiveKit credentials. Room page shows a graceful notice.
-      return res.status(200).json({ ok: true, mock: true, token: null, url: null })
+      const isAdmin = await resolveIsAdminFromRequest(req)
+      return res.status(200).json({ ok: true, mock: true, token: null, url: null, isAdmin })
     }
 
     if (!url) {
@@ -68,7 +69,8 @@ export default async function handler(req, res) {
     })
 
     const token = await at.toJwt()
-    return res.status(200).json({ ok: true, token, url, maxParticipants: MAX_PARTICIPANTS })
+    const isAdmin = await resolveIsAdminFromRequest(req)
+    return res.status(200).json({ ok: true, token, url, maxParticipants: MAX_PARTICIPANTS, isAdmin })
   } catch (err) {
     console.error(err)
     return res.status(500).json({ ok: false, error: 'Server error' })

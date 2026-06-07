@@ -87,6 +87,36 @@ export function durationFromEgress(info) {
   return Math.round(Number(file.duration))
 }
 
+/** Returns whether the caller is an admin (for UI flags). Does not reject the request. */
+export async function resolveIsAdminFromRequest(req) {
+  const admin = getSupabaseAdmin()
+  if (!admin) {
+    return req.headers['x-demo-admin'] === 'true'
+  }
+
+  const authHeader = req.headers.authorization || req.headers.Authorization
+  if (!authHeader?.startsWith('Bearer ')) {
+    return false
+  }
+
+  const token = authHeader.slice(7)
+  const {
+    data: { user },
+    error,
+  } = await admin.auth.getUser(token)
+  if (error || !user) {
+    return false
+  }
+
+  const { data: profile } = await admin
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .maybeSingle()
+
+  return profile?.role === 'admin'
+}
+
 export async function verifyAdminRequest(req) {
   const admin = getSupabaseAdmin()
 
