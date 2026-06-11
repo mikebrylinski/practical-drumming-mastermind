@@ -1,4 +1,4 @@
-import { getSupabaseAdmin } from '../../../server/lib/supabaseAdmin.js'
+import { getSupabaseAdmin } from '../../../../server/lib/supabaseAdmin.js'
 import {
   findActiveRecording,
   getEgressClient,
@@ -7,7 +7,7 @@ import {
   parseBody,
   syncRecordingFromEgress,
   verifyAdminRequest,
-} from '../_lib.js'
+} from '../../_lib.js'
 
 export default async function handler(req, res) {
   if (handleOptions(req, res)) return
