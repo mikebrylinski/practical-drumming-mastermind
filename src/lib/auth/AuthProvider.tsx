@@ -143,38 +143,50 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { data } = await supabase!.auth.getSession()
       if (!active) return
       setSession(data.session)
-      if (data.session?.user) {
-        await loadProfile(data.session.user.id, data.session.user.email ?? undefined)
-      }
       if (active) setLoading(false)
     }
 
     void bootstrap()
 
+    // Keep this callback synchronous — async Supabase calls here can deadlock sign-in.
     const { data: sub } = supabase.auth.onAuthStateChange((_event, nextSession) => {
-      void (async () => {
-        setLoading(true)
-        setSession(nextSession)
-        if (nextSession?.user) {
-          setSeedDataActive(false)
-          clearStoredSeedSession()
-          await loadProfile(nextSession.user.id, nextSession.user.email ?? undefined)
-        } else {
-          setProfile(null)
-        }
+      setSession(nextSession)
+      if (!nextSession?.user) {
+        setProfile(null)
         setLoading(false)
-      })()
+      }
     })
 
     return () => {
       active = false
       sub.subscription.unsubscribe()
     }
-  }, [mockMode, loadProfile])
+  }, [mockMode])
+
+  useEffect(() => {
+    if (mockMode || !supabase || !session?.user) {
+      if (!mockMode && !session) setLoading(false)
+      return
+    }
+
+    let active = true
+    setLoading(true)
+    setSeedDataActive(false)
+    clearStoredSeedSession()
+
+    void (async () => {
+      await loadProfile(session.user.id, session.user.email ?? undefined)
+      if (active) setLoading(false)
+    })()
+
+    return () => {
+      active = false
+    }
+  }, [mockMode, session?.user?.id, session?.user?.email, loadProfile])
 
   const signInWithPassword = useCallback(
     async (email: string, password: string): Promise<AuthResult> => {
-      if (!supabase) return { error: null }
+      if (!supabase) return { error: 'Auth is not configured' }
       const { error } = await supabase.auth.signInWithPassword({ email, password })
       return { error: error?.message ?? null }
     },

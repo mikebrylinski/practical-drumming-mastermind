@@ -50,6 +50,7 @@ export function LoginPage() {
     isAuthed,
     loading,
     role,
+    useSeedData,
   } = useAuth()
   const showSeedLogin = mockMode || demoLoginEnabled
   const navigate = useNavigate()
@@ -65,9 +66,10 @@ export function LoginPage() {
     (from.startsWith('/admin') ? 'admin' : from.startsWith('/dashboard') ? 'member' : null)
 
   useEffect(() => {
-    if (loading || !isAuthed || !role || showSeedLogin) return
+    if (loading || !isAuthed || !role) return
+    if (useSeedData) return
     navigate(postLoginPath(from, role, roleHint), { replace: true })
-  }, [loading, isAuthed, role, from, roleHint, navigate, showSeedLogin])
+  }, [loading, isAuthed, role, useSeedData, from, roleHint, navigate])
 
   const [view, setView] = useState<AuthView>('signin')
   const [email, setEmail] = useState('')
