@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { ClubCtaAnimation } from '../components/club/ClubCtaAnimation'
+import { HeroVideoPopup } from '../components/hero/HeroVideoPopup'
 import { JoinClubBackground } from '../components/JoinClubBackground'
 import { Reveal } from '../components/Reveal'
 import { Seo } from '../components/Seo'
@@ -194,24 +195,7 @@ export function HomePage2() {
               transition={{ delay: 0.08, duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
               className="order-1 lg:order-2"
             >
-              <div className="hero-visual relative mx-auto w-3/4 max-w-[17rem] sm:w-full sm:max-w-sm lg:ml-auto lg:max-w-md">
-                <div className="relative aspect-[4/5] overflow-hidden rounded-[1.75rem] bg-charcoal/80 shadow-[0_24px_80px_-20px_rgba(0,0,0,0.9)] ring-1 ring-white/10 backdrop-blur-[2px] sm:aspect-[5/6]">
-                  <img
-                    src="/home2-hero-community.png"
-                    alt="Drummers practicing together in a mastermind session"
-                    className="absolute inset-0 h-full w-full object-cover object-center"
-                    fetchPriority="high"
-                    decoding="async"
-                  />
-                  <div
-                    className="pointer-events-none absolute inset-0 bg-gradient-to-t from-void/50 via-transparent to-void/10"
-                    aria-hidden
-                  />
-                </div>
-                <p className="mt-4 text-center font-garamond text-xs tracking-[0.22em] uppercase text-mist/50 lg:text-right">
-                  mastermind club
-                </p>
-              </div>
+              <HeroVideoPopup />
             </motion.div>
           </div>
         </div>

@@ -30,14 +30,15 @@ function metaSummary(metadata: Record<string, unknown>) {
     .join(' · ')
 }
 
-export function LeadTimeline({ events }: { events: LeadEvent[] }) {
+export function LeadTimeline({ events, limit }: { events: LeadEvent[]; limit?: number }) {
   if (events.length === 0) {
     return <p className="font-garamond text-sm text-mist/40">No events recorded.</p>
   }
   const ordered = [...events].sort((a, b) => b.created_at.localeCompare(a.created_at))
+  const visible = limit ? ordered.slice(0, limit) : ordered
   return (
     <ol className="relative space-y-4 border-l border-white/10 pl-5">
-      {ordered.map((e) => {
+      {visible.map((e) => {
         const meta = EVENT_META[e.type] ?? { label: e.type, dot: 'bg-mist/40' }
         const summary = metaSummary(e.metadata)
         return (

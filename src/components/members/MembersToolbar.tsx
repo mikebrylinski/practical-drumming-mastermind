@@ -1,10 +1,24 @@
+import { Link } from 'react-router-dom'
 import { BellIcon, MembersIcon } from './MembersIcons'
+import { useAuth } from '../../lib/auth/AuthProvider'
 
 type MembersToolbarProps = {
   onOpenMenu: () => void
 }
 
+function initialsFromName(name: string, email: string): string {
+  const source = name.trim() || email.trim()
+  if (!source) return '?'
+  const parts = source.split(/\s+/).filter(Boolean)
+  if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase()
+  return source.slice(0, 2).toUpperCase()
+}
+
 export function MembersToolbar({ onOpenMenu }: MembersToolbarProps) {
+  const { profile } = useAuth()
+  const avatar = profile?.avatar_url
+  const initials = initialsFromName(profile?.full_name ?? '', profile?.email ?? '')
+
   return (
     <div className="flex shrink-0 items-center justify-between gap-3 border-b border-white/10 bg-charcoal/40 px-4 py-3 sm:px-5">
       <button
@@ -30,11 +44,23 @@ export function MembersToolbar({ onOpenMenu }: MembersToolbarProps) {
             3
           </span>
         </button>
-        <img
-          src="/about-mike.png"
-          alt="Your profile"
-          className="size-9 rounded-full object-cover ring-2 ring-gold/30 sm:size-10"
-        />
+        {avatar ? (
+          <Link to="/profile" aria-label="Your profile">
+            <img
+              src={avatar}
+              alt=""
+              className="size-9 rounded-full object-cover ring-2 ring-gold/30 sm:size-10"
+            />
+          </Link>
+        ) : (
+          <Link
+            to="/profile"
+            aria-label="Your profile"
+            className="flex size-9 items-center justify-center rounded-full bg-gold/15 font-bebas text-sm text-gold ring-2 ring-gold/30 sm:size-10"
+          >
+            {initials}
+          </Link>
+        )}
       </div>
     </div>
   )

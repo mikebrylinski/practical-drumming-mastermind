@@ -88,14 +88,19 @@ API routes: `POST /api/livekit/egress/start`, `POST /api/livekit/egress/stop`, `
 
 ## Supabase setup
 
+Full step-by-step guide: [supabase/SETUP.md](supabase/SETUP.md) (auth, admin users, storage, Vercel env).
+
 1. Create a Supabase project; copy the URL + anon key into `VITE_*` and the
    URL + service-role key into the server vars.
 2. Run [supabase/schema.sql](supabase/schema.sql) in the SQL editor. It creates
    all tables, the `is_admin()` helper, RLS policies, a profile-on-signup
    trigger, and adds CRM tables to the Realtime publication.
-3. (Optional) Run [supabase/seed.sql](supabase/seed.sql) for sample cohorts and
+3. Run [supabase/storage.sql](supabase/storage.sql) for the `session-recordings` bucket.
+4. (Optional) Run [supabase/seed.sql](supabase/seed.sql) for sample cohorts and
    availability slots. Promote yourself to admin:
    `update public.profiles set role = 'admin' where email = 'you@example.com';`
+5. Enable **Email** auth and set Site URL / redirect URLs (see SETUP.md).
+6. Create **Storage S3 access keys** and add `SUPABASE_STORAGE_S3_*` vars on Vercel, then redeploy.
 
 ## Systems
 

@@ -92,7 +92,7 @@ export function AdminCohorts() {
   }
 
   return (
-    <AdminShell eyebrow="Admin" title="Cohorts" subtitle="Live mentorship groups & rooms." wide>
+    <AdminShell eyebrow="Admin" title="Cohorts" subtitle="Live mentorship groups & rooms.">
       <div className="grid gap-6 lg:grid-cols-[24rem_minmax(0,1fr)]">
         <AppCard className="h-fit">
           <h3 className="font-garamond text-lg text-mist">New cohort</h3>

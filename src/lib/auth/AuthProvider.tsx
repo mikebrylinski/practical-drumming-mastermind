@@ -8,9 +8,10 @@ import {
   type ReactNode,
 } from 'react'
 import type { Session } from '@supabase/supabase-js'
-import { isDemoLoginEnabled, SEED_DATA_SESSION_KEY, seedSignInAsAdmin } from '../demo/flags'
+import { isDemoLoginEnabled, SEED_DATA_SESSION_KEY, seedSignInAsAdmin, clearStoredSeedSession, isRealSupabaseAuthEnabled } from '../demo/flags'
 import { isSupabaseConfigured, supabase } from '../supabase/client'
 import { setLeadUserId } from '../leads/track'
+import { PROFILE_FIELDS } from '../profile/saveProfile'
 import type { Profile, Role } from '../supabase/types'
 
 type AuthResult = { error: string | null }
@@ -32,9 +33,13 @@ type AuthContextValue = {
   signInWithPassword: (email: string, password: string) => Promise<AuthResult>
   signUp: (email: string, password: string, fullName: string) => Promise<AuthResult>
   signInWithOtp: (email: string) => Promise<AuthResult>
+  resetPassword: (email: string) => Promise<AuthResult>
+  updatePassword: (password: string) => Promise<AuthResult>
   signOut: () => Promise<void>
   enterSeedDataLogin: (role: Role) => Promise<void>
   setMockRole: (role: Role) => void
+  refreshProfile: () => Promise<void>
+  setLocalProfile: (patch: Partial<Profile>) => void
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null)
@@ -46,6 +51,10 @@ const MOCK_PROFILE: Profile = {
   email: 'demo.admin@practicaldrumming.dev',
   full_name: 'Demo Admin',
   role: 'admin',
+  avatar_url: '/about-mike.png',
+  phone: '',
+  location: '',
+  bio: '',
 }
 
 function readStoredSeedRole(): Role | null {
@@ -60,10 +69,11 @@ function readStoredSeedRole(): Role | null {
 export function AuthProvider({ children }: { children: ReactNode }) {
   const mockMode = !isSupabaseConfigured
   const demoLoginEnabled = isDemoLoginEnabled
+  const realAuth = isRealSupabaseAuthEnabled(isSupabaseConfigured)
   const forceAdminSeed = seedSignInAsAdmin(mockMode)
   const storedSeedRole = readStoredSeedRole()
   const [seedDataActive, setSeedDataActive] = useState(
-    () => demoLoginEnabled && storedSeedRole !== null,
+    () => !realAuth && demoLoginEnabled && storedSeedRole !== null,
   )
   const useSeedData = seedDataActive
   const [loading, setLoading] = useState(mockMode ? false : !seedDataActive)
@@ -77,7 +87,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!supabase) return
     const { data } = await supabase
       .from('profiles')
-      .select('id, email, full_name, role, created_at')
+      .select(PROFILE_FIELDS)
       .eq('id', userId)
       .maybeSingle()
     if (data) {
@@ -88,43 +98,79 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         email: fallbackEmail ?? '',
         full_name: '',
         role: 'member',
+        avatar_url: null,
+        phone: null,
+        location: null,
+        bio: null,
       })
     }
   }, [])
+
+  const refreshProfile = useCallback(async () => {
+    if (useSeedData || !session?.user?.id) return
+    await loadProfile(session.user.id, session.user.email ?? undefined)
+  }, [useSeedData, session, loadProfile])
+
+  const setLocalProfile = useCallback(
+    (patch: Partial<Profile>) => {
+      setProfile((prev) => {
+        const base = useSeedData
+          ? { ...MOCK_PROFILE, role: mockRole }
+          : prev ?? {
+              id: session?.user?.id ?? '',
+              email: session?.user?.email ?? '',
+              full_name: '',
+              role: 'member' as Role,
+            }
+        return { ...base, ...patch }
+      })
+    },
+    [useSeedData, mockRole, session],
+  )
+
+  useEffect(() => {
+    if (!realAuth) return
+    clearStoredSeedSession()
+    setSeedDataActive(false)
+  }, [realAuth])
 
   useEffect(() => {
     if (mockMode || !supabase) return
 
     let active = true
-    supabase.auth.getSession().then(({ data }) => {
+
+    async function bootstrap() {
+      const { data } = await supabase!.auth.getSession()
       if (!active) return
       setSession(data.session)
       if (data.session?.user) {
-        void loadProfile(data.session.user.id, data.session.user.email ?? undefined)
+        await loadProfile(data.session.user.id, data.session.user.email ?? undefined)
       }
-      setLoading(false)
-    })
+      if (active) setLoading(false)
+    }
+
+    void bootstrap()
 
     const { data: sub } = supabase.auth.onAuthStateChange((_event, nextSession) => {
-      setSession(nextSession)
-      if (nextSession?.user) {
-        setSeedDataActive(false)
-        try {
-          sessionStorage.removeItem(SEED_DATA_SESSION_KEY)
-        } catch {
-          /* no-op */
+      void (async () => {
+        setLoading(true)
+        setSession(nextSession)
+        if (nextSession?.user) {
+          setSeedDataActive(false)
+          clearStoredSeedSession()
+          await loadProfile(nextSession.user.id, nextSession.user.email ?? undefined)
+        } else {
+          setProfile(null)
         }
-        void loadProfile(nextSession.user.id, nextSession.user.email ?? undefined)
-      } else {
-        setProfile(null)
-      }
+        setLoading(false)
+      })()
     })
 
     return () => {
       active = false
       sub.subscription.unsubscribe()
     }
-  }, [useSeedData, loadProfile])
+  }, [mockMode, loadProfile])
 
   const signInWithPassword = useCallback(
     async (email: string, password: string): Promise<AuthResult> => {
@@ -157,13 +203,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { error: error?.message ?? null }
   }, [])
 
+  const resetPassword = useCallback(async (email: string): Promise<AuthResult> => {
+    if (!supabase) return { error: 'Auth is not configured' }
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/login`,
+    })
+    return { error: error?.message ?? null }
+  }, [])
+
+  const updatePassword = useCallback(async (password: string): Promise<AuthResult> => {
+    if (!supabase) return { error: 'Auth is not configured' }
+    const { error } = await supabase.auth.updateUser({ password })
+    return { error: error?.message ?? null }
+  }, [])
+
   const signOut = useCallback(async () => {
     setSeedDataActive(false)
-    try {
-      sessionStorage.removeItem(SEED_DATA_SESSION_KEY)
-    } catch {
-      /* no-op */
-    }
+    clearStoredSeedSession()
     if (!supabase) {
       setProfile(null)
       setSession(null)
@@ -191,6 +247,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const enterSeedDataLogin = useCallback(
     async (role: Role) => {
+      if (realAuth) return
       const effectiveRole = forceAdminSeed ? 'admin' : role
       if (supabase) await supabase.auth.signOut()
       setSession(null)
@@ -204,7 +261,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       setLoading(false)
     },
-    [forceAdminSeed],
+    [forceAdminSeed, realAuth],
   )
 
   const effectiveProfile = useSeedData ? { ...MOCK_PROFILE, role: mockRole } : profile
@@ -228,9 +285,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       signInWithPassword,
       signUp,
       signInWithOtp,
+      resetPassword,
+      updatePassword,
       signOut,
       enterSeedDataLogin,
       setMockRole: updateMockRole,
+      refreshProfile,
+      setLocalProfile,
     }),
     [
       loading,
@@ -243,9 +304,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       signInWithPassword,
       signUp,
       signInWithOtp,
+      resetPassword,
+      updatePassword,
       signOut,
       enterSeedDataLogin,
       updateMockRole,
+      refreshProfile,
+      setLocalProfile,
     ],
   )
 

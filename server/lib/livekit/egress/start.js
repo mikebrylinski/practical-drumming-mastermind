@@ -44,7 +44,7 @@ export default async function handler(req, res) {
       return res.status(503).json({
         ok: false,
         error:
-          'Recording storage is not configured. Set LIVEKIT_EGRESS_S3_* vars or LIVEKIT_EGRESS_USE_CLOUD_STORAGE=true (with default bucket in LiveKit Cloud).',
+          'Recording storage is not configured. In Supabase → Project Settings → Storage → S3 Connection, enable S3 and create access keys. Then set SUPABASE_STORAGE_S3_ACCESS_KEY and SUPABASE_STORAGE_S3_SECRET_KEY (see supabase/SETUP.md).',
       })
     }
 

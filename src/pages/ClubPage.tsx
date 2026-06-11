@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { ClubAnimatedBackground } from '../components/club/ClubAnimatedBackground'
 import { ClubBenefitsBackground } from '../components/club/ClubBenefitsBackground'
 import { ClubCtaAnimation } from '../components/club/ClubCtaAnimation'
+import { HeroVideoPopup } from '../components/hero/HeroVideoPopup'
 import { Reveal } from '../components/Reveal'
 import { Seo } from '../components/Seo'
 import { pageWrapClass, SectionShell } from '../components/SectionShell'
@@ -147,14 +148,18 @@ export function ClubPage() {
       {/* Hero — club-specific, not home repeat */}
       <section className="relative overflow-hidden border-b border-white/[0.06]">
         <div
-          className="absolute inset-0 bg-cover bg-[center_45%] bg-no-repeat hero-kenburns"
-          style={{ backgroundImage: "url('/club-hero-field.png')" }}
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat hero-kenburns"
+          style={{ backgroundImage: "url('/home2-hero-community.png')" }}
           aria-hidden
         />
-        <div className="absolute inset-0 bg-void/40" aria-hidden />
-        <div className="absolute inset-0 bg-gradient-to-b from-void/75 via-void/45 to-void/80" aria-hidden />
-        <div className="absolute inset-0 bg-gradient-to-r from-void/55 via-void/35 to-void/65" aria-hidden />
-        <div className="pointer-events-none absolute inset-0 grain opacity-15" aria-hidden />
+        <div className="absolute inset-0 bg-void/50" aria-hidden />
+        <div className="absolute inset-0 bg-gradient-to-b from-void/82 via-void/58 to-void/88" aria-hidden />
+        <div className="absolute inset-0 bg-gradient-to-r from-void/70 via-void/50 to-void/75" aria-hidden />
+        <div
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_70%_at_50%_45%,transparent_12%,rgba(5,5,5,0.35)_55%,rgba(5,5,5,0.78)_100%)]"
+          aria-hidden
+        />
+        <div className="pointer-events-none absolute inset-0 grain opacity-[0.17]" aria-hidden />
 
         <div className={`relative z-10 ${pageWrapClass} pb-16 pt-16 md:pb-20 md:pt-20 lg:pb-24 lg:pt-24`}>
           <Reveal className="mx-auto max-w-3xl text-center">
@@ -226,25 +231,14 @@ export function ClubPage() {
               </Prose>
             </Reveal>
           </div>
-          <Reveal delay={0.1} className="flex w-full justify-center">
-            <figure className="w-full max-w-lg">
-              <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-void shadow-[0_16px_48px_-16px_rgba(0,0,0,0.85)] ring-1 ring-white/10">
-                <img
-                  src="/home2-mastermind-zoom.png"
-                  alt="Live mastermind video call with drummers"
-                  className="aspect-[4/3] w-full object-cover object-center"
-                  loading="lazy"
-                  decoding="async"
-                />
-                <div
-                  className="pointer-events-none absolute inset-0 bg-gradient-to-t from-void/40 via-transparent to-void/10"
-                  aria-hidden
-                />
-              </div>
-              <figcaption className="mt-4 text-center font-garamond text-xs tracking-[0.22em] uppercase text-mist/50 lg:text-left">
-                Live group calls · Open Q&amp;A · Member participation
-              </figcaption>
-            </figure>
+          <Reveal delay={0.1} className="flex w-full justify-center lg:justify-end">
+            <HeroVideoPopup
+              caption="Watch intro"
+              previewImage="/home2-mastermind-zoom.png"
+              previewAlt="Live mastermind video call with drummers"
+              aspectClass="aspect-[4/3]"
+              imageClassName="object-cover object-center"
+            />
           </Reveal>
         </div>
         </div>

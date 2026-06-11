@@ -1,19 +1,10 @@
 import type { Session } from '@supabase/supabase-js'
+import { adminRequestHeaders } from '../auth/accessToken'
 import type { SessionRecording } from './types'
 
 type AuthOpts = {
   session: Session | null
   demoAdmin?: boolean
-}
-
-function adminHeaders({ session, demoAdmin }: AuthOpts) {
-  const headers: Record<string, string> = { 'Content-Type': 'application/json' }
-  if (session?.access_token) {
-    headers.Authorization = `Bearer ${session.access_token}`
-  } else if (demoAdmin) {
-    headers['X-Demo-Admin'] = 'true'
-  }
-  return headers
 }
 
 async function parseJson(res: Response) {
@@ -31,7 +22,7 @@ export async function startRoomRecording(
 ): Promise<{ ok: boolean; recording?: SessionRecording; error?: string; mock?: boolean }> {
   const res = await fetch('/api/livekit/egress/start', {
     method: 'POST',
-    headers: adminHeaders(auth),
+    headers: await adminRequestHeaders(auth.session, auth.demoAdmin),
     body: JSON.stringify({ room, title }),
   })
   const json = await parseJson(res)
@@ -48,7 +39,7 @@ export async function stopRoomRecording(
 ): Promise<{ ok: boolean; recording?: SessionRecording; error?: string; mock?: boolean }> {
   const res = await fetch('/api/livekit/egress/stop', {
     method: 'POST',
-    headers: adminHeaders(auth),
+    headers: await adminRequestHeaders(auth.session, auth.demoAdmin),
     body: JSON.stringify({ room, recordingId }),
   })
   const json = await parseJson(res)
@@ -61,14 +52,18 @@ export async function stopRoomRecording(
 export async function fetchRoomRecordingStatus(
   room: string,
   auth: AuthOpts,
-): Promise<{ ok: boolean; recording: SessionRecording | null; mock?: boolean }> {
+): Promise<{ ok: boolean; recording: SessionRecording | null; error?: string; mock?: boolean }> {
   const params = new URLSearchParams({ room })
   const res = await fetch(`/api/livekit/egress/status?${params}`, {
-    headers: adminHeaders(auth),
+    headers: await adminRequestHeaders(auth.session, auth.demoAdmin),
   })
   const json = await parseJson(res)
   if (!res.ok || !json?.ok) {
-    return { ok: false, recording: null }
+    return {
+      ok: false,
+      recording: null,
+      error: json?.error || `Request failed (${res.status})`,
+    }
   }
   return { ok: true, recording: json.recording ?? null, mock: json.mock }
 }

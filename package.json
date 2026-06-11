@@ -7,6 +7,9 @@
     "dev": "vite",
     "dev:client": "vite",
     "dev:api": "node --env-file-if-exists=.env server/index.js",
+    "check:supabase": "node --env-file-if-exists=.env scripts/check-supabase.mjs",
+    "check:storage": "node --env-file-if-exists=.env scripts/check-storage.mjs",
+    "seed:cohorts": "node --env-file-if-exists=.env scripts/seed-cohort-sessions.mjs",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"

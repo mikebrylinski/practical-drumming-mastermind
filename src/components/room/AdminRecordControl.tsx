@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import type { Session } from '@supabase/supabase-js'
+import { useAuth } from '../../lib/auth/AuthProvider'
 import {
   fetchRoomRecordingStatus,
   startRoomRecording,
@@ -10,15 +10,9 @@ import { formatRecordingDuration, isRecordingActive, type SessionRecording } fro
 const recordBtnClass =
   'pointer-events-auto flex items-center gap-2 rounded-full border px-4 py-1.5 font-garamond text-xs tracking-[0.14em] uppercase backdrop-blur transition disabled:opacity-50'
 
-export function AdminRecordControl({
-  roomName,
-  session,
-  demoAdmin,
-}: {
-  roomName: string
-  session: Session | null
-  demoAdmin: boolean
-}) {
+export function AdminRecordControl({ roomName }: { roomName: string }) {
+  const { session, isAdmin, mockMode, useSeedData } = useAuth()
+  const demoAdmin = isAdmin && (useSeedData || mockMode)
   const [recording, setRecording] = useState<SessionRecording | null>(null)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -27,12 +21,18 @@ export function AdminRecordControl({
 
   const refresh = useCallback(async () => {
     const result = await fetchRoomRecordingStatus(roomName, auth)
-    if (result.ok) setRecording(result.recording)
+    if (result.ok) {
+      setRecording(result.recording)
+      setError(null)
+    } else if (result.error) {
+      setError(result.error)
+    }
   }, [roomName, session, demoAdmin])
 
   useEffect(() => {
+    if (!session?.access_token && !demoAdmin) return
     void refresh()
-  }, [refresh])
+  }, [refresh, session?.access_token, demoAdmin])
 
   useEffect(() => {
     const shouldPoll =
@@ -51,6 +51,10 @@ export function AdminRecordControl({
   }, [recording?.status, recording?.id, refresh])
 
   async function start() {
+    if (!session?.access_token && !demoAdmin) {
+      setError('Sign in again to start recording.')
+      return
+    }
     setBusy(true)
     setError(null)
     const result = await startRoomRecording(roomName, auth, `Session — ${roomName}`)

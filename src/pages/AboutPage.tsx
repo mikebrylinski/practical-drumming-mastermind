@@ -259,9 +259,9 @@ export function AboutPage() {
             <Prose>
               His career is defined by driving the percussion on some of the most statistically dominant
               records, iconic live spectacles, and prestigious award-winning projects in modern music
-              history. He was also featured on the cover of{' '}
-              <em className="text-mist/85">Modern Drummer</em> magazine — recognition reserved for
-              drummers whose impact on the instrument reaches far beyond the stage.
+              history — including a cover feature in{' '}
+              <em className="text-mist/85">Modern Drummer</em>, the world&apos;s most widely read drum
+              magazine.
             </Prose>
           </div>
         </Reveal>
@@ -341,94 +341,104 @@ export function AboutPage() {
       </SectionShell>
 
       <SectionShell>
-        <Reveal className="w-full text-center lg:text-left">
-          <SectionHeading
-            eyebrow="Honors & Recognition"
-            title="Modern Drummer Cover & the Guitar Center RockWalk"
-          />
-          <Prose className="mt-5 lg:max-w-3xl">
-            Beyond the records and the stages, Mike Malinin&apos;s impact on the drumming world has
-            been recognized by the institutions that define the craft — from the pages of the
-            instrument&apos;s most respected magazine to a permanent place among rock&apos;s greats in
-            Hollywood.
-          </Prose>
+        <Reveal delay={0.04} className={twoColClass}>
+          <div className="flex w-full flex-col items-center justify-center text-center">
+            <figure className={`${portraitSizeClass} w-full max-w-[14rem] sm:max-w-[15rem] lg:max-w-[16rem]`}>
+              <div className={`relative overflow-hidden ${portraitFrameClass} aspect-[3/4] w-full`}>
+                <img
+                  src="/about-modern-drummer-cover.png"
+                  alt="August 2002 Modern Drummer magazine cover featuring Mike Malinin of the Goo Goo Dolls"
+                  className="absolute inset-0 h-full w-full object-cover object-top"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <div
+                  className="pointer-events-none absolute inset-0 bg-gradient-to-t from-void/35 via-transparent to-transparent"
+                  aria-hidden
+                />
+              </div>
+              <figcaption className="mt-3 text-center font-garamond text-xs tracking-[0.22em] uppercase text-mist/50">
+                Modern Drummer · August 2002
+              </figcaption>
+            </figure>
+          </div>
+          <div className={`${colClass} space-y-5`}>
+            <SectionHeading
+              eyebrow="Press & recognition"
+              title={
+                <>
+                  On the Cover of <span className="text-gold">Modern Drummer</span>
+                </>
+              }
+              subtitle="Goo Goo Dolls' Mike Malinin — Maximum Pop"
+            />
+            <Prose>
+              In August 2002, Mike Malinin graced the cover of{' '}
+              <em className="text-mist/85">Modern Drummer</em> — the definitive global publication for
+              the instrument and the highest-profile honor a working drummer can receive.
+            </Prose>
+            <Prose>
+              The feature spotlighted his role anchoring the Goo Goo Dolls at the peak of their
+              commercial run — the pocket, dynamics, and song-first musicality behind hits like
+              &ldquo;Iris,&rdquo; &ldquo;Slide,&rdquo; and &ldquo;Black Balloon.&rdquo; A cover
+              placement puts a player among the elite drummers whose approach shapes how the next
+              generation thinks about playing for the music.
+            </Prose>
+            <Prose className="text-mist/65">
+              That same philosophy — feel over flash, serving the song — is at the core of Practical
+              Drumming today.
+            </Prose>
+          </div>
         </Reveal>
+      </SectionShell>
 
-        <div className="mt-10 grid gap-10 lg:mt-12 lg:grid-cols-2 lg:gap-12 xl:gap-16">
-          <Reveal>
-            <div className="flex w-full flex-col gap-6 lg:flex-row lg:items-start lg:gap-7">
-              <figure className="mx-auto w-full max-w-[12rem] shrink-0 sm:max-w-[13rem]">
-                <div className={`relative overflow-hidden ${portraitFrameClass} aspect-[3/4] w-full`}>
-                  <img
-                    src="/about-modern-drummer.png"
-                    alt="Mike Malinin featured on the cover of Modern Drummer magazine"
-                    className="absolute inset-0 h-full w-full object-cover object-center"
-                    loading="lazy"
-                    decoding="async"
-                    onError={(e) => {
-                      e.currentTarget.src = '/about-mike-practical.png'
-                    }}
-                  />
-                </div>
-                <figcaption className="mt-3 text-center font-garamond text-xs tracking-[0.22em] uppercase text-mist/50">
-                  Modern Drummer — cover feature
-                </figcaption>
-              </figure>
-              <div className="text-center lg:text-left">
-                <h3 className="font-bebas text-xl tracking-wide text-gold md:text-2xl">
-                  On the Cover of Modern Drummer
-                </h3>
-                <p className="mt-2.5 font-garamond text-sm leading-relaxed text-mist/65 md:text-base">
-                  <em className="text-mist/85">Modern Drummer</em> is the definitive global
-                  publication for the instrument, and a cover feature is one of the highest honors a
-                  player can receive. Mike earned that spotlight not for flash, but for feel — the
-                  pocket, dynamics, and song-first musicality that turned tracks like
-                  &ldquo;Iris&rdquo; into generational hits.
-                </p>
-                <p className="mt-2.5 font-garamond text-sm leading-relaxed text-mist/65 md:text-base">
-                  The feature placed him among the elite drummers whose approach shapes how the next
-                  generation thinks about playing for the music — exactly the philosophy at the core
-                  of Practical Drumming.
-                </p>
+      <SectionShell alt>
+        <Reveal delay={0.04} className={twoColClass}>
+          <div className="order-1 flex w-full flex-col items-center justify-center text-center lg:order-2">
+            <figure className={`${portraitSizeClass} w-full max-w-[14rem] sm:max-w-[15rem] lg:max-w-[16rem]`}>
+              <div className={`relative overflow-hidden ${portraitFrameClass} aspect-[3/4] w-full`}>
+                <img
+                  src="/about-cta-rockwalk.png"
+                  alt="Mike Malinin at his Guitar Center RockWalk induction beside his handprint plaque in Hollywood"
+                  className="absolute inset-0 h-full w-full object-cover object-center"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <div
+                  className="pointer-events-none absolute inset-0 bg-gradient-to-t from-void/35 via-transparent to-transparent"
+                  aria-hidden
+                />
               </div>
-            </div>
-          </Reveal>
-
-          <Reveal delay={0.06}>
-            <div className="flex w-full flex-col gap-6 lg:flex-row lg:items-start lg:gap-7">
-              <figure className="mx-auto w-full max-w-[12rem] shrink-0 sm:max-w-[13rem]">
-                <div className={`relative overflow-hidden ${portraitFrameClass} aspect-[3/4] w-full`}>
-                  <img
-                    src="/about-cta-rockwalk.png"
-                    alt="Mike Malinin at his Guitar Center RockWalk induction beside his handprint plaque in Hollywood"
-                    className="absolute inset-0 h-full w-full object-cover object-center"
-                    loading="lazy"
-                    decoding="async"
-                  />
-                </div>
-                <figcaption className="mt-3 text-center font-garamond text-xs tracking-[0.22em] uppercase text-mist/50">
-                  Guitar Center RockWalk — Hollywood
-                </figcaption>
-              </figure>
-              <div className="text-center lg:text-left">
-                <h3 className="font-bebas text-xl tracking-wide text-gold md:text-2xl">
-                  Guitar Center RockWalk Honoree
-                </h3>
-                <p className="mt-2.5 font-garamond text-sm leading-relaxed text-mist/65 md:text-base">
-                  The Guitar Center RockWalk of Fame in Hollywood immortalizes the musicians who have
-                  shaped popular music, capturing their handprints alongside legends like Jimi
-                  Hendrix, Eddie Van Halen, and Stevie Wonder. As part of the Goo Goo Dolls, Mike was
-                  inducted with his bandmates — his handprints set in stone on the world&apos;s most
-                  famous music boulevard.
-                </p>
-                <p className="mt-2.5 font-garamond text-sm leading-relaxed text-mist/65 md:text-base">
-                  It&apos;s the kind of recognition reserved for artists whose work defines an era —
-                  and a testament to the rock-solid drumming that powered five billion streams.
-                </p>
-              </div>
-            </div>
-          </Reveal>
-        </div>
+              <figcaption className="mt-3 text-center font-garamond text-xs tracking-[0.22em] uppercase text-mist/50">
+                Guitar Center RockWalk · Hollywood
+              </figcaption>
+            </figure>
+          </div>
+          <div className={`${colClass} order-2 space-y-5 lg:order-1`}>
+            <SectionHeading
+              eyebrow="Honors & recognition"
+              title={
+                <>
+                  Guitar Center <span className="text-gold">RockWalk</span>
+                </>
+              }
+              subtitle="Handprints set in stone on the world's most famous music boulevard"
+            />
+            <Prose>
+              The Guitar Center RockWalk of Fame in Hollywood immortalizes the musicians who have shaped
+              popular music, capturing their handprints alongside legends like Jimi Hendrix, Eddie Van
+              Halen, and Stevie Wonder.
+            </Prose>
+            <Prose>
+              As part of the Goo Goo Dolls, Mike was inducted with his bandmates — his handprints
+              permanently placed on Hollywood Boulevard alongside the artists who defined their eras.
+            </Prose>
+            <Prose className="text-mist/65">
+              It&apos;s recognition reserved for artists whose work defines a generation — and a testament
+              to the rock-solid drumming that powered five billion streams.
+            </Prose>
+          </div>
+        </Reveal>
       </SectionShell>
 
       <section className="relative overflow-hidden border-t border-gold/15 bg-charcoal/25 py-14 md:py-16 lg:py-20">
@@ -443,11 +453,9 @@ export function AboutPage() {
               <div className="flex w-full flex-col items-center justify-center text-center">
                 <AboutFigure
                   aspect="portrait"
-                  src="/about-hero-crowd.png"
-                  alt="Mike Malinin performing for a packed crowd"
-                  caption="From the world's biggest stages to your kit"
-                  captionCenter
-                  className={portraitSizeClass}
+                  src="/hero-mike-live.png"
+                  alt="Mike Malinin performing live on drums"
+                  className="mx-auto w-full max-w-[15rem] sm:max-w-[17rem] lg:max-w-[19rem]"
                 />
               </div>
             </Reveal>

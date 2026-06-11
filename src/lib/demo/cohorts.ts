@@ -31,7 +31,7 @@ const SEEDS: CohortSeed[] = [
     startsInDays: -56,
     nextSessionInMin: 12, // within the live window → shows "Live now"
     pastSessions: 8,
-    upcomingSessions: 8,
+    upcomingSessions: 6,
     titles: [
       'Building Confidence Behind the Kit',
       'Dynamics & Ghost Notes',
@@ -53,7 +53,7 @@ const SEEDS: CohortSeed[] = [
     startsInDays: -28,
     nextSessionInMin: 2 * 24 * 60, // ~2 days out
     pastSessions: 4,
-    upcomingSessions: 8,
+    upcomingSessions: 6,
     titles: [
       'Grip, Stroke & Posture',
       'Single & Double Stroke Rolls',
@@ -75,7 +75,7 @@ const SEEDS: CohortSeed[] = [
     startsInDays: -35,
     nextSessionInMin: 4 * 24 * 60, // ~4 days out
     pastSessions: 5,
-    upcomingSessions: 8,
+    upcomingSessions: 6,
     titles: [
       'Where the Pocket Lives',
       'Pushing & Pulling Time',
@@ -97,7 +97,7 @@ const SEEDS: CohortSeed[] = [
     startsInDays: 7,
     nextSessionInMin: 6 * 24 * 60, // ~6 days out
     pastSessions: 0,
-    upcomingSessions: 8,
+    upcomingSessions: 6,
     titles: [
       'Four-Way Coordination Systems',
       'Ostinato Soloing',

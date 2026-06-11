@@ -2,12 +2,8 @@ export const memberNavItems = [
   { id: 'dashboard', label: 'Dashboard', icon: 'grid' },
   { id: 'cohorts', label: 'Cohorts', icon: 'users' },
   { id: 'vault', label: 'Video Vault', icon: 'play' },
-  { id: 'qa', label: 'Q&A Board', icon: 'message' },
-  { id: 'planner', label: 'Practice Planner', icon: 'calendar' },
   { id: 'community', label: 'Community', icon: 'feed' },
   { id: 'directory', label: 'Member Directory', icon: 'directory' },
-  { id: 'resources', label: 'Resources', icon: 'folder' },
-  { id: 'challenges', label: 'Challenges', icon: 'trophy' },
   { id: 'settings', label: 'Settings', icon: 'settings' },
 ] as const
 

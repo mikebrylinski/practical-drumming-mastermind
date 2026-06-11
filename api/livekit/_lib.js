@@ -7,6 +7,14 @@ import {
   S3Upload,
 } from 'livekit-server-sdk'
 import { getSupabaseAdmin } from '../../server/lib/supabaseAdmin.js'
+import { resolveAdminFromRequest } from '../../server/lib/authRequest.js'
+import {
+  getEgressS3Config,
+  isEgressStorageConfigured,
+  resolveRecordingPlaybackUrl,
+} from '../../server/lib/recordingStorage.js'
+
+export { isEgressStorageConfigured }
 
 export function parseBody(req) {
   return typeof req.body === 'string' ? JSON.parse(req.body || '{}') : req.body || {}
@@ -32,31 +40,20 @@ export function getEgressClient() {
   return new EgressClient(creds.httpUrl, creds.apiKey, creds.apiSecret)
 }
 
-export function isEgressStorageConfigured() {
-  const bucket = process.env.LIVEKIT_EGRESS_S3_BUCKET
-  const accessKey = process.env.LIVEKIT_EGRESS_S3_ACCESS_KEY
-  const secret = process.env.LIVEKIT_EGRESS_S3_SECRET
-  if (bucket && accessKey && secret) return true
-  return process.env.LIVEKIT_EGRESS_USE_CLOUD_STORAGE === 'true'
-}
-
 export function buildRecordingFileOutput(roomName, recordingId) {
   const stamp = new Date().toISOString().replace(/[:.]/g, '-')
   const filepath = `recordings/${roomName}/${stamp}-${recordingId.slice(0, 8)}.mp4`
 
-  const bucket = process.env.LIVEKIT_EGRESS_S3_BUCKET
-  const accessKey = process.env.LIVEKIT_EGRESS_S3_ACCESS_KEY
-  const secret = process.env.LIVEKIT_EGRESS_S3_SECRET
-  const region = process.env.LIVEKIT_EGRESS_S3_REGION || 'us-east-1'
-  const endpoint = process.env.LIVEKIT_EGRESS_S3_ENDPOINT
-
-  if (bucket && accessKey && secret) {
+  const { accessKey, secret, bucket, endpoint, region } = getEgressS3Config()
+  if (accessKey && secret && bucket && endpoint) {
     const s3 = new S3Upload({
       accessKey,
       secret,
       bucket,
       region,
-      ...(endpoint ? { endpoint } : {}),
+      endpoint,
+      // Supabase S3 API requires path-style URLs; virtual-hosted style causes TLS failures.
+      forcePathStyle: true,
     })
     return new EncodedFileOutput({
       fileType: EncodedFileType.MP4,
@@ -89,69 +86,33 @@ export function durationFromEgress(info) {
 
 /** Returns whether the caller is an admin (for UI flags). Does not reject the request. */
 export async function resolveIsAdminFromRequest(req) {
-  const admin = getSupabaseAdmin()
-  if (!admin) {
+  if (!getSupabaseAdmin()) {
     return req.headers['x-demo-admin'] === 'true'
   }
-
-  const authHeader = req.headers.authorization || req.headers.Authorization
-  if (!authHeader?.startsWith('Bearer ')) {
-    return false
-  }
-
-  const token = authHeader.slice(7)
-  const {
-    data: { user },
-    error,
-  } = await admin.auth.getUser(token)
-  if (error || !user) {
-    return false
-  }
-
-  const { data: profile } = await admin
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .maybeSingle()
-
-  return profile?.role === 'admin'
+  const result = await resolveAdminFromRequest(req)
+  return result.ok
 }
 
 export async function verifyAdminRequest(req) {
-  const admin = getSupabaseAdmin()
-
-  if (!admin) {
+  if (!getSupabaseAdmin()) {
     if (req.headers['x-demo-admin'] === 'true') {
       return { ok: true, userId: 'demo-admin', demo: true }
     }
     return { ok: false, status: 503, error: 'Admin auth not configured' }
   }
 
-  const authHeader = req.headers.authorization || req.headers.Authorization
-  if (!authHeader?.startsWith('Bearer ')) {
-    return { ok: false, status: 401, error: 'Missing authorization token' }
+  const result = await resolveAdminFromRequest(req)
+  if (!result.ok || !result.user) {
+    const status =
+      result.error === 'Admin access required'
+        ? 403
+        : result.error === 'Missing authorization token'
+          ? 401
+          : 401
+    return { ok: false, status, error: result.error || 'Unauthorized' }
   }
 
-  const token = authHeader.slice(7)
-  const {
-    data: { user },
-    error,
-  } = await admin.auth.getUser(token)
-  if (error || !user) {
-    return { ok: false, status: 401, error: 'Invalid or expired session' }
-  }
-
-  const { data: profile } = await admin
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .maybeSingle()
-
-  if (profile?.role !== 'admin') {
-    return { ok: false, status: 403, error: 'Admin access required' }
-  }
-
-  return { ok: true, userId: user.id }
+  return { ok: true, userId: result.user.id }
 }
 
 export function applyCors(req, res) {
@@ -207,6 +168,11 @@ export async function syncRecordingFromEgress(admin, egressClient, recording) {
   }
 
   if (Object.keys(patch).length === 0) return recording
+
+  if (patch.status === 'complete' && patch.filepath) {
+    patch.playback_url =
+      (await resolveRecordingPlaybackUrl(patch.filepath)) || patch.playback_url
+  }
 
   const { data } = await admin
     .from('session_recordings')

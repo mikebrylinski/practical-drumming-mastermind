@@ -83,7 +83,7 @@ export function LeadDetail({
         <p className="mb-4 font-garamond text-xs tracking-[0.16em] text-gold/80 uppercase">
           Activity timeline
         </p>
-        <LeadTimeline events={lead.events} />
+        <LeadTimeline events={lead.events} limit={10} />
       </div>
     </div>
   )

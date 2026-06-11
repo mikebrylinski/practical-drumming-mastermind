@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { markSlotBooked } from '../../lib/booking/slotStore'
+import { useScrollToTop } from '../../hooks/useScrollToTop'
 import { supabase } from '../../lib/supabase/client'
 import { formatDateTime } from '../../lib/datetime'
 import { trackLeadEvent } from '../../lib/leads/track'
@@ -44,11 +45,8 @@ export function BookCallFlow() {
     null,
   )
 
-  // Reset scroll to the top of the page on every step/phase change. React
-  // Router only resets scroll on route changes, not on these in-page steps.
-  useEffect(() => {
-    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
-  }, [phase, step])
+  // Reset scroll on every step/phase change (router only handles route changes).
+  useScrollToTop(phase, step)
 
   function patchAnswers(patch: Partial<BookCallAnswers>) {
     setAnswers((prev) => ({ ...prev, ...patch }))
@@ -197,7 +195,7 @@ export function BookCallFlow() {
           {phase === 'schedule' ? (
             <motion.div
               key="schedule"
-              className={`${stepPanelClass} justify-start overflow-y-auto`}
+              className={`${stepPanelClass} justify-start`}
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}

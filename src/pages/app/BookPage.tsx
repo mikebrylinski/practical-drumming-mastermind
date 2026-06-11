@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { AppShell } from '../../components/app/AppShell'
+import { useScrollToTop } from '../../hooks/useScrollToTop'
 import { supabase } from '../../lib/supabase/client'
 import { useAuth } from '../../lib/auth/AuthProvider'
 import { trackLeadEvent } from '../../lib/leads/track'
@@ -100,6 +101,8 @@ export function BookPage() {
   const [copied, setCopied] = useState(false)
 
   const title = eventTitle(slug)
+
+  useScrollToTop(slug, selected?.id ?? null, confirmed?.dateLabel ?? null)
 
   useEffect(() => {
     trackLeadEvent('booking_click', { source: 'book-page', slug })

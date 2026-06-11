@@ -18,7 +18,13 @@ export function ProtectedRoute({ children }: { children?: ReactNode }) {
 
   if (loading) return <AuthLoading />
   if (!isAuthed) {
-    return <Navigate to="/login" replace state={{ from: location.pathname }} />
+    return (
+      <Navigate
+        to="/login"
+        replace
+        state={{ from: location.pathname, seedRole: 'member' }}
+      />
+    )
   }
   return children ? <>{children}</> : <Outlet />
 }
@@ -29,7 +35,13 @@ export function RequireAdmin({ children }: { children?: ReactNode }) {
 
   if (loading) return <AuthLoading />
   if (!isAuthed) {
-    return <Navigate to="/login" replace state={{ from: location.pathname }} />
+    return (
+      <Navigate
+        to="/login?role=admin"
+        replace
+        state={{ from: location.pathname, seedRole: 'admin' }}
+      />
+    )
   }
   if (!isAdmin) return <Navigate to="/dashboard" replace />
   return children ? <>{children}</> : <Outlet />

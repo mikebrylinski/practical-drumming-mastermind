@@ -6,6 +6,7 @@ import {
   getLiveKitCredentials,
   playbackUrlFromEgress,
 } from '../../../../api/livekit/_lib.js'
+import { resolveRecordingPlaybackUrl } from '../../recordingStorage.js'
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -59,13 +60,19 @@ export default async function handler(req, res) {
     const failed =
       info.status === EgressStatus.EGRESS_FAILED ||
       info.status === EgressStatus.EGRESS_ABORTED
+    const filepath = filepathFromEgress(info) || recording.filepath
     const patch = {
       ended_at: new Date().toISOString(),
       status: failed ? 'failed' : 'complete',
-      playback_url: failed ? null : playbackUrlFromEgress(info),
-      filepath: filepathFromEgress(info) || recording.filepath,
+      filepath,
       duration_seconds: durationFromEgress(info),
       error_message: failed ? info.error || 'Recording failed' : null,
+      playback_url: null,
+    }
+
+    if (!failed && filepath) {
+      patch.playback_url =
+        (await resolveRecordingPlaybackUrl(filepath)) || playbackUrlFromEgress(info)
     }
 
     await admin.from('session_recordings').update(patch).eq('id', recording.id)

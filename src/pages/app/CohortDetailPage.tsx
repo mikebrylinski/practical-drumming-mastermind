@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { AppCard, AppShell } from '../../components/app/AppShell'
+import { AppCard } from '../../components/app/AppShell'
+import { MembersLayout } from '../../components/members/MembersLayout'
 import { useAuth } from '../../lib/auth/AuthProvider'
 import { supabase } from '../../lib/supabase/client'
 import { cohortRoomName } from '../../lib/slug'
@@ -144,35 +145,44 @@ export function CohortDetailPage() {
 
   if (loading) {
     return (
-      <AppShell eyebrow="Cohort" title="Loading…" wide>
+      <MembersLayout activeId="cohorts">
         <p className="font-garamond text-mist/40">Loading…</p>
-      </AppShell>
+      </MembersLayout>
     )
   }
 
   if (!cohort) {
     return (
-      <AppShell eyebrow="Cohort" title="Not found" wide>
+      <MembersLayout activeId="cohorts">
         <p className="font-garamond text-mist/50">
           This cohort doesn’t exist.{' '}
           <Link to="/cohorts" className="text-gold underline-offset-2 hover:underline">
             Back to cohorts
           </Link>
         </p>
-      </AppShell>
+      </MembersLayout>
     )
   }
 
   return (
-    <AppShell
-      eyebrow="Cohort"
-      title={cohort.name}
-      subtitle={cohort.description ?? undefined}
-      wide
-      actions={
+    <MembersLayout activeId="cohorts">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div className="min-w-0">
+          <Link
+            to="/cohorts"
+            className="inline-flex items-center gap-1 font-garamond text-xs tracking-[0.14em] text-mist/45 uppercase transition hover:text-gold"
+          >
+            ← All cohorts
+          </Link>
+          <p className="mt-2 font-garamond text-xs tracking-[0.28em] text-gold uppercase">Cohort</p>
+          <h1 className="mt-1 font-bebas text-3xl tracking-wide text-mist md:text-4xl">{cohort.name}</h1>
+          {cohort.description ? (
+            <p className="mt-1 max-w-2xl font-garamond text-base text-mist/55">{cohort.description}</p>
+          ) : null}
+        </div>
         <Link
           to={`/room/${room}`}
-          className={`flex min-h-10 items-center justify-center gap-2 rounded-full px-5 font-garamond text-sm tracking-[0.14em] uppercase transition ${
+          className={`inline-flex min-h-10 shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full px-5 font-garamond text-xs tracking-[0.12em] uppercase transition sm:text-sm sm:tracking-[0.14em] ${
             liveSession
               ? 'bg-red-600 text-white hover:bg-red-600/90'
               : 'bg-gold text-void hover:bg-gold/90'
@@ -181,22 +191,15 @@ export function CohortDetailPage() {
           {liveSession ? (
             <>
               <span className="size-2 animate-pulse rounded-full bg-white" aria-hidden />
-              Join live now
+              Join live
             </>
           ) : (
-            'Enter live room'
+            'Join room'
           )}
         </Link>
-      }
-    >
-      <Link
-        to="/cohorts"
-        className="inline-flex items-center gap-1 font-garamond text-xs tracking-[0.14em] text-mist/45 uppercase transition hover:text-gold"
-      >
-        ← All cohorts
-      </Link>
+      </div>
 
-      <div className="mt-5 grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
         <div className="space-y-6">
           <section>
             <h2 className="font-garamond text-sm tracking-[0.16em] text-gold/80 uppercase">
@@ -320,6 +323,6 @@ export function CohortDetailPage() {
           </AppCard>
         </aside>
       </div>
-    </AppShell>
+    </MembersLayout>
   )
 }

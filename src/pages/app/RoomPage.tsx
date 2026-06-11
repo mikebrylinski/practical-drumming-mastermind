@@ -21,6 +21,7 @@ import {
   Track,
   type VideoCaptureOptions,
 } from 'livekit-client'
+import { adminRequestHeaders } from '../../lib/auth/accessToken'
 import { useAuth } from '../../lib/auth/AuthProvider'
 import {
   ConnectionStrengthMeter,
@@ -39,7 +40,7 @@ type TokenState =
 function VideoStage() {
   const tracks = useTracks(
     [
-      { source: Track.Source.Camera, withPlaceholder: true },
+      { source: Track.Source.Camera, withPlaceholder: false },
       { source: Track.Source.ScreenShare, withPlaceholder: false },
     ],
     { onlySubscribed: false },
@@ -289,13 +290,7 @@ function mediaAuthHeaders(
   session: ReturnType<typeof useAuth>['session'],
   demoAdmin: boolean,
 ) {
-  const headers: Record<string, string> = { 'Content-Type': 'application/json' }
-  if (session?.access_token) {
-    headers.Authorization = `Bearer ${session.access_token}`
-  } else if (demoAdmin) {
-    headers['X-Demo-Admin'] = 'true'
-  }
-  return headers
+  return adminRequestHeaders(session, demoAdmin)
 }
 
 async function ensureMediaEnabled(room: Room, includeVideo: boolean) {
@@ -376,20 +371,14 @@ function JoinedRoom({
   max,
   navigate,
   onLeave,
-  isAdmin,
   canRecord,
-  session,
-  demoAdmin,
 }: {
   room: Room
   roomName: string
   max: number
   navigate: NavigateFunction
   onLeave: (message: string) => void
-  isAdmin: boolean
   canRecord: boolean
-  session: ReturnType<typeof useAuth>['session']
-  demoAdmin: boolean
 }) {
   useEffect(() => {
     const handleDisconnected = (reason?: DisconnectReason) => {
@@ -416,14 +405,7 @@ function JoinedRoom({
   return (
     <RoomContext.Provider value={room}>
       <div className="relative min-h-svh bg-void" data-lk-theme="default" style={{ height: '100svh' }}>
-        <RoomTopBar
-          roomName={roomName}
-          max={max}
-          navigate={navigate}
-          canRecord={canRecord || isAdmin}
-          session={session}
-          demoAdmin={demoAdmin}
-        />
+        <RoomTopBar roomName={roomName} max={max} navigate={navigate} canRecord={canRecord} />
         <div className="h-[calc(100svh-5rem)] p-4 pt-16">
           <VideoStage />
         </div>
@@ -454,15 +436,11 @@ function RoomTopBar({
   max,
   navigate,
   canRecord,
-  session,
-  demoAdmin,
 }: {
   roomName: string
   max: number
   navigate: NavigateFunction
   canRecord: boolean
-  session: ReturnType<typeof useAuth>['session']
-  demoAdmin: boolean
 }) {
   return (
     <div className="pointer-events-none absolute inset-x-0 top-0 z-30 flex items-start justify-between gap-3 p-4">
@@ -476,9 +454,7 @@ function RoomTopBar({
           <ParticipantCount max={max} />
         </div>
         <InviteButton />
-        {canRecord ? (
-          <AdminRecordControl roomName={roomName} session={session} demoAdmin={demoAdmin} />
-        ) : null}
+        {canRecord ? <AdminRecordControl roomName={roomName} /> : null}
       </div>
       <div className="pointer-events-auto">
         <ConnectionStrengthMeter />
@@ -489,7 +465,7 @@ function RoomTopBar({
 
 export function RoomPage() {
   const { roomName = '' } = useParams()
-  const { profile, session, isAdmin, useSeedData, mockMode } = useAuth()
+  const { profile, session, isAdmin, useSeedData, mockMode, loading: authLoading } = useAuth()
   const navigate = useNavigate()
   const [state, setState] = useState<TokenState>({ status: 'loading' })
   const [joined, setJoined] = useState(false)
@@ -506,10 +482,11 @@ export function RoomPage() {
   const demoAdmin = isAdmin && (useSeedData || mockMode)
 
   useEffect(() => {
+    if (authLoading) return
     let active = true
     async function getToken() {
       let res: Response
-      const headers = mediaAuthHeaders(session, demoAdmin)
+      const headers = await mediaAuthHeaders(session, demoAdmin)
       try {
         res = await fetch('/api/livekit/token', {
           method: 'POST',
@@ -573,7 +550,7 @@ export function RoomPage() {
     return () => {
       active = false
     }
-  }, [roomName, identity, displayName, session, demoAdmin, isAdmin])
+  }, [roomName, identity, displayName, session, demoAdmin, isAdmin, authLoading])
 
   useEffect(() => {
     return () => {
@@ -695,10 +672,7 @@ export function RoomPage() {
       max={state.max}
       navigate={navigate}
       onLeave={leaveRoom}
-      isAdmin={isAdmin}
-      canRecord={state.canRecord}
-      session={session}
-      demoAdmin={demoAdmin}
+      canRecord={(state.canRecord || isAdmin) && Boolean(session?.access_token || demoAdmin)}
     />
   )
 }

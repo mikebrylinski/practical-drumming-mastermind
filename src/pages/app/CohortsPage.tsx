@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { AppShell } from '../../components/app/AppShell'
+import { CohortSessionsCalendar } from '../../components/cohorts/CohortSessionsCalendar'
+import { MembersLayout } from '../../components/members/MembersLayout'
 import { useAuth } from '../../lib/auth/AuthProvider'
 import { supabase } from '../../lib/supabase/client'
 import { cohortRoomName } from '../../lib/slug'
@@ -8,7 +9,7 @@ import { formatDateTime } from '../../lib/datetime'
 import { buildDemoCohorts, buildDemoSessions } from '../../lib/demo/cohorts'
 import type { Cohort, Session } from '../../lib/supabase/types'
 
-const LIVE_WINDOW_MS = 60 * 60 * 1000 // a session is "live" within an hour of start
+const LIVE_WINDOW_MS = 60 * 60 * 1000
 
 function nextSessionFor(cohortId: string, sessions: Session[]): Session | null {
   const now = Date.now()
@@ -25,6 +26,11 @@ function isLive(session: Session | null): boolean {
   if (!session?.scheduled_at) return false
   const diff = new Date(session.scheduled_at).getTime() - Date.now()
   return diff <= LIVE_WINDOW_MS && diff >= -LIVE_WINDOW_MS
+}
+
+function isUpcoming(session: Session): boolean {
+  if (!session.scheduled_at) return false
+  return new Date(session.scheduled_at).getTime() >= Date.now() - LIVE_WINDOW_MS
 }
 
 function CohortCard({ cohort, sessions }: { cohort: Cohort; sessions: Session[] }) {
@@ -84,20 +90,20 @@ function CohortCard({ cohort, sessions }: { cohort: Cohort; sessions: Session[] 
           </div>
         </dl>
 
-        <div className="mt-5 flex items-center gap-2">
+        <div className="mt-5 flex flex-wrap items-center gap-2">
           <Link
             to={`/room/${room}`}
-            className={`flex min-h-10 flex-1 items-center justify-center gap-2 rounded-full font-garamond text-sm tracking-[0.14em] uppercase transition ${
+            className={`inline-flex min-h-10 flex-1 items-center justify-center whitespace-nowrap rounded-full px-4 font-garamond text-xs tracking-[0.12em] uppercase sm:text-sm sm:tracking-[0.14em] ${
               live
                 ? 'bg-red-600 text-white hover:bg-red-600/90'
                 : 'bg-gold text-void hover:bg-gold/90'
             }`}
           >
-            {live ? 'Join live now' : 'Enter live room'}
+            {live ? 'Join live' : 'Join room'}
           </Link>
           <Link
             to={`/cohorts/${cohort.id}`}
-            className="flex min-h-10 items-center justify-center rounded-full border border-white/15 px-4 font-garamond text-sm tracking-[0.14em] text-mist/60 uppercase transition hover:border-gold/40 hover:text-gold"
+            className="inline-flex min-h-10 items-center justify-center whitespace-nowrap rounded-full border border-white/15 px-4 font-garamond text-xs tracking-[0.12em] text-mist/60 uppercase transition hover:border-gold/40 hover:text-gold sm:text-sm sm:tracking-[0.14em]"
           >
             Details
           </Link>
@@ -132,36 +138,54 @@ export function CohortsPage() {
     }
   }, [useSeedData])
 
+  const upcomingSessions = useMemo(
+    () => sessions.filter(isUpcoming).sort((a, b) => (a.scheduled_at ?? '').localeCompare(b.scheduled_at ?? '')),
+    [sessions],
+  )
+
   const liveCount = useMemo(
     () => cohorts.filter((c) => isLive(nextSessionFor(c.id, sessions))).length,
     [cohorts, sessions],
   )
 
   return (
-    <AppShell
-      eyebrow="Community"
-      title="Cohorts"
-      subtitle="Your live mentorship groups."
-      actions={
-        liveCount > 0 ? (
+    <MembersLayout activeId="cohorts">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <p className="font-garamond text-xs tracking-[0.28em] text-gold uppercase">Members</p>
+          <h1 className="mt-1 font-bebas text-3xl tracking-wide text-mist md:text-4xl">Cohorts</h1>
+          <p className="mt-1 font-garamond text-base text-mist/55">
+            Weekly live mentorship groups — pick a day on the calendar for details.
+          </p>
+        </div>
+        {liveCount > 0 ? (
           <span className="flex items-center gap-2 rounded-full bg-red-600/15 px-3 py-1.5 font-garamond text-xs tracking-[0.14em] text-red-300 uppercase ring-1 ring-red-500/30">
             <span className="size-2 animate-pulse rounded-full bg-red-400" aria-hidden />
             {liveCount} live
           </span>
-        ) : null
-      }
-    >
+        ) : null}
+      </div>
+
       {loading ? (
         <p className="font-garamond text-mist/40">Loading…</p>
       ) : cohorts.length === 0 ? (
         <p className="font-garamond text-mist/50">No cohorts yet.</p>
       ) : (
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {cohorts.map((c) => (
-            <CohortCard key={c.id} cohort={c} sessions={sessions} />
-          ))}
+        <div className="space-y-10">
+          <CohortSessionsCalendar sessions={upcomingSessions} cohorts={cohorts} />
+
+          <section>
+            <h2 className="font-garamond text-sm tracking-[0.16em] text-gold/80 uppercase">
+              All cohorts
+            </h2>
+            <div className="mt-4 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {cohorts.map((c) => (
+                <CohortCard key={c.id} cohort={c} sessions={sessions} />
+              ))}
+            </div>
+          </section>
         </div>
       )}
-    </AppShell>
+    </MembersLayout>
   )
 }

@@ -5,6 +5,10 @@ export type Profile = {
   email: string
   full_name: string
   role: Role
+  avatar_url?: string | null
+  phone?: string | null
+  location?: string | null
+  bio?: string | null
   created_at?: string
 }
 
