@@ -1,7 +1,7 @@
-import startHandler from './handlers/start.js'
-import stopHandler from './handlers/stop.js'
-import statusHandler from './handlers/status.js'
-import webhookHandler from './handlers/webhook.js'
+import startHandler from '../../../server/lib/livekit/egress/start.js'
+import stopHandler from '../../../server/lib/livekit/egress/stop.js'
+import statusHandler from '../../../server/lib/livekit/egress/status.js'
+import webhookHandler from '../../../server/lib/livekit/egress/webhook.js'
 
 const routes = {
   start: startHandler,

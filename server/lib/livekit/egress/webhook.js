@@ -1,11 +1,11 @@
 import { WebhookReceiver, EgressStatus } from 'livekit-server-sdk'
-import { getSupabaseAdmin } from '../../../../server/lib/supabaseAdmin.js'
+import { getSupabaseAdmin } from '../../supabaseAdmin.js'
 import {
   durationFromEgress,
   filepathFromEgress,
   getLiveKitCredentials,
   playbackUrlFromEgress,
-} from '../../_lib.js'
+} from '../../../../api/livekit/_lib.js'
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {

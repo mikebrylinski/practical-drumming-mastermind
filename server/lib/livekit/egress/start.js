@@ -1,4 +1,4 @@
-import { getSupabaseAdmin } from '../../../../server/lib/supabaseAdmin.js'
+import { getSupabaseAdmin } from '../../supabaseAdmin.js'
 import {
   buildRecordingFileOutput,
   findActiveRecording,
@@ -9,7 +9,7 @@ import {
   newRecordingId,
   parseBody,
   verifyAdminRequest,
-} from '../../_lib.js'
+} from '../../../../api/livekit/_lib.js'
 
 export default async function handler(req, res) {
   if (handleOptions(req, res)) return
