@@ -5,7 +5,7 @@ import {
   filepathFromEgress,
   getLiveKitCredentials,
   playbackUrlFromEgress,
-} from '../../../../api/livekit/_lib.js'
+} from '../_lib.js'
 import { resolveRecordingPlaybackUrl } from '../../recordingStorage.js'
 
 export default async function handler(req, res) {

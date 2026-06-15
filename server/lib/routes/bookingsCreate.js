@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto'
-import { getSupabaseAdmin } from '../../server/lib/supabaseAdmin.js'
-import { sendBookingConfirmationEmails } from '../../server/lib/bookingEmail.js'
+import { getSupabaseAdmin } from '../supabaseAdmin.js'
+import { sendBookingConfirmationEmails } from '../bookingEmail.js'
 
 export default async function handler(req, res) {
   if (req.method === 'OPTIONS') {

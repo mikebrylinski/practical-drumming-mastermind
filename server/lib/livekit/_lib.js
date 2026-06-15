@@ -6,13 +6,13 @@ import {
   EgressStatus,
   S3Upload,
 } from 'livekit-server-sdk'
-import { getSupabaseAdmin } from '../../server/lib/supabaseAdmin.js'
-import { resolveAdminFromRequest } from '../../server/lib/authRequest.js'
+import { getSupabaseAdmin } from '../supabaseAdmin.js'
+import { resolveAdminFromRequest } from '../authRequest.js'
 import {
   getEgressS3Config,
   isEgressStorageConfigured,
   resolveRecordingPlaybackUrl,
-} from '../../server/lib/recordingStorage.js'
+} from '../recordingStorage.js'
 
 export { isEgressStorageConfigured }
 

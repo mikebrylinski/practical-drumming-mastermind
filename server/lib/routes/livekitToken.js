@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto'
 import { AccessToken, RoomServiceClient } from 'livekit-server-sdk'
-import { authorizeRoomToken } from '../../server/lib/roomAuth.js'
-import { resolveIsAdminFromRequest } from './_lib.js'
+import { authorizeRoomToken } from '../roomAuth.js'
+import { resolveIsAdminFromRequest } from '../livekit/_lib.js'
 
 const MAX_PARTICIPANTS = Number(process.env.LIVEKIT_MAX_PARTICIPANTS) || 12
 

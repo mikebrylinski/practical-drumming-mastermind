@@ -5,7 +5,7 @@ import {
   listCommunityPosts,
   verifyAdminRequest,
   verifyMemberRequest,
-} from '../../server/lib/communityForum.js'
+} from '../communityForum.js'
 
 export default async function handler(req, res) {
   if (handleOptions(req, res)) return

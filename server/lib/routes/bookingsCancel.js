@@ -1,7 +1,7 @@
-import { getSupabaseAdmin } from '../../server/lib/supabaseAdmin.js'
-import { sendTemplatedEmail } from '../../server/lib/sendEmail.js'
-import { publicPath } from '../../server/lib/publicUrl.js'
-import { formatBookingDateLabel } from '../../server/lib/bookingEmail.js'
+import { getSupabaseAdmin } from '../supabaseAdmin.js'
+import { sendTemplatedEmail } from '../sendEmail.js'
+import { publicPath } from '../publicUrl.js'
+import { formatBookingDateLabel } from '../bookingEmail.js'
 
 export default async function handler(req, res) {
   if (req.method === 'OPTIONS') {

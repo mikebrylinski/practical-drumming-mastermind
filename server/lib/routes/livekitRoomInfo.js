@@ -1,4 +1,4 @@
-import { getRoomInfo } from '../../server/lib/roomAuth.js'
+import { getRoomInfo } from '../roomAuth.js'
 
 export default async function handler(req, res) {
   if (req.method === 'OPTIONS') {

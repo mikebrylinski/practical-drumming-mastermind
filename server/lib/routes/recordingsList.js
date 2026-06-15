@@ -1,6 +1,6 @@
-import { getSupabaseAdmin } from '../../server/lib/supabaseAdmin.js'
+import { getSupabaseAdmin } from '../supabaseAdmin.js'
 import { handleOptions } from '../livekit/_lib.js'
-import { createSignedStorageUrl, publicStorageObjectUrl, isStoragePublic } from '../../server/lib/recordingStorage.js'
+import { createSignedStorageUrl, publicStorageObjectUrl, isStoragePublic } from '../recordingStorage.js'
 
 async function playbackUrlForRecording(recording) {
   if (recording.playback_url) return recording.playback_url

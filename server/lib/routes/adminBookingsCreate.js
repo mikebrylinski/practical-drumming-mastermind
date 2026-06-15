@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto'
-import { handleOptions, verifyAdminRequest } from '../../livekit/_lib.js'
-import { getSupabaseAdmin } from '../../../server/lib/supabaseAdmin.js'
-import { sendBookingConfirmationEmails } from '../../../server/lib/bookingEmail.js'
+import { handleOptions, verifyAdminRequest } from '../livekit/_lib.js'
+import { getSupabaseAdmin } from '../supabaseAdmin.js'
+import { sendBookingConfirmationEmails } from '../bookingEmail.js'
 
 export default async function handler(req, res) {
   if (handleOptions(req, res)) return

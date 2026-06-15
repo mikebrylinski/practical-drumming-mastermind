@@ -1,4 +1,4 @@
-import { getSupabaseAdmin } from '../../server/lib/supabaseAdmin.js'
+import { getSupabaseAdmin } from '../supabaseAdmin.js'
 import { handleOptions, verifyAdminRequest } from '../livekit/_lib.js'
 
 export default async function handler(req, res) {
