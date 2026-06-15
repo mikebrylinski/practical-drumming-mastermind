@@ -87,6 +87,7 @@ export default async function handler(req, res) {
         title,
         status: 'starting',
         filepath,
+        is_published: false,
         started_by: auth.userId,
       })
       .select('*')

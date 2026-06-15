@@ -1,9 +1,13 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
-import { AdminShell } from '../../components/app/AdminShell'
+import { AppCard, AdminShell } from '../../components/app/AdminShell'
 import { useAuth } from '../../lib/auth/AuthProvider'
+import { adminRequestHeaders } from '../../lib/auth/accessToken'
 import { supabase } from '../../lib/supabase/client'
 import type { Profile } from '../../lib/supabase/types'
+
+const inputClass =
+  'rounded-lg border border-white/12 bg-charcoal/40 px-3 py-2 font-garamond text-sm text-mist outline-none focus:border-gold/45'
 
 const MOCK_MEMBERS: Profile[] = [
   { id: 'u1', email: 'jordan@example.com', full_name: 'Jordan Vega', role: 'member' },
@@ -12,9 +16,16 @@ const MOCK_MEMBERS: Profile[] = [
 ]
 
 export function AdminMembers() {
-  const { useSeedData } = useAuth()
+  const { useSeedData, session, isAdmin, mockMode } = useAuth()
+  const demoAdmin = isAdmin && (useSeedData || mockMode)
   const [members, setMembers] = useState<Profile[]>(MOCK_MEMBERS)
   const [loading, setLoading] = useState(!useSeedData)
+  const [showForm, setShowForm] = useState(false)
+  const [email, setEmail] = useState('')
+  const [fullName, setFullName] = useState('')
+  const [creating, setCreating] = useState(false)
+  const [formError, setFormError] = useState<string | null>(null)
+  const [formSuccess, setFormSuccess] = useState<string | null>(null)
 
   useEffect(() => {
     if (useSeedData || !supabase) return
@@ -33,8 +44,98 @@ export function AdminMembers() {
     }
   }, [useSeedData])
 
+  async function addMember(e: FormEvent) {
+    e.preventDefault()
+    if (!email.trim()) return
+    setCreating(true)
+    setFormError(null)
+    setFormSuccess(null)
+    try {
+      const headers = await adminRequestHeaders(session, demoAdmin)
+      const res = await fetch('/api/admin/members/create', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          email: email.trim(),
+          full_name: fullName.trim(),
+        }),
+      })
+      const json = await res.json()
+      if (!res.ok || !json.ok) {
+        throw new Error(json.error || 'Could not add member')
+      }
+      setFormSuccess(
+        json.existing
+          ? 'Existing user updated.'
+          : 'Invitation sent — they will receive an email to set their password.',
+      )
+      setEmail('')
+      setFullName('')
+      if (supabase && !useSeedData) {
+        const { data } = await supabase.from('profiles').select('*').order('created_at', { ascending: false })
+        if (data) setMembers(data as Profile[])
+      }
+    } catch (err) {
+      setFormError(err instanceof Error ? err.message : 'Could not add member')
+    } finally {
+      setCreating(false)
+    }
+  }
+
   return (
-    <AdminShell eyebrow="Admin" title="Members" wide>
+    <AdminShell
+      eyebrow="Admin"
+      title="Members"
+      wide
+      actions={
+        <button
+          type="button"
+          onClick={() => setShowForm((v) => !v)}
+          className="flex min-h-10 items-center gap-2 rounded-full bg-gold px-5 font-garamond text-sm tracking-[0.14em] text-void uppercase transition hover:bg-gold/90"
+        >
+          {showForm ? 'Close' : '+ Add member'}
+        </button>
+      }
+    >
+      {showForm ? (
+        <AppCard className="mb-6">
+          <h3 className="font-garamond text-lg text-mist">Invite a member</h3>
+          <form onSubmit={addMember} className="mt-4 flex flex-wrap items-end gap-3">
+            <label className="font-garamond text-xs text-mist/55">
+              Email
+              <input
+                type="email"
+                required
+                className={`${inputClass} mt-1 block w-56`}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </label>
+            <label className="font-garamond text-xs text-mist/55">
+              Full name
+              <input
+                className={`${inputClass} mt-1 block w-48`}
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+              />
+            </label>
+            <button
+              type="submit"
+              disabled={creating}
+              className="flex min-h-10 items-center justify-center rounded-full bg-gold px-6 font-garamond text-sm tracking-[0.14em] text-void uppercase transition hover:bg-gold/90 disabled:opacity-50"
+            >
+              {creating ? 'Sending…' : 'Send invite'}
+            </button>
+          </form>
+          {formError ? (
+            <p className="mt-3 font-garamond text-sm text-red-400/90">{formError}</p>
+          ) : null}
+          {formSuccess ? (
+            <p className="mt-3 font-garamond text-sm text-emerald-300/90">{formSuccess}</p>
+          ) : null}
+        </AppCard>
+      ) : null}
+
       {loading ? (
         <p className="font-garamond text-mist/40">Loading…</p>
       ) : (

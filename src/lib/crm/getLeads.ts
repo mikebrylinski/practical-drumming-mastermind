@@ -49,8 +49,12 @@ export async function getLeads(opts?: { useSeedData?: boolean }): Promise<CRMLea
 
   const leads = new Map<string, CRMLead>()
   const emailIndex = new Map<string, string>() // email -> lead key
+  const adminUserIds = new Set(
+    profiles.filter((p) => p.role === 'admin').map((p) => p.id),
+  )
 
   for (const p of profiles) {
+    if (p.role === 'admin') continue
     const key = p.id
     leads.set(key, {
       userId: key,
@@ -80,6 +84,7 @@ export async function getLeads(opts?: { useSeedData?: boolean }): Promise<CRMLea
   }
 
   for (const ev of events) {
+    if (ev.user_id && adminUserIds.has(ev.user_id)) continue
     const key = resolveKey({ userId: ev.user_id, visitorId: ev.visitor_id })
     if (!key) continue
     if (!leads.has(key)) {
@@ -168,15 +173,17 @@ function ev(
   type: LeadEvent['type'],
   minsAgo: number,
   metadata: Record<string, unknown> = {},
+  ip_address: string | null = null,
 ): LeadEvent {
   return {
     id: `${type}-${minsAgo}-${Math.random().toString(36).slice(2, 6)}`,
     user_id: null,
     visitor_id: 'mock',
     type,
-    path: '/',
+    path: typeof metadata.path === 'string' ? metadata.path : '/',
     metadata,
     score_delta: 0,
+    ip_address,
     created_at: new Date(Date.now() - minsAgo * 60000).toISOString(),
   }
 }
@@ -190,12 +197,12 @@ export function mockLeads(): CRMLead[] {
       role: 'member',
       isAnonymous: false,
       events: [
-        ev('page_visit', 600, { path: '/' }),
-        ev('page_visit', 540, { path: '/club' }),
-        ev('booking_click', 520),
-        ev('page_visit', 500, { path: '/apply' }),
-        ev('form_submit', 480, { type: 'book-a-call' }),
-        ev('booking_created', 60),
+        ev('page_visit', 600, { path: '/' }, '192.168.1.42'),
+        ev('page_visit', 540, { path: '/club' }, '192.168.1.42'),
+        ev('booking_click', 520, {}, '192.168.1.42'),
+        ev('page_visit', 500, { path: '/apply' }, '192.168.1.42'),
+        ev('form_submit', 480, { type: 'book-a-call' }, '192.168.1.42'),
+        ev('booking_created', 60, {}, '192.168.1.42'),
       ],
       bookingStatus: 'confirmed',
       applicationStatus: 'contacted',
@@ -209,10 +216,10 @@ export function mockLeads(): CRMLead[] {
       role: 'member',
       isAnonymous: false,
       events: [
-        ev('page_visit', 4000, { path: '/' }),
-        ev('page_visit', 3990, { path: '/about' }),
-        ev('booking_click', 3980),
-        ev('form_submit', 3970, { type: 'contact' }),
+        ev('page_visit', 4000, { path: '/' }, '73.44.210.18'),
+        ev('page_visit', 3990, { path: '/about' }, '73.44.210.18'),
+        ev('booking_click', 3980, {}, '73.44.210.18'),
+        ev('form_submit', 3970, { type: 'contact' }, '73.44.210.18'),
       ],
       applicationStatus: 'new',
     },
@@ -224,9 +231,9 @@ export function mockLeads(): CRMLead[] {
       isAnonymous: true,
       visitorId: 'abc',
       events: [
-        ev('page_visit', 120, { path: '/' }),
-        ev('page_visit', 118, { path: '/club' }),
-        ev('booking_click', 115),
+        ev('page_visit', 120, { path: '/' }, '203.0.113.88'),
+        ev('page_visit', 118, { path: '/club' }, '203.0.113.88'),
+        ev('booking_click', 115, {}, '203.0.113.88'),
       ],
     },
     {
@@ -235,7 +242,7 @@ export function mockLeads(): CRMLead[] {
       email: 'mateo@example.com',
       role: 'member',
       isAnonymous: false,
-      events: [ev('page_visit', 10080, { path: '/' })],
+      events: [ev('page_visit', 10080, { path: '/' }, '198.51.100.12')],
     },
   ]
 

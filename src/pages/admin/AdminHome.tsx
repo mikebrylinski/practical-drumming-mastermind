@@ -6,7 +6,7 @@ import { supabase } from '../../lib/supabase/client'
 import { getLeads } from '../../lib/crm/getLeads'
 import { HEAT_THEME, STAGE_THEME, heatBand, type Stage } from '../../lib/crm/scoring'
 import type { CRMLead } from '../../lib/crm/types'
-import type { Application, Booking } from '../../lib/supabase/types'
+import type { Booking } from '../../lib/supabase/types'
 
 type Counts = { members: number; emails: number }
 
@@ -41,33 +41,6 @@ const MOCK_BOOKINGS: Booking[] = [
     status: 'confirmed',
     starts_at: new Date(Date.now() + 4 * 864e5).toISOString(),
     created_at: new Date(Date.now() - 9e6).toISOString(),
-  },
-]
-
-const MOCK_APPS: Application[] = [
-  {
-    id: 'a1',
-    user_id: null,
-    email: 'jordan@example.com',
-    full_name: 'Jordan Vega',
-    type: 'book-a-call',
-    answers: {},
-    status: 'contacted',
-    notes: null,
-    created_at: new Date(Date.now() - 6e6).toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: 'a2',
-    user_id: null,
-    email: 'sasha@example.com',
-    full_name: 'Sasha Lin',
-    type: 'apply',
-    answers: {},
-    status: 'new',
-    notes: null,
-    created_at: new Date(Date.now() - 18e6).toISOString(),
-    updated_at: new Date().toISOString(),
   },
 ]
 
@@ -111,7 +84,6 @@ export function AdminHome() {
   const { useSeedData } = useAuth()
   const [leads, setLeads] = useState<CRMLead[]>([])
   const [bookings, setBookings] = useState<Booking[]>([])
-  const [applications, setApplications] = useState<Application[]>([])
   const [counts, setCounts] = useState<Counts>({ members: 0, emails: 0 })
   const [loading, setLoading] = useState(true)
 
@@ -123,7 +95,7 @@ export function AdminHome() {
       setLeads(leadData)
 
       if (supabase && !useSeedData) {
-        const [members, emails, recentBookings, recentApps] = await Promise.all([
+        const [members, emails, recentBookings] = await Promise.all([
           supabase.from('profiles').select('id', { count: 'exact', head: true }),
           supabase.from('email_logs').select('id', { count: 'exact', head: true }),
           supabase
@@ -131,23 +103,16 @@ export function AdminHome() {
             .select('*')
             .order('created_at', { ascending: false })
             .limit(5),
-          supabase
-            .from('applications')
-            .select('*')
-            .order('created_at', { ascending: false })
-            .limit(5),
         ])
         if (!active) return
         setCounts({ members: members.count ?? 0, emails: emails.count ?? 0 })
         setBookings((recentBookings.data as Booking[]) ?? [])
-        setApplications((recentApps.data as Application[]) ?? [])
       } else {
         setCounts({
           members: leadData.filter((l) => !l.isAnonymous).length || 128,
           emails: 96,
         })
         setBookings(MOCK_BOOKINGS)
-        setApplications(MOCK_APPS)
       }
       setLoading(false)
     }
@@ -173,7 +138,13 @@ export function AdminHome() {
     const topLeads = [...leads].sort((a, b) => b.intentScore - a.intentScore).slice(0, 5)
     const recentEvents = leads
       .flatMap((l) =>
-        l.events.map((e) => ({ lead: l, type: e.type, at: e.created_at })),
+        l.events.map((e) => ({
+          lead: l,
+          type: e.type,
+          at: e.created_at,
+          ip_address: e.ip_address ?? null,
+          path: e.path ?? null,
+        })),
       )
       .sort((a, b) => b.at.localeCompare(a.at))
       .slice(0, 8)
@@ -312,8 +283,8 @@ export function AdminHome() {
             </AppCard>
           </div>
 
-          {/* Activity + bookings + applications */}
-          <div className="grid gap-6 lg:grid-cols-3">
+          {/* Activity + bookings */}
+          <div className="grid gap-6 lg:grid-cols-2">
             <AppCard>
               <h3 className="font-garamond text-base text-mist/80">Recent activity</h3>
               <ul className="mt-3 space-y-3">
@@ -321,11 +292,23 @@ export function AdminHome() {
                   <li className="font-garamond text-sm text-mist/40">No activity yet.</li>
                 ) : (
                   metrics.recentEvents.map((e, i) => (
-                    <li key={i} className="flex items-baseline justify-between gap-3">
-                      <span className="min-w-0 font-garamond text-sm text-mist/70">
-                        <span className="text-mist">{e.lead.name}</span>{' '}
-                        {EVENT_LABEL[e.type] ?? e.type}
-                      </span>
+                    <li key={i} className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="font-garamond text-sm text-mist/70">
+                          <span className="text-mist">{e.lead.name}</span>{' '}
+                          {EVENT_LABEL[e.type] ?? e.type}
+                          {e.path ? (
+                            <span className="text-mist/45"> · {e.path}</span>
+                          ) : null}
+                        </p>
+                        {e.ip_address ? (
+                          <p className="mt-0.5 font-garamond text-xs text-mist/35">
+                            IP {e.ip_address}
+                          </p>
+                        ) : e.lead.isAnonymous ? (
+                          <p className="mt-0.5 font-garamond text-xs text-mist/30">IP unknown</p>
+                        ) : null}
+                      </div>
                       <span className="shrink-0 font-garamond text-xs text-mist/35">
                         {relativeTime(e.at)}
                       </span>
@@ -356,34 +339,6 @@ export function AdminHome() {
                       </span>
                       <span className="shrink-0 font-garamond text-xs text-mist/35">
                         {b.starts_at ? new Date(b.starts_at).toLocaleDateString() : '—'}
-                      </span>
-                    </li>
-                  ))
-                )}
-              </ul>
-            </AppCard>
-
-            <AppCard>
-              <div className="flex items-center justify-between">
-                <h3 className="font-garamond text-base text-mist/80">Recent applications</h3>
-                <Link
-                  to="/admin/applications"
-                  className="font-garamond text-xs tracking-[0.14em] text-gold/80 uppercase hover:text-gold"
-                >
-                  All
-                </Link>
-              </div>
-              <ul className="mt-3 space-y-3">
-                {applications.length === 0 ? (
-                  <li className="font-garamond text-sm text-mist/40">No applications yet.</li>
-                ) : (
-                  applications.map((a) => (
-                    <li key={a.id} className="flex items-baseline justify-between gap-3">
-                      <span className="min-w-0 truncate font-garamond text-sm text-mist/70">
-                        {a.full_name || a.email || 'Applicant'}
-                      </span>
-                      <span className="shrink-0 font-garamond text-xs uppercase tracking-[0.1em] text-mist/40">
-                        {a.status}
                       </span>
                     </li>
                   ))

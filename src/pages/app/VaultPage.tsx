@@ -1,7 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import { MembersLayout } from '../../components/members/MembersLayout'
 import { PlayIcon } from '../../components/members/MembersIcons'
+import { VaultVideoPreview } from '../../components/members/VaultVideoPreview'
+import { OverlayPortal, OVERLAY_Z } from '../../components/ui/OverlayPortal'
 import { vaultFilters, vaultVideos, type VaultVideo } from '../../components/members/mockData'
+import { useAuth } from '../../lib/auth/AuthProvider'
 import { fetchSavedRecordings } from '../../lib/recording/api'
 import { formatRecordingDuration } from '../../lib/recording/types'
 import { formatDate } from '../../lib/datetime'
@@ -14,11 +17,7 @@ function VideoCard({ video, onPlay }: { video: VaultVideo; onPlay: (v: VaultVide
       className="group text-left"
     >
       <div className="relative aspect-video overflow-hidden rounded-xl border border-white/10">
-        <img
-          src={video.thumb}
-          alt=""
-          className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
-        />
+        <VaultVideoPreview />
         <span className="absolute inset-0 flex items-center justify-center bg-void/40 opacity-0 transition group-hover:opacity-100">
           <span className="flex size-12 items-center justify-center rounded-full bg-gold text-void">
             <PlayIcon />
@@ -40,11 +39,27 @@ function VideoCard({ video, onPlay }: { video: VaultVideo; onPlay: (v: VaultVide
 }
 
 function PlayerModal({ video, onClose }: { video: VaultVideo; onClose: () => void }) {
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') onClose()
+    }
+    document.addEventListener('keydown', onKey)
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.removeEventListener('keydown', onKey)
+      document.body.style.overflow = ''
+    }
+  }, [onClose])
+
   return (
-    <div
-      className="fixed inset-0 z-[60] flex items-center justify-center bg-void/85 p-4 backdrop-blur"
-      onClick={onClose}
-    >
+    <OverlayPortal>
+      <div
+        className={`fixed inset-0 ${OVERLAY_Z} flex items-center justify-center bg-void/85 p-4 backdrop-blur`}
+        onClick={onClose}
+        role="dialog"
+        aria-modal="true"
+        aria-label={video.title}
+      >
       <div
         className="w-full max-w-3xl overflow-hidden rounded-2xl border border-white/10 bg-charcoal"
         onClick={(e) => e.stopPropagation()}
@@ -59,7 +74,7 @@ function PlayerModal({ video, onClose }: { video: VaultVideo; onClose: () => voi
             />
           ) : (
             <>
-              <img src={video.thumb} alt="" className="h-full w-full object-cover opacity-70" />
+              <VaultVideoPreview className="opacity-90" logoClassName="size-16 md:size-20" />
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
                 <span className="flex size-16 items-center justify-center rounded-full bg-gold text-void">
                   <PlayIcon />
@@ -90,35 +105,48 @@ function PlayerModal({ video, onClose }: { video: VaultVideo; onClose: () => voi
           <p className="mt-3 font-garamond text-sm text-mist/40">Recorded {video.date}</p>
         </div>
       </div>
-    </div>
+      </div>
+    </OverlayPortal>
   )
 }
 
 export function VaultPage() {
+  const { useSeedData } = useAuth()
   const [filter, setFilter] = useState<string>('All')
   const [active, setActive] = useState<VaultVideo | null>(null)
   const [savedVideos, setSavedVideos] = useState<VaultVideo[]>([])
+  const [loading, setLoading] = useState(!useSeedData)
 
   useEffect(() => {
-    void fetchSavedRecordings().then((recordings) => {
-      setSavedVideos(
-        recordings
-          .filter((r) => r.playback_url)
-          .map((r) => ({
-            id: r.id,
-            title: r.title || r.room_name,
-            description: `Recorded live session · ${r.room_name}`,
-            category: 'Live session',
-            duration: formatRecordingDuration(r.duration_seconds),
-            date: formatDate(r.started_at, { month: 'short', day: 'numeric', year: 'numeric' }),
-            thumb: '/hero-mike-live.png',
-            playbackUrl: r.playback_url || undefined,
-          })),
-      )
-    })
-  }, [])
+    if (useSeedData) {
+      setLoading(false)
+      return
+    }
+    setLoading(true)
+    void fetchSavedRecordings()
+      .then((recordings) => {
+        setSavedVideos(
+          recordings
+            .filter((r) => r.playback_url)
+            .map((r) => ({
+              id: r.id,
+              title: r.title || r.room_name,
+              description: `Recorded live session · ${r.room_name}`,
+              category: 'Live session' as const,
+              duration: formatRecordingDuration(r.duration_seconds),
+              date: formatDate(r.started_at, { month: 'short', day: 'numeric', year: 'numeric' }),
+              thumb: '/logo-dd.png',
+              playbackUrl: r.playback_url || undefined,
+            })),
+        )
+      })
+      .finally(() => setLoading(false))
+  }, [useSeedData])
 
-  const allVideos = useMemo(() => [...savedVideos, ...vaultVideos], [savedVideos])
+  const allVideos = useMemo(
+    () => (useSeedData ? [...savedVideos, ...vaultVideos] : savedVideos),
+    [savedVideos, useSeedData],
+  )
 
   const filtered = useMemo(
     () => (filter === 'All' ? allVideos : allVideos.filter((v) => v.category === filter)),
@@ -160,8 +188,14 @@ export function VaultPage() {
         ))}
       </div>
 
-      {filtered.length === 0 ? (
-        <p className="font-garamond text-mist/45">No videos in this category yet.</p>
+      {loading ? (
+        <p className="font-garamond text-mist/45">Loading videos…</p>
+      ) : filtered.length === 0 ? (
+        <p className="font-garamond text-mist/45">
+          {useSeedData
+            ? 'No videos in this category yet.'
+            : 'No published recordings yet. Your admin will add sessions here after live calls.'}
+        </p>
       ) : (
         <>
           {/* Featured */}
@@ -172,11 +206,7 @@ export function VaultPage() {
               className="group grid w-full overflow-hidden rounded-2xl border border-white/10 text-left md:grid-cols-2"
             >
               <div className="relative aspect-video md:aspect-auto">
-                <img
-                  src={featured.thumb}
-                  alt=""
-                  className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
-                />
+                <VaultVideoPreview logoClassName="size-16 md:size-24" />
                 <span className="absolute inset-0 flex items-center justify-center bg-void/30">
                   <span className="flex size-14 items-center justify-center rounded-full bg-gold text-void">
                     <PlayIcon />

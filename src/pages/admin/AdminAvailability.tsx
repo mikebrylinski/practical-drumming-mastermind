@@ -30,6 +30,13 @@ function dayKey(d: Date): string {
   return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`
 }
 
+function slotsOverlap(
+  a: { starts_at: string; ends_at: string },
+  b: { starts_at: string; ends_at: string },
+): boolean {
+  return a.starts_at < b.ends_at && a.ends_at > b.starts_at
+}
+
 export function AdminAvailability() {
   const { useSeedData } = useAuth()
   const [slots, setSlots] = useState<AvailabilitySlot[]>(() =>
@@ -50,6 +57,7 @@ export function AdminAvailability() {
   const [endTime, setEndTime] = useState('16:00')
   const [duration, setDuration] = useState(30)
   const [busy, setBusy] = useState(false)
+  const [slotNotice, setSlotNotice] = useState<string | null>(null)
   const { confirm, dialogProps } = useConfirm()
 
   const load = useCallback(() => {
@@ -142,18 +150,32 @@ export function AdminAvailability() {
     if (!selectedDate) return
     const windowSlots = buildWindowSlots()
     if (windowSlots.length === 0) return
+
+    const existingForSlug = slots.filter((s) => s.slug === slug)
+    const toInsert = windowSlots.filter(
+      (candidate) =>
+        !existingForSlug.some((existing) => slotsOverlap(candidate, existing)),
+    )
+    const skipped = windowSlots.length - toInsert.length
+
+    if (toInsert.length === 0) {
+      setSlotNotice('All proposed slots overlap existing availability.')
+      return
+    }
+
     setBusy(true)
+    setSlotNotice(null)
     try {
       if (supabase && !useSeedData) {
         await supabase
           .from('availability_slots')
-          .insert(windowSlots.map((w) => ({ slug, ...w })))
+          .insert(toInsert.map((w) => ({ slug, ...w })))
         load()
       } else {
         const now = Date.now()
         setSlots(
           addStoredSlots(
-            windowSlots.map((w, i) => ({
+            toInsert.map((w, i) => ({
               id: `local-${now}-${i}`,
               slug,
               starts_at: w.starts_at,
@@ -164,6 +186,9 @@ export function AdminAvailability() {
             })),
           ),
         )
+      }
+      if (skipped > 0) {
+        setSlotNotice(`${skipped} slot${skipped === 1 ? '' : 's'} skipped (already exist).`)
       }
     } finally {
       setBusy(false)
@@ -346,6 +371,9 @@ export function AdminAvailability() {
                 </button>
               </div>
             </form>
+            {slotNotice ? (
+              <p className="mt-3 font-garamond text-sm text-amber-300/90">{slotNotice}</p>
+            ) : null}
 
             <div className="mt-5 space-y-2">
               {daySlots.length === 0 ? (

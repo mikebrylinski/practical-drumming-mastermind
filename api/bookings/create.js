@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto'
 import { getSupabaseAdmin } from '../../server/lib/supabaseAdmin.js'
-import { sendTemplatedEmail } from '../../server/lib/sendEmail.js'
+import { sendBookingConfirmationEmails } from '../../server/lib/bookingEmail.js'
 
 export default async function handler(req, res) {
   if (req.method === 'OPTIONS') {
@@ -22,20 +22,23 @@ export default async function handler(req, res) {
     }
 
     const roomName = `call-${randomUUID().slice(0, 8)}`
-    const base = process.env.PUBLIC_BASE_URL || ''
     const admin = getSupabaseAdmin()
 
     if (!admin) {
-      // Mock mode: pretend the booking succeeded.
-      await sendTemplatedEmail({
-        template: 'booking_confirmation',
-        to: email,
-        data: { joinUrl: base ? `${base}/room/${roomName}` : `/room/${roomName}` },
+      const emailResult = await sendBookingConfirmationEmails({
+        name: name || null,
+        email,
+        startsAt: null,
+        roomName,
       })
       return res.status(201).json({
         ok: true,
         mock: true,
         booking: { id: 'mock-booking', livekit_room_name: roomName, status: 'confirmed' },
+        email: {
+          guest: emailResult.guest.status,
+          error: emailResult.guest.error,
+        },
       })
     }
 
@@ -94,17 +97,21 @@ export default async function handler(req, res) {
       score_delta: 60,
     })
 
-    const dateLabel = slot.starts_at ? new Date(slot.starts_at).toLocaleString() : ''
-    await sendTemplatedEmail({
-      template: 'booking_confirmation',
-      to: email,
-      data: {
-        dateLabel,
-        joinUrl: base ? `${base}/room/${roomName}` : `/room/${roomName}`,
-      },
+    const emailResult = await sendBookingConfirmationEmails({
+      name: name || null,
+      email,
+      startsAt: slot.starts_at,
+      roomName,
     })
 
-    return res.status(201).json({ ok: true, booking })
+    return res.status(201).json({
+      ok: true,
+      booking,
+      email: {
+        guest: emailResult.guest.status,
+        error: emailResult.guest.error,
+      },
+    })
   } catch (err) {
     console.error(err)
     return res.status(500).json({ ok: false, error: 'Server error' })

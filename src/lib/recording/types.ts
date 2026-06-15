@@ -20,6 +20,7 @@ export type SessionRecording = {
   started_at: string
   ended_at: string | null
   error_message: string | null
+  is_published?: boolean
   created_at: string
 }
 

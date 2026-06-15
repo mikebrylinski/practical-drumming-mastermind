@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
+import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
 import type { NavigateFunction } from 'react-router-dom'
 import '@livekit/components-styles'
 import {
@@ -28,6 +28,7 @@ import {
   StrengthMeterView,
 } from '../../components/room/ConnectionStrengthMeter'
 import { AdminRecordControl } from '../../components/room/AdminRecordControl'
+import { RoomPreviewLobby } from '../../components/room/RoomPreviewLobby'
 
 const DEFAULT_MAX_PARTICIPANTS = 12
 
@@ -36,6 +37,16 @@ type TokenState =
   | { status: 'mock' }
   | { status: 'error'; message: string }
   | { status: 'ready'; token: string; url: string; max: number; canRecord: boolean }
+
+type RoomInfoState =
+  | { status: 'loading' }
+  | { status: 'error'; message: string }
+  | {
+      status: 'ready'
+      roomType: 'booking' | 'member'
+      requiresAuth: boolean
+      guestName: string | null
+    }
 
 function VideoStage() {
   const tracks = useTracks(
@@ -236,61 +247,17 @@ const IOS_VIDEO_CONSTRAINTS: VideoCaptureOptions = {
 function permissionHelpMessage(err: unknown): string {
   const msg = err instanceof Error ? err.message : String(err)
   if (/not allowed by the user agent|NotAllowedError|permission/i.test(msg)) {
-    return 'Permission blocked. On iPhone: Settings → Chrome → Camera & Microphone → Allow, then reload this page and tap Join room again.'
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent)
+    if (isIOS) {
+      const browser = /CriOS/i.test(navigator.userAgent) ? 'Chrome' : 'Safari'
+      return `Permission blocked. On iPhone: Settings → ${browser} → Camera & Microphone → Allow, then reload and tap Join again.`
+    }
+    return 'Camera/microphone access is blocked. Allow access for this site in your browser settings, then reload and try again.'
   }
   if (/NotFoundError|device not found/i.test(msg)) {
     return 'No camera or microphone was found on this device.'
   }
   return msg || 'Could not join the room. Please try again.'
-}
-
-/** iOS Chrome often loses user-activation on React onClick — use native pointerdown. */
-function GestureActionButton({
-  onGesture,
-  disabled,
-  className,
-  children,
-}: {
-  onGesture: () => void
-  disabled?: boolean
-  className?: string
-  children: ReactNode
-}) {
-  const btnRef = useRef<HTMLButtonElement>(null)
-  const onGestureRef = useRef(onGesture)
-  onGestureRef.current = onGesture
-
-  useEffect(() => {
-    const el = btnRef.current
-    if (!el) return
-
-    let handled = false
-    const run = (event: Event) => {
-      if (disabled || handled) return
-      handled = true
-      window.setTimeout(() => {
-        handled = false
-      }, 400)
-      event.preventDefault()
-      onGestureRef.current()
-    }
-
-    el.addEventListener('pointerdown', run, { passive: false })
-    return () => el.removeEventListener('pointerdown', run)
-  }, [disabled])
-
-  return (
-    <button ref={btnRef} type="button" disabled={disabled} className={className}>
-      {children}
-    </button>
-  )
-}
-
-function mediaAuthHeaders(
-  session: ReturnType<typeof useAuth>['session'],
-  demoAdmin: boolean,
-) {
-  return adminRequestHeaders(session, demoAdmin)
 }
 
 async function ensureMediaEnabled(room: Room, includeVideo: boolean) {
@@ -304,65 +271,6 @@ async function ensureMediaEnabled(room: Room, includeVideo: boolean) {
       await cam.unmute()
     }
   }
-}
-
-function PreJoinLobby({
-  roomName,
-  joining,
-  joinError,
-  onJoinWithVideo,
-  onJoinAudioOnly,
-}: {
-  roomName: string
-  joining: boolean
-  joinError: string | null
-  onJoinWithVideo: () => void
-  onJoinAudioOnly: () => void
-}) {
-  const goldBtn =
-    'flex min-h-12 w-full items-center justify-center rounded-full bg-gold px-6 font-garamond text-sm tracking-[0.16em] uppercase text-void transition hover:bg-gold/90 disabled:opacity-50'
-  const ghostBtn =
-    'flex min-h-11 w-full items-center justify-center rounded-full border border-white/15 px-6 font-garamond text-xs tracking-[0.14em] text-mist/70 uppercase transition hover:border-gold/35 hover:text-gold disabled:opacity-50'
-
-  return (
-    <div className="flex min-h-svh flex-col items-center justify-center gap-6 bg-void px-6 text-center">
-      <div className="max-w-md space-y-3">
-        <p className="font-garamond text-xs tracking-[0.2em] text-gold uppercase">Video room</p>
-        <h1 className="font-bebas text-4xl tracking-wide text-mist">{roomName}</h1>
-        <p className="font-garamond text-sm leading-relaxed text-mist/60">
-          Tap join — camera and microphone are requested once, then you&apos;re in.
-        </p>
-      </div>
-
-      {joinError ? (
-        <p className="max-w-md font-garamond text-sm text-red-400/90">{joinError}</p>
-      ) : null}
-
-      <div className="flex w-full max-w-sm flex-col gap-3">
-        <GestureActionButton
-          onGesture={onJoinWithVideo}
-          disabled={joining}
-          className={goldBtn}
-        >
-          {joining ? 'Joining room…' : 'Join room'}
-        </GestureActionButton>
-        <GestureActionButton
-          onGesture={onJoinAudioOnly}
-          disabled={joining}
-          className={ghostBtn}
-        >
-          Join with audio only
-        </GestureActionButton>
-      </div>
-
-      <Link
-        to="/dashboard"
-        className="font-garamond text-sm text-mist/45 underline transition hover:text-gold"
-      >
-        Back to dashboard
-      </Link>
-    </div>
-  )
 }
 
 function JoinedRoom({
@@ -465,28 +373,82 @@ function RoomTopBar({
 
 export function RoomPage() {
   const { roomName = '' } = useParams()
-  const { profile, session, isAdmin, useSeedData, mockMode, loading: authLoading } = useAuth()
+  const { profile, session, isAdmin, isAuthed, useSeedData, mockMode, loading: authLoading } = useAuth()
   const navigate = useNavigate()
+  const [roomInfo, setRoomInfo] = useState<RoomInfoState>({ status: 'loading' })
   const [state, setState] = useState<TokenState>({ status: 'loading' })
   const [joined, setJoined] = useState(false)
   const [joining, setJoining] = useState(false)
   const [joinError, setJoinError] = useState<string | null>(null)
+  const [displayName, setDisplayName] = useState('')
 
   const room = useMemo(() => new Room(), [])
   const { connect, disconnect } = useSequentialRoomConnectDisconnect(room)
 
-  const userId = session?.user?.id
   const guestIdRef = useRef(`guest-${Math.random().toString(36).slice(2, 8)}`)
-  const identity = userId ?? guestIdRef.current
-  const displayName = profile?.full_name || profile?.email || 'Guest'
+  const userId = session?.user?.id
+  const identity =
+    roomInfo.status === 'ready' && roomInfo.roomType === 'booking'
+      ? guestIdRef.current
+      : userId ?? guestIdRef.current
   const demoAdmin = isAdmin && (useSeedData || mockMode)
+  const skipNamePrompt = isAuthed || useSeedData
+  const resolvedDisplayName =
+    displayName.trim() ||
+    profile?.full_name?.trim() ||
+    profile?.email?.split('@')[0] ||
+    ''
 
   useEffect(() => {
     if (authLoading) return
     let active = true
+    async function loadRoomInfo() {
+      try {
+        const headers = await adminRequestHeaders(session, demoAdmin)
+        const res = await fetch(`/api/livekit/room-info?room=${encodeURIComponent(roomName)}`, {
+          headers,
+        })
+        const json = await res.json().catch(() => null)
+        if (!active) return
+        if (!res.ok || !json?.ok) {
+          setRoomInfo({
+            status: 'error',
+            message: json?.error || 'This room is not available.',
+          })
+          return
+        }
+        setRoomInfo({
+          status: 'ready',
+          roomType: json.roomType,
+          requiresAuth: json.requiresAuth,
+          guestName: json.guestName,
+        })
+        const defaultName =
+          json.guestName ||
+          profile?.full_name ||
+          profile?.email?.split('@')[0] ||
+          ''
+        setDisplayName(defaultName)
+      } catch {
+        if (active) {
+          setRoomInfo({ status: 'error', message: 'Could not load room information.' })
+        }
+      }
+    }
+    void loadRoomInfo()
+    return () => {
+      active = false
+    }
+  }, [roomName, session, demoAdmin, authLoading, profile?.full_name, profile?.email])
+
+  useEffect(() => {
+    if (authLoading || roomInfo.status !== 'ready') return
+    if (roomInfo.requiresAuth && !isAuthed && !useSeedData) return
+
+    let active = true
     async function getToken() {
       let res: Response
-      const headers = await mediaAuthHeaders(session, demoAdmin)
+      const headers = await adminRequestHeaders(session, demoAdmin)
       try {
         res = await fetch('/api/livekit/token', {
           method: 'POST',
@@ -494,7 +456,7 @@ export function RoomPage() {
           body: JSON.stringify({
             room: roomName,
             identity,
-            name: displayName,
+            name: resolvedDisplayName || 'Guest',
           }),
         })
       } catch {
@@ -507,7 +469,6 @@ export function RoomPage() {
         return
       }
 
-      // The token endpoint returns JSON; HTML/empty means the API route is missing.
       let json: {
         token?: string
         url?: string
@@ -550,7 +511,18 @@ export function RoomPage() {
     return () => {
       active = false
     }
-  }, [roomName, identity, displayName, session, demoAdmin, isAdmin, authLoading])
+  }, [
+    roomName,
+    identity,
+    resolvedDisplayName,
+    session,
+    demoAdmin,
+    isAdmin,
+    authLoading,
+    roomInfo,
+    isAuthed,
+    useSeedData,
+  ])
 
   useEffect(() => {
     return () => {
@@ -560,8 +532,8 @@ export function RoomPage() {
 
   async function joinWithMedia(includeVideo: boolean) {
     if (state.status !== 'ready' || joining || joined || !connect) return
-    if (!navigator.mediaDevices?.getUserMedia) {
-      setJoinError('Camera/microphone is not available in this browser. Use HTTPS and a current browser.')
+    if (!skipNamePrompt && !resolvedDisplayName) {
+      setJoinError('Please enter your name before joining.')
       return
     }
 
@@ -600,6 +572,37 @@ export function RoomPage() {
     setJoinError(message)
   }
 
+  if (authLoading || roomInfo.status === 'loading') {
+    return (
+      <div className="flex min-h-svh items-center justify-center bg-void">
+        <span className="font-garamond text-sm tracking-[0.2em] text-mist/40 uppercase">
+          Loading room…
+        </span>
+      </div>
+    )
+  }
+
+  if (roomInfo.status === 'error') {
+    return (
+      <div className="flex min-h-svh flex-col items-center justify-center gap-4 bg-void px-6 text-center">
+        <p className="font-garamond text-mist/70">{roomInfo.message}</p>
+        <Link to="/" className="font-garamond text-sm text-gold underline">
+          Back to home
+        </Link>
+      </div>
+    )
+  }
+
+  if (roomInfo.requiresAuth && !isAuthed && !useSeedData) {
+    return (
+      <Navigate
+        to="/login"
+        replace
+        state={{ from: `/room/${roomName}`, seedRole: 'member' }}
+      />
+    )
+  }
+
   if (state.status === 'loading') {
     return (
       <div className="flex min-h-svh items-center justify-center bg-void">
@@ -611,11 +614,12 @@ export function RoomPage() {
   }
 
   if (state.status === 'error') {
+    const backTo = roomInfo.roomType === 'booking' ? '/' : '/dashboard'
     return (
       <div className="flex min-h-svh flex-col items-center justify-center gap-4 bg-void">
         <p className="font-garamond text-mist/70">{state.message}</p>
-        <Link to="/dashboard" className="font-garamond text-sm text-gold underline">
-          Back to dashboard
+        <Link to={backTo} className="font-garamond text-sm text-gold underline">
+          Go back
         </Link>
       </div>
     )
@@ -654,13 +658,23 @@ export function RoomPage() {
   }
 
   if (!joined) {
+    const backLink =
+      roomInfo.roomType === 'booking'
+        ? { to: '/', label: 'Back to home' }
+        : { to: '/dashboard', label: 'Back to dashboard' }
+
     return (
-      <PreJoinLobby
+      <RoomPreviewLobby
         roomName={roomName}
+        roomType={roomInfo.roomType}
+        displayName={resolvedDisplayName}
+        onDisplayNameChange={setDisplayName}
+        hideNameField={skipNamePrompt}
         joining={joining}
         joinError={joinError}
         onJoinWithVideo={() => void joinWithMedia(true)}
         onJoinAudioOnly={() => void joinWithMedia(false)}
+        backLink={backLink}
       />
     )
   }

@@ -2,7 +2,8 @@ import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { ClubCtaAnimation } from '../components/club/ClubCtaAnimation'
-import { HeroVideoPopup } from '../components/hero/HeroVideoPopup'
+import { TestimonialsSection } from '../components/home/TestimonialsSection'
+import { WebinarVideoEmbed } from '../components/home/WebinarVideoEmbed'
 import { JoinClubBackground } from '../components/JoinClubBackground'
 import { Reveal } from '../components/Reveal'
 import { Seo } from '../components/Seo'
@@ -195,82 +196,81 @@ export function HomePage2() {
               transition={{ delay: 0.08, duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
               className="order-1 lg:order-2"
             >
-              <HeroVideoPopup />
+              <div className="hero-visual relative mx-auto w-3/4 max-w-[17rem] sm:w-full sm:max-w-sm lg:ml-auto lg:max-w-md">
+                <div className="relative aspect-[4/5] overflow-hidden rounded-[1.75rem] bg-charcoal/80 shadow-[0_24px_80px_-20px_rgba(0,0,0,0.9)] ring-1 ring-white/10 backdrop-blur-[2px] sm:aspect-[5/6]">
+                  <img
+                    src="/home2-hero-community.png"
+                    alt="Drummers practicing together in a mastermind session"
+                    className="absolute inset-0 h-full w-full object-cover object-center"
+                    fetchPriority="high"
+                    decoding="async"
+                  />
+                  <div
+                    className="pointer-events-none absolute inset-0 bg-gradient-to-t from-void/50 via-transparent to-void/10"
+                    aria-hidden
+                  />
+                </div>
+                <p className="mt-4 text-center font-garamond text-xs tracking-[0.22em] uppercase text-mist/50 lg:text-right">
+                  mastermind club
+                </p>
+              </div>
             </motion.div>
           </div>
         </div>
       </section>
 
-      {/* What this really is */}
-      <SectionShell className="lg:pt-28 lg:pb-40 xl:pt-32 xl:pb-48">
-        <div className={twoColClass}>
-          <Reveal
-            delay={0.1}
-            className="order-2 flex w-full max-w-lg justify-center lg:order-1 lg:max-w-none lg:justify-start"
-          >
-            <figure className="w-full">
-              <div className="relative overflow-hidden rounded-[1.75rem] border border-white/10 bg-void shadow-[0_24px_80px_-20px_rgba(0,0,0,0.9)] ring-1 ring-white/10">
-                <img
-                  src="/home2-mastermind-zoom.png"
-                  alt="Live mastermind video session with drummers on a group call"
-                  className="aspect-[4/3] w-full object-cover object-center"
-                  loading="lazy"
-                  decoding="async"
-                />
-                <div
-                  className="pointer-events-none absolute inset-0 bg-gradient-to-t from-void/30 via-transparent to-transparent"
-                  aria-hidden
-                />
-              </div>
-              <figcaption className="mt-4 text-center font-garamond text-xs tracking-[0.22em] uppercase text-mist/50 lg:text-left">
-                Live weekly sessions
-              </figcaption>
-            </figure>
-          </Reveal>
-          <div className="order-1 w-full lg:order-2">
-            <SectionHeading
-              eyebrow="What this really is"
-              title={
-                <>
-                  <span className="text-mist">More Than Lessons.</span>
-                  <br />
-                  <span className="text-gold">A Professional Growth Community.</span>
-                </>
-              }
-            />
-            <Reveal delay={0.06} className="mt-8 space-y-5 text-center lg:mt-10 lg:text-left">
-              <Prose>Most online drum education stops at technique.</Prose>
-              <p className="font-bebas text-xl tracking-wide text-gold md:text-2xl">
-                Practical Drumming goes deeper.
-              </p>
-              <Prose>
-                This mastermind club was built to give serious drummers access to the conversations,
-                mentorship, critiques, mindset shifts, and professional experiences that normally stay hidden
-                behind years of touring and industry relationships.
-              </Prose>
-              <Prose className="text-mist/80">
-                Members don&apos;t just watch content.
+      {/* What this really is — with webinar video */}
+      <SectionShell className="border-t border-white/[0.06] lg:py-20 xl:py-24">
+        <div className="mx-auto flex w-full max-w-4xl flex-col items-center text-center">
+          <SectionHeading
+            align="center"
+            eyebrow="What this really is"
+            title={
+              <>
+                <span className="text-mist">More Than Lessons.</span>
                 <br />
-                They participate.
-              </Prose>
-              <Prose>
-                Weekly live sessions create an environment where players can ask questions, share challenges,
-                receive feedback, and learn directly from professionals who&apos;ve spent decades performing,
-                recording, teaching, and navigating the music industry.
-              </Prose>
-              <p className="font-garamond text-base italic text-mist/80 md:text-lg">
-                This is about becoming the kind of musician people want to work with.
-              </p>
-              <p className="pt-2">
-                <Link
-                  to="/club"
-                  className="inline-flex font-garamond text-xs tracking-[0.22em] uppercase text-gold underline decoration-gold/35 underline-offset-4 transition hover:text-mist"
-                >
-                  Learn more
-                </Link>
-              </p>
-            </Reveal>
-          </div>
+                <span className="text-gold">A Professional Growth Community.</span>
+              </>
+            }
+          />
+          <Reveal delay={0.06} className="mt-8 w-full max-w-6xl space-y-4 lg:mt-10">
+            <p className="font-garamond text-base text-mist/70 md:text-[1.05rem]">
+              Watch Mike break down what the mastermind is really about — from the free webinar overview.
+            </p>
+            <WebinarVideoEmbed />
+          </Reveal>
+          <Reveal delay={0.1} className="mt-10 space-y-5 lg:mt-14">
+            <Prose>Most online drum education stops at technique.</Prose>
+            <p className="font-bebas text-xl tracking-wide text-gold md:text-2xl">
+              Practical Drumming goes deeper.
+            </p>
+            <Prose>
+              This mastermind club was built to give serious drummers access to the conversations,
+              mentorship, critiques, mindset shifts, and professional experiences that normally stay hidden
+              behind years of touring and industry relationships.
+            </Prose>
+            <Prose className="text-mist/80">
+              Members don&apos;t just watch content.
+              <br />
+              They participate.
+            </Prose>
+            <Prose>
+              Weekly live sessions create an environment where players can ask questions, share challenges,
+              receive feedback, and learn directly from professionals who&apos;ve spent decades performing,
+              recording, teaching, and navigating the music industry.
+            </Prose>
+            <p className="font-garamond text-base italic text-mist/80 md:text-lg">
+              This is about becoming the kind of musician people want to work with.
+            </p>
+          </Reveal>
+          <Reveal delay={0.14} className="pt-6">
+            <Link
+              to="/club"
+              className="inline-flex font-garamond text-xs tracking-[0.22em] uppercase text-gold underline decoration-gold/35 underline-offset-4 transition hover:text-mist"
+            >
+              Learn more
+            </Link>
+          </Reveal>
         </div>
       </SectionShell>
 
@@ -403,6 +403,8 @@ export function HomePage2() {
           </div>
         </div>
       </SectionShell>
+
+      <TestimonialsSection />
 
       {/* Final CTA */}
       <section className="relative overflow-hidden border-t border-gold/15 bg-void py-32 pb-36 md:py-44 md:pb-48 lg:py-52 lg:pb-56 xl:py-60 xl:pb-64">

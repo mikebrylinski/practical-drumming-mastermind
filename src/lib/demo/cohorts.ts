@@ -121,6 +121,7 @@ export function buildDemoCohorts(): Cohort[] {
     description: s.description,
     starts_at: new Date(Date.now() + s.startsInDays * 864e5).toISOString(),
     livekit_room_name: s.room,
+    image_url: null,
     created_at: createdAt,
   }))
 }

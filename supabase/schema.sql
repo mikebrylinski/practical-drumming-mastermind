@@ -88,6 +88,7 @@ create table if not exists public.bookings (
   livekit_room_name text,
   status            text not null default 'confirmed' check (status in ('confirmed', 'cancelled', 'completed')),
   starts_at         timestamptz,
+  hidden            boolean not null default false,
   created_at        timestamptz not null default now()
 );
 
@@ -292,6 +293,7 @@ create table if not exists public.session_recordings (
   started_at        timestamptz not null default now(),
   ended_at          timestamptz,
   error_message     text,
+  is_published      boolean not null default false,
   created_at        timestamptz not null default now()
 );
 
@@ -305,7 +307,10 @@ alter table public.session_recordings enable row level security;
 
 drop policy if exists session_recordings_read on public.session_recordings;
 create policy session_recordings_read on public.session_recordings
-  for select using (auth.role() = 'authenticated');
+  for select using (
+    public.is_admin()
+    or (auth.role() = 'authenticated' and is_published = true)
+  );
 
 drop policy if exists session_recordings_admin on public.session_recordings;
 create policy session_recordings_admin on public.session_recordings

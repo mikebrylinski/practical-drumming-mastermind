@@ -16,6 +16,7 @@ import { CohortDetailPage } from './pages/app/CohortDetailPage'
 import { SessionsPage } from './pages/app/SessionsPage'
 import { VaultPage } from './pages/app/VaultPage'
 import { MyBookingsPage } from './pages/app/MyBookingsPage'
+import { CommunityPage } from './pages/app/CommunityPage'
 import { BookPage } from './pages/app/BookPage'
 // LiveKit room is heavy; load it on demand to keep the main bundle lean.
 const RoomPage = lazy(() =>
@@ -25,10 +26,10 @@ import { AdminHome } from './pages/admin/AdminHome'
 import { AdminMembers } from './pages/admin/AdminMembers'
 import { AdminMemberDetail } from './pages/admin/AdminMemberDetail'
 import { AdminCohorts } from './pages/admin/AdminCohorts'
-import { AdminApplications } from './pages/admin/AdminApplications'
 import { AdminAvailability } from './pages/admin/AdminAvailability'
 import { AdminBookings } from './pages/admin/AdminBookings'
 import { LeadsPage } from './pages/admin/LeadsPage'
+import { AdminVaultPage } from './pages/admin/AdminVaultPage'
 
 export default function App() {
   return (
@@ -39,17 +40,15 @@ export default function App() {
         <Route
           path="/room/:roomName"
           element={
-            <ProtectedRoute>
-              <Suspense
-                fallback={
-                  <div className="flex min-h-svh items-center justify-center bg-void font-garamond text-sm tracking-[0.2em] text-mist/40 uppercase">
-                    Loading room…
-                  </div>
-                }
-              >
-                <RoomPage />
-              </Suspense>
-            </ProtectedRoute>
+            <Suspense
+              fallback={
+                <div className="flex min-h-svh items-center justify-center bg-void font-garamond text-sm tracking-[0.2em] text-mist/40 uppercase">
+                  Loading room…
+                </div>
+              }
+            >
+              <RoomPage />
+            </Suspense>
           }
         />
 
@@ -76,6 +75,7 @@ export default function App() {
             <Route path="vault" element={<VaultPage />} />
             <Route path="sessions" element={<SessionsPage />} />
             <Route path="profile" element={<ProfilePage />} />
+            <Route path="community" element={<CommunityPage />} />
             <Route path="my-bookings" element={<MyBookingsPage />} />
           </Route>
 
@@ -86,7 +86,8 @@ export default function App() {
             <Route path="admin/member/:id" element={<AdminMemberDetail />} />
             <Route path="admin/cohorts" element={<AdminCohorts />} />
             <Route path="admin/sessions" element={<Navigate to="/admin/cohorts" replace />} />
-            <Route path="admin/applications" element={<AdminApplications />} />
+            <Route path="admin/vault" element={<AdminVaultPage />} />
+            <Route path="admin/applications" element={<Navigate to="/admin" replace />} />
             <Route path="admin/availability" element={<AdminAvailability />} />
             <Route path="admin/bookings" element={<AdminBookings />} />
             <Route path="admin/leads" element={<LeadsPage />} />

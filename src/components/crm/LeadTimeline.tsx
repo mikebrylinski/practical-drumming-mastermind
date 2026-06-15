@@ -56,6 +56,9 @@ export function LeadTimeline({ events, limit }: { events: LeadEvent[]; limit?: n
             {e.path ? (
               <p className="font-garamond text-xs text-mist/45">{e.path}</p>
             ) : null}
+            {e.ip_address ? (
+              <p className="font-garamond text-xs text-mist/35">IP: {e.ip_address}</p>
+            ) : null}
             {summary ? (
               <p className="mt-0.5 font-garamond text-xs text-mist/35">{summary}</p>
             ) : null}

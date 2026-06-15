@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { BellIcon, MembersIcon } from './MembersIcons'
+import { MembersIcon } from './MembersIcons'
 import { useAuth } from '../../lib/auth/AuthProvider'
 
 type MembersToolbarProps = {
@@ -34,16 +34,6 @@ export function MembersToolbar({ onOpenMenu }: MembersToolbarProps) {
       </p>
       <div className="hidden flex-1 lg:block" aria-hidden />
       <div className="ml-auto flex items-center gap-2 sm:gap-3">
-        <button
-          type="button"
-          className="relative flex size-9 items-center justify-center rounded-full border border-white/12 text-mist/70 transition hover:border-gold/30 hover:text-gold sm:size-10"
-          aria-label="Notifications"
-        >
-          <BellIcon className="size-5" />
-          <span className="absolute -right-0.5 -top-0.5 flex size-4 items-center justify-center rounded-full bg-gold font-garamond text-[0.6rem] text-void">
-            3
-          </span>
-        </button>
         {avatar ? (
           <Link to="/profile" aria-label="Your profile">
             <img

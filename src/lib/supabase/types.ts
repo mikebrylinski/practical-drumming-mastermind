@@ -18,6 +18,7 @@ export type Cohort = {
   description: string | null
   starts_at: string | null
   livekit_room_name: string | null
+  image_url?: string | null
   created_at: string
 }
 
@@ -52,6 +53,7 @@ export type SessionRecording = {
   started_at: string
   ended_at: string | null
   error_message: string | null
+  is_published?: boolean
   created_at: string
 }
 
@@ -91,6 +93,7 @@ export type Booking = {
   livekit_room_name: string | null
   status: BookingStatus
   starts_at: string | null
+  hidden?: boolean
   created_at: string
 }
 
@@ -122,5 +125,32 @@ export type LeadEvent = {
   path: string | null
   metadata: Record<string, unknown>
   score_delta: number
+  ip_address?: string | null
+  created_at: string
+}
+
+export type ContactSubmission = {
+  id: string
+  name: string
+  email: string
+  message: string
+  ip_address: string | null
+  created_at: string
+}
+
+export type CommunityPost = {
+  id: string
+  user_id: string
+  title: string
+  body: string
+  created_at: string
+  updated_at: string
+}
+
+export type CommunityReply = {
+  id: string
+  post_id: string
+  user_id: string
+  body: string
   created_at: string
 }

@@ -52,25 +52,6 @@ export function MembersSidebar({ activeId = 'dashboard', mobileOpen, onClose }: 
             })}
           </ul>
         </nav>
-
-        <div className="border-t border-white/10 p-4">
-          <div className="rounded-xl border border-gold/25 bg-gold/5 p-4">
-            <div className="flex items-start gap-3">
-              <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-gold/15 text-gold">
-                <MembersIcon name="star" className="size-5" />
-              </span>
-              <div className="min-w-0">
-                <p className="font-garamond text-xs tracking-[0.2em] text-mist/45 uppercase">
-                  Member Tier
-                </p>
-                <p className="font-garamond text-base font-medium text-mist">Backstage Access</p>
-                <button type="button" className="mt-2 font-garamond text-sm text-gold underline decoration-gold/40 underline-offset-2">
-                  View Benefits
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
       </aside>
     </>
   )

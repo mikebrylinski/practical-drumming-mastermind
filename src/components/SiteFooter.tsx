@@ -40,6 +40,9 @@ export function SiteFooter() {
           <br />
           All Rights Reserved.
         </p>
+        <p className="mt-4 text-center font-garamond text-[0.6rem] tracking-[0.12em] text-mist/35 md:text-[0.65rem]">
+          eMastermind Solution by Pixel Palisade
+        </p>
       </div>
     </footer>
   )

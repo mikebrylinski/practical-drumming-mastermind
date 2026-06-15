@@ -23,37 +23,68 @@ export default async function handler(req, res) {
 
     const room = req.query?.room
     const status = req.query?.status || 'complete'
-    const limit = Math.min(Number(req.query?.limit) || 50, 100)
+    const limit = Math.min(Math.max(Number(req.query?.limit) || 25, 1), 100)
+    const offset = Math.max(Number(req.query?.offset) || 0, 0)
+    const isAdminRequest = req.query?.admin === '1'
 
-    let query = admin
-      .from('session_recordings')
-      .select(
-        'id, session_id, room_name, title, status, playback_url, duration_seconds, started_at, ended_at, created_at',
-      )
-      .order('started_at', { ascending: false })
-      .limit(limit)
+    const baseFields =
+      'id, session_id, room_name, title, status, playback_url, duration_seconds, started_at, ended_at, created_at'
+    const fieldsWithPublish = `${baseFields}, is_published`
 
-    if (status !== 'all') {
-      query = query.eq('status', status)
+    async function runQuery(includePublish) {
+      let query = admin
+        .from('session_recordings')
+        .select(includePublish ? fieldsWithPublish : baseFields, { count: 'exact' })
+        .order('started_at', { ascending: false })
+        .range(offset, offset + limit - 1)
+
+      if (includePublish && !isAdminRequest) {
+        query = query.eq('is_published', true)
+      }
+
+      if (status !== 'all') {
+        query = query.eq('status', status)
+      }
+      if (room) {
+        query = query.eq('room_name', room)
+      }
+
+      return query
     }
-    if (room) {
-      query = query.eq('room_name', room)
+
+    let schemaWarning = null
+    let { data, error, count } = await runQuery(true)
+
+    if (error?.message?.includes('is_published')) {
+      schemaWarning =
+        'Run supabase/migrations/20250614_platform_updates.sql (or add session_recordings.is_published) to enable vault publish controls.'
+      ;({ data, error, count } = await runQuery(false))
     }
 
-    const { data, error } = await query
     if (error) {
       console.error('[recordings/list]', error)
-      return res.status(500).json({ ok: false, error: 'Could not load recordings' })
+      return res.status(500).json({
+        ok: false,
+        error: error.message || 'Could not load recordings',
+      })
     }
 
     const recordings = await Promise.all(
       (data || []).map(async (row) => ({
         ...row,
+        is_published: row.is_published ?? true,
         playback_url: await playbackUrlForRecording(row),
       })),
     )
 
-    return res.status(200).json({ ok: true, recordings })
+    return res.status(200).json({
+      ok: true,
+      recordings,
+      total: count ?? recordings.length,
+      limit,
+      offset,
+      ...(schemaWarning ? { schemaWarning } : {}),
+    })
   } catch (err) {
     console.error('[recordings/list]', err)
     return res.status(500).json({ ok: false, error: 'Server error' })

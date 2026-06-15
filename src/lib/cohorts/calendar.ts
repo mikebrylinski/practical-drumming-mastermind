@@ -72,4 +72,33 @@ export function cohortDotsForDay(
   return dots
 }
 
+/** First session day from today onward — prefers today if it has sessions. */
+export function findFirstSessionFromToday(sessions: Session[]): {
+  dayKey: string
+  sessionId: string
+  viewMonth: Date
+} | null {
+  const todayKey = calendarDayKey(new Date())
+  const todayStart = new Date()
+  todayStart.setHours(0, 0, 0, 0)
+
+  const scheduled = sessions
+    .filter((s) => s.scheduled_at)
+    .sort((a, b) => (a.scheduled_at ?? '').localeCompare(b.scheduled_at ?? ''))
+
+  if (scheduled.length === 0) return null
+
+  const todaySessions = scheduled.filter((s) => sessionDayKey(s.scheduled_at!) === todayKey)
+  const pick = todaySessions[0] ?? scheduled.find((s) => new Date(s.scheduled_at!).getTime() >= todayStart.getTime())
+
+  if (!pick?.scheduled_at) return null
+
+  const when = new Date(pick.scheduled_at)
+  return {
+    dayKey: sessionDayKey(pick.scheduled_at),
+    sessionId: pick.id,
+    viewMonth: new Date(when.getFullYear(), when.getMonth(), 1),
+  }
+}
+
 export { WEEKDAYS, MONTH_NAMES }

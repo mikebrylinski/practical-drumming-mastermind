@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   MONTH_NAMES,
@@ -7,11 +7,12 @@ import {
   buildMonthGrid,
   calendarDayKey,
   cohortDotsForDay,
+  findFirstSessionFromToday,
   groupSessionsByDay,
   sessionDayKey,
 } from '../../lib/cohorts/calendar'
 import { cohortRoomName } from '../../lib/slug'
-import { formatDateTime, formatTime } from '../../lib/datetime'
+import { formatDate, formatTime } from '../../lib/datetime'
 import type { Cohort, Session } from '../../lib/supabase/types'
 
 const LIVE_WINDOW_MS = 60 * 60 * 1000
@@ -28,21 +29,38 @@ type CohortSessionsCalendarProps = {
 }
 
 export function CohortSessionsCalendar({ sessions, cohorts }: CohortSessionsCalendarProps) {
+  const initialSelection = useMemo(() => findFirstSessionFromToday(sessions), [sessions])
+
   const [viewMonth, setViewMonth] = useState(() => {
+    const sel = findFirstSessionFromToday(sessions)
+    if (sel) return sel.viewMonth
     const d = new Date()
     return new Date(d.getFullYear(), d.getMonth(), 1)
   })
-  const [selectedKey, setSelectedKey] = useState<string | null>(() => calendarDayKey(new Date()))
+  const [selectedKey, setSelectedKey] = useState<string | null>(null)
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null)
+  const [initialViewApplied, setInitialViewApplied] = useState(() =>
+    Boolean(findFirstSessionFromToday(sessions)),
+  )
+
+  useEffect(() => {
+    if (initialViewApplied || !initialSelection) return
+    setViewMonth(initialSelection.viewMonth)
+    setInitialViewApplied(true)
+  }, [initialSelection, initialViewApplied])
+
+  const activeKey =
+    selectedKey ?? initialSelection?.dayKey ?? calendarDayKey(new Date())
+  const activeSessionId = selectedSessionId ?? initialSelection?.sessionId ?? null
 
   const cohortById = useMemo(() => new Map(cohorts.map((c) => [c.id, c])), [cohorts])
   const colorMap = useMemo(() => buildCohortColorMap(cohorts), [cohorts])
   const byDay = useMemo(() => groupSessionsByDay(sessions), [sessions])
   const cells = useMemo(() => buildMonthGrid(viewMonth), [viewMonth])
 
-  const daySessions = selectedKey ? (byDay.get(selectedKey) ?? []) : []
+  const daySessions = activeKey ? (byDay.get(activeKey) ?? []) : []
   const focusedSession =
-    daySessions.find((s) => s.id === selectedSessionId) ?? daySessions[0] ?? null
+    daySessions.find((s) => s.id === activeSessionId) ?? daySessions[0] ?? null
   const focusedCohort = focusedSession?.cohort_id
     ? cohortById.get(focusedSession.cohort_id)
     : null
@@ -100,7 +118,7 @@ export function CohortSessionsCalendar({ sessions, cohorts }: CohortSessionsCale
               const key = calendarDayKey(day)
               const dayList = byDay.get(key) ?? []
               const dots = cohortDotsForDay(dayList, colorMap)
-              const selected = key === selectedKey
+              const selected = key === activeKey
               const today = calendarDayKey(new Date()) === key
               return (
                 <button
@@ -152,8 +170,13 @@ export function CohortSessionsCalendar({ sessions, cohorts }: CohortSessionsCale
       <div className="space-y-4">
         <div>
           <h2 className="font-garamond text-sm tracking-[0.16em] text-gold/80 uppercase">
-            {selectedKey ? 'Sessions this day' : 'Select a day'}
+            {activeKey ? 'Sessions this day' : 'Select a day'}
           </h2>
+          {activeKey && daySessions[0]?.scheduled_at ? (
+            <p className="mt-1 font-garamond text-sm text-mist/50">
+              {formatDate(daySessions[0].scheduled_at)}
+            </p>
+          ) : null}
           {daySessions.length === 0 ? (
             <p className="mt-3 font-garamond text-mist/45">No cohort sessions on this day.</p>
           ) : (
@@ -226,7 +249,8 @@ export function CohortSessionsCalendar({ sessions, cohorts }: CohortSessionsCale
                 ) : null}
                 {focusedSession.scheduled_at ? (
                   <p className="mt-3 font-garamond text-sm text-mist/50">
-                    {formatDateTime(focusedSession.scheduled_at)}
+                    {formatDate(focusedSession.scheduled_at)} ·{' '}
+                    {formatTime(focusedSession.scheduled_at)}
                   </p>
                 ) : null}
                 <p className="mt-1 font-garamond text-sm text-mist/70">{focusedSession.title}</p>

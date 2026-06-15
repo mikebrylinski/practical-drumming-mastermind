@@ -58,7 +58,7 @@ const tanyaHighlights = [
   },
   {
     title: 'Historic Venues',
-    body: 'As her bandleader, Malinin guided the live shows through highly celebrated performances at legendary, bucket-list venues. This included a historic, standing-room-only performance at West Hollywood’s iconic The Troubadour (which was captured for a live album release) and a highly revered taping for Austin City Limits.',
+    body: 'As her bandleader, Malinin guided the live shows through highly celebrated performances at legendary, bucket-list venues. This included a historic, standing-room-only performance at West Hollywood’s iconic The Troubadour (which was captured for a live album release).',
   },
 ] as const
 
@@ -78,6 +78,8 @@ const twoColClass =
 const colClass = 'flex w-full flex-col items-center justify-center text-center lg:items-start lg:justify-center lg:text-left'
 
 const portraitSizeClass = 'mx-auto w-full max-w-[13rem] sm:max-w-[14rem] lg:max-w-[15rem]'
+const portraitDesktopSizeClass =
+  'mx-auto w-full max-w-[14rem] sm:max-w-[16rem] lg:max-w-[22rem] xl:max-w-[28rem]'
 
 function Prose({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
@@ -333,7 +335,7 @@ export function AboutPage() {
               alt="Mike Malinin behind the drum kit for Tanya Tucker"
               caption="Bandleader for Tanya Tucker — Nashville"
               captionCenter
-              className={portraitSizeClass}
+              className={portraitDesktopSizeClass}
             />
           </div>
         </Reveal>
@@ -343,7 +345,7 @@ export function AboutPage() {
       <SectionShell>
         <Reveal delay={0.04} className={twoColClass}>
           <div className="flex w-full flex-col items-center justify-center text-center">
-            <figure className={`${portraitSizeClass} w-full max-w-[14rem] sm:max-w-[15rem] lg:max-w-[16rem]`}>
+            <figure className={portraitDesktopSizeClass}>
               <div className={`relative overflow-hidden ${portraitFrameClass} aspect-[3/4] w-full`}>
                 <img
                   src="/about-modern-drummer-cover.png"
@@ -374,19 +376,46 @@ export function AboutPage() {
             />
             <Prose>
               In August 2002, Mike Malinin graced the cover of{' '}
-              <em className="text-mist/85">Modern Drummer</em> — the definitive global publication for
-              the instrument and the highest-profile honor a working drummer can receive.
+              <a
+                href="https://www.moderndrummer.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gold underline decoration-gold/35 underline-offset-2"
+              >
+                <em className="text-mist/85 not-italic">Modern Drummer</em>
+              </a>{' '}
+              — the definitive global publication for the instrument and the highest-profile honor a
+              working drummer can receive.
             </Prose>
             <Prose>
               The feature spotlighted his role anchoring the Goo Goo Dolls at the peak of their
               commercial run — the pocket, dynamics, and song-first musicality behind hits like
               &ldquo;Iris,&rdquo; &ldquo;Slide,&rdquo; and &ldquo;Black Balloon.&rdquo; A cover
               placement puts a player among the elite drummers whose approach shapes how the next
-              generation thinks about playing for the music.
+              generation thinks about playing for the music.{' '}
+              <a
+                href="https://www.moderndrummer.com/2004/05/mike-malinin/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gold underline decoration-gold/35 underline-offset-2"
+              >
+                Read &ldquo;Mike Malinin: Pop-Rock Precision&rdquo;
+              </a>
+              .
             </Prose>
             <Prose className="text-mist/65">
               That same philosophy — feel over flash, serving the song — is at the core of Practical
-              Drumming today.
+              Drumming today. Mike has long played{' '}
+              <a
+                href="https://remo.com/profile/mike-malinin"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gold underline decoration-gold/35 underline-offset-2"
+              >
+                Remo
+              </a>{' '}
+              heads on stage and in the studio — the same focus on tone and reliability he brings to
+              mastermind sessions.
             </Prose>
           </div>
         </Reveal>

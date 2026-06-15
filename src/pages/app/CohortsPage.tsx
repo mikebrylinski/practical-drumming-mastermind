@@ -33,6 +33,10 @@ function isUpcoming(session: Session): boolean {
   return new Date(session.scheduled_at).getTime() >= Date.now() - LIVE_WINDOW_MS
 }
 
+function cohortImage(cohort: Cohort): string {
+  return cohort.image_url || '/logo-dd-footer.png'
+}
+
 function CohortCard({ cohort, sessions }: { cohort: Cohort; sessions: Session[] }) {
   const next = nextSessionFor(cohort.id, sessions)
   const live = isLive(next)
@@ -40,13 +44,13 @@ function CohortCard({ cohort, sessions }: { cohort: Cohort; sessions: Session[] 
 
   return (
     <div className="group relative overflow-hidden rounded-xl border border-white/10 bg-charcoal/60 transition hover:border-gold/30">
-      <div className="relative h-28 overflow-hidden">
-        <div
-          className="absolute inset-0 bg-cover bg-center transition duration-500 group-hover:scale-105"
-          style={{ backgroundImage: "url('/hero-mike-live.png')" }}
-          aria-hidden
+      <div className="relative aspect-square max-h-40 overflow-hidden bg-void">
+        <img
+          src={cohortImage(cohort)}
+          alt=""
+          className="size-full object-cover transition duration-500 group-hover:scale-105"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-charcoal via-charcoal/40 to-transparent" aria-hidden />
+        <div className="absolute inset-0 bg-gradient-to-t from-charcoal via-charcoal/20 to-transparent" aria-hidden />
         {live ? (
           <span className="absolute right-3 top-3 flex items-center gap-1.5 rounded-full bg-red-600/90 px-2.5 py-1 font-garamond text-[0.65rem] tracking-[0.16em] text-white uppercase">
             <span className="size-1.5 animate-pulse rounded-full bg-white" aria-hidden />

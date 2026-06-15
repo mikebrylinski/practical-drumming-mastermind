@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto'
 import { AccessToken, RoomServiceClient } from 'livekit-server-sdk'
+import { authorizeRoomToken } from '../../server/lib/roomAuth.js'
 import { resolveIsAdminFromRequest } from './_lib.js'
 
 const MAX_PARTICIPANTS = Number(process.env.LIVEKIT_MAX_PARTICIPANTS) || 12
@@ -22,6 +23,11 @@ export default async function handler(req, res) {
 
     if (!room) {
       return res.status(400).json({ ok: false, error: 'room is required' })
+    }
+
+    const auth = await authorizeRoomToken(req, String(room))
+    if (!auth.ok) {
+      return res.status(auth.status || 403).json({ ok: false, error: auth.error })
     }
 
     const apiKey = process.env.LIVEKIT_API_KEY

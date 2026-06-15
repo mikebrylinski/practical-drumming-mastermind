@@ -6,8 +6,9 @@ Follow these steps once per environment (Production on Vercel + your Supabase pr
 
 | Area | Routes | Who can access |
 | --- | --- | --- |
-| Marketing | `/`, `/club`, `/about`, `/apply` | Public |
-| Member club | `/dashboard`, `/cohorts`, `/vault`, `/sessions`, `/profile`, `/room/*` | Signed-in users (`profiles.role = member` or `admin`) |
+| Marketing | `/`, `/club`, `/about`, `/apply`, `/book/*` | Public |
+| Discovery calls | `/room/call-*` | Public (valid booking required) |
+| Member club | `/dashboard`, `/cohorts`, `/vault`, `/community`, `/room/*` (cohort) | Signed-in users |
 | Admin | `/admin/*` | Signed-in users with `profiles.role = admin` |
 
 New sign-ups get `role = member` automatically. Promote admins manually in SQL (below).
@@ -29,7 +30,8 @@ In **SQL Editor**, run in order:
 1. [`schema.sql`](./schema.sql) — tables, RLS, profiles trigger
 2. [`profile-fields.sql`](./profile-fields.sql) — avatar + contact fields, avatars storage bucket
 3. [`storage.sql`](./storage.sql) — `session-recordings` bucket + policies
-4. [`seed.sql`](./seed.sql) — optional sample cohorts/slots for dev
+4. [`migrations/20250614_platform_updates.sql`](./migrations/20250614_platform_updates.sql) — contact form, community forum, CRM IP, booking hide, cohort images, vault publish
+5. [`seed.sql`](./seed.sql) — optional sample cohorts/slots for dev
 
 ## 3. Enable auth (email + password)
 
@@ -42,6 +44,34 @@ In **SQL Editor**, run in order:
      - `http://127.0.0.1:5173/**`
      - `https://practical-drumming-mastermind.vercel.app/**`
 4. Set `PUBLIC_BASE_URL` on Vercel to the same production URL (used in emails/links).
+
+### Styled auth emails (Supabase Dashboard)
+
+Supabase sends password recovery, magic link, and confirm-signup emails. To match the app brand (void background, gold accent), paste HTML into **Authentication → Email Templates** for each template type. Use this structure for **Reset Password**:
+
+```html
+<!doctype html>
+<html>
+  <body style="margin:0;background:#050505;color:#e8e4dc;font-family:Georgia,'EB Garamond',serif;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#050505;padding:32px 16px;">
+      <tr><td align="center">
+        <table role="presentation" width="100%" style="max-width:560px;background:#0f0e0c;border:1px solid rgba(255,255,255,0.08);border-radius:14px;">
+          <tr><td style="padding:28px 32px;border-bottom:1px solid rgba(255,255,255,0.06);">
+            <span style="font-family:Arial,sans-serif;letter-spacing:2px;font-size:18px;color:#c9a55c;">PRACTICAL DRUMMING MASTERMIND</span>
+          </td></tr>
+          <tr><td style="padding:32px;">
+            <h1 style="margin:0 0 16px;font-size:24px;color:#e8e4dc;">Reset your password</h1>
+            <p style="margin:0 0 14px;font-size:16px;line-height:1.6;color:rgba(232,228,220,0.75);">Tap the button below to choose a new password. This link expires soon.</p>
+            <a href="{{ .ConfirmationURL }}" style="display:inline-block;margin-top:20px;background:#c9a55c;color:#050505;text-decoration:none;padding:12px 26px;border-radius:999px;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;">Reset password</a>
+          </td></tr>
+        </table>
+      </td></tr>
+    </table>
+  </body>
+</html>
+```
+
+Repeat the same header/footer for **Magic Link** and **Confirm signup**, changing the heading and button label. App transactional mail (bookings, contact notifications) uses **Resend** via `RESEND_API_KEY` and `EMAIL_FROM`; set `ADMIN_EMAIL` for contact form alerts.
 
 ### Create Mike's admin account
 

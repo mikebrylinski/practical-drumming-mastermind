@@ -1,5 +1,7 @@
 import { getSupabaseAdmin } from '../../server/lib/supabaseAdmin.js'
 import { sendTemplatedEmail } from '../../server/lib/sendEmail.js'
+import { publicPath } from '../../server/lib/publicUrl.js'
+import { formatBookingDateLabel } from '../../server/lib/bookingEmail.js'
 
 export default async function handler(req, res) {
   if (req.method === 'OPTIONS') {
@@ -19,7 +21,6 @@ export default async function handler(req, res) {
       return res.status(400).json({ ok: false, error: 'bookingId is required' })
     }
 
-    const base = process.env.PUBLIC_BASE_URL || ''
     const admin = getSupabaseAdmin()
     if (!admin) return res.status(200).json({ ok: true, mock: true })
 
@@ -37,11 +38,11 @@ export default async function handler(req, res) {
     }
 
     if (booking.email) {
-      const dateLabel = booking.starts_at ? new Date(booking.starts_at).toLocaleString() : ''
+      const dateLabel = formatBookingDateLabel(booking.starts_at)
       await sendTemplatedEmail({
         template: 'booking_cancelled',
         to: booking.email,
-        data: { dateLabel, bookUrl: base ? `${base}/book/discovery-call` : '/book/discovery-call' },
+        data: { dateLabel, bookUrl: publicPath('/book/discovery-call') },
       })
     }
 

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { PlayIcon } from '../members/MembersIcons'
+import { OverlayPortal, OVERLAY_Z } from '../ui/OverlayPortal'
 
 const YOUTUBE_VIDEO_ID = 'EVf_cCLU_Iw'
 const PREVIEW_IMAGE = '/hero-video-preview.png'
@@ -32,37 +33,39 @@ function YoutubeModal({ open, onClose }: { open: boolean; onClose: () => void })
   if (!open) return null
 
   return (
-    <div
-      className="fixed inset-0 z-[60] flex items-center justify-center bg-void/85 p-4 backdrop-blur"
-      onClick={onClose}
-      role="dialog"
-      aria-modal="true"
-      aria-label="Watch intro video"
-    >
+    <OverlayPortal>
       <div
-        className="w-full max-w-4xl overflow-hidden rounded-2xl border border-white/10 bg-charcoal shadow-[0_24px_80px_-20px_rgba(0,0,0,0.9)]"
-        onClick={(e) => e.stopPropagation()}
+        className={`fixed inset-0 ${OVERLAY_Z} flex items-center justify-center bg-void/85 p-4 backdrop-blur`}
+        onClick={onClose}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Watch intro video"
       >
-        <div className="relative aspect-video bg-black">
-          <iframe
-            title="Practical Drumming Mastermind intro"
-            src={`https://www.youtube.com/embed/${YOUTUBE_VIDEO_ID}?autoplay=1&rel=0&modestbranding=1`}
-            className="absolute inset-0 h-full w-full"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowFullScreen
-          />
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Close video"
-            className="absolute right-3 top-3 z-10 flex size-9 items-center justify-center rounded-full bg-void/70 font-garamond text-mist/80 transition hover:text-gold"
-          >
-            ✕
-          </button>
-          <SquareLogoBadge className="absolute bottom-3 right-3 z-10" />
+        <div
+          className="w-full max-w-4xl overflow-hidden rounded-2xl border border-white/10 bg-charcoal shadow-[0_24px_80px_-20px_rgba(0,0,0,0.9)]"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="relative aspect-video bg-black">
+            <iframe
+              title="Practical Drumming Mastermind intro"
+              src={`https://www.youtube.com/embed/${YOUTUBE_VIDEO_ID}?autoplay=1&rel=0&modestbranding=1`}
+              className="absolute inset-0 h-full w-full"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+            />
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="Close video"
+              className="absolute right-3 top-3 z-10 flex size-9 items-center justify-center rounded-full bg-void/70 font-garamond text-mist/80 transition hover:text-gold"
+            >
+              ✕
+            </button>
+            <SquareLogoBadge className="absolute bottom-3 right-3 z-10" />
+          </div>
         </div>
       </div>
-    </div>
+    </OverlayPortal>
   )
 }
 

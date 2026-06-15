@@ -1,5 +1,6 @@
 import { getSupabaseAdmin } from '../../server/lib/supabaseAdmin.js'
 import { scoreForEvent } from '../../server/lib/leadScoring.js'
+import { clientIpFromRequest } from '../../server/lib/clientIp.js'
 
 export default async function handler(req, res) {
   if (req.method === 'OPTIONS') {
@@ -36,6 +37,7 @@ export default async function handler(req, res) {
       path: path || null,
       metadata: metadata || {},
       score_delta: scoreDelta,
+      ip_address: clientIpFromRequest(req),
     })
 
     if (error) {
