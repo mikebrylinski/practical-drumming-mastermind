@@ -6,6 +6,8 @@
  * Usage:
  *   npm run check:resend
  *   CHECK_EMAIL=you@example.com npm run check:resend
+ *
+ * Room links always use the production site unless EMAIL_PUBLIC_BASE_URL is set.
  */
 import { sendTemplatedEmail } from '../server/lib/sendEmail.js'
 import { publicRoomUrl } from '../server/lib/publicUrl.js'

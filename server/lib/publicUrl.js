@@ -12,20 +12,19 @@ function isLocalhostUrl(url) {
 
 /** Public site base URL for links in emails (no trailing slash). */
 export function getPublicBaseUrl() {
+  const emailOverride = normalizeBaseUrl(process.env.EMAIL_PUBLIC_BASE_URL || '')
+  if (emailOverride) return emailOverride
+
   const configured = normalizeBaseUrl(process.env.PUBLIC_BASE_URL || '')
-  const onVercel = process.env.VERCEL === '1'
+  if (configured && !isLocalhostUrl(configured)) return configured
 
-  if (configured && !(onVercel && isLocalhostUrl(configured))) {
-    return configured
-  }
-
-  if (onVercel) {
+  if (process.env.VERCEL === '1') {
     if (process.env.VERCEL_ENV === 'production') return PRODUCTION_SITE
     const vercelUrl = process.env.VERCEL_URL
     if (vercelUrl) return normalizeBaseUrl(vercelUrl)
   }
 
-  return configured
+  return PRODUCTION_SITE
 }
 
 export function publicPath(path) {
