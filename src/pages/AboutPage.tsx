@@ -6,6 +6,24 @@ import { Seo } from '../components/Seo'
 import { SectionGridOverlay } from '../components/SectionGridOverlay'
 import { pageWrapClass, SectionShell } from '../components/SectionShell'
 
+const albumsPerformedOn = [
+  'Dizzy Up the Girl (1998)',
+  'Gutterflower (2002)',
+  'Let Love In (2006)',
+  'Something for the Rest of Us (2010)',
+  'Magnetic (2013)',
+] as const
+
+const studentTopics = [
+  'Professional touring drummer techniques',
+  'Rock drumming fundamentals and advanced concepts',
+  'Studio recording preparation',
+  'Drum parts and song construction',
+  'Music industry career development',
+  'Auditions and touring opportunities',
+  'Building consistency and confidence behind the kit',
+] as const
+
 const careerHighlights = [
   {
     title: 'The Pulse of a Diamond Hit',
@@ -93,13 +111,19 @@ function SectionHeading({
   eyebrow,
   title,
   subtitle,
+  subtitleClassName = 'text-mist/65',
+  center = false,
 }: {
   eyebrow?: string
   title: ReactNode
   subtitle?: string
+  subtitleClassName?: string
+  center?: boolean
 }) {
+  const alignClass = center ? 'text-center' : 'text-center lg:text-left'
+
   return (
-    <div className="w-full text-center lg:text-left">
+    <div className={`w-full ${alignClass}`}>
       {eyebrow ? (
         <p className="font-garamond text-[0.7rem] tracking-[0.32em] uppercase text-gold/75 md:text-xs">
           {eyebrow}
@@ -113,7 +137,9 @@ function SectionHeading({
         {title}
       </h2>
       {subtitle ? (
-        <p className="mt-3 font-garamond text-lg leading-snug text-mist/65 md:text-xl">{subtitle}</p>
+        <p className={`mt-3 font-garamond text-lg leading-snug md:text-xl ${subtitleClassName}`}>
+          {subtitle}
+        </p>
       ) : null}
     </div>
   )
@@ -165,6 +191,24 @@ function AboutFigure({
   )
 }
 
+function BulletList({ items, center = false }: { items: readonly string[]; center?: boolean }) {
+  return (
+    <ul className={`mt-4 space-y-2.5 ${center ? 'mx-auto w-fit max-w-md' : ''}`}>
+      {items.map((item) => (
+        <li
+          key={item}
+          className={`flex gap-3 font-garamond text-base leading-relaxed text-mist/70 md:text-[1.05rem] ${
+            center ? 'items-start justify-center text-left' : ''
+          }`}
+        >
+          <span className="mt-2 size-1.5 shrink-0 rounded-full bg-gold" aria-hidden />
+          <span>{item}</span>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
 function FeatureCard({ title, body }: { title: string; body: string }) {
   return (
     <div className="rounded-2xl border border-white/[0.08] bg-charcoal/75 p-6 ring-1 ring-white/[0.04] backdrop-blur-sm md:p-7">
@@ -201,8 +245,8 @@ export function AboutPage() {
   return (
     <article className="bg-void">
       <Seo
-        title="About Mike Malinin"
-        description="Mike Malinin — former Goo Goo Dolls and Tanya Tucker drummer behind the Diamond-certified hit 'Iris,' a Modern Drummer cover feature, and a Guitar Center RockWalk honoree. The story behind Practical Drumming."
+        title="About Mike Malinin — Goo Goo Dolls Drummer, Mentor & Educator"
+        description="Mike Malinin is an American professional drummer, recording artist, mentor, and educator — former Goo Goo Dolls drummer (1995–2013) on Iris, Slide, and platinum albums including Dizzy Up the Girl. Learn rock drumming, studio prep, and music industry career development through Practical Drumming."
         image="/about-mike-practical.png"
         canonicalPath="/about"
         type="profile"
@@ -228,8 +272,10 @@ export function AboutPage() {
                 5 billion streams. Diamond &amp; platinum records. The world&apos;s biggest stages.
               </p>
               <p className="mt-3 font-garamond text-lg leading-snug text-mist/65 md:text-xl">
-                Former Goo Goo Dolls / Tanya Tucker drummer — anchoring some of the most dominant
-                records and live spectacles in modern rock.
+                Professional drummer, recording artist, mentor, and educator — former Goo
+                Goo Dolls drummer (1995–2013) on platinum albums, world tours, and hits like
+                &ldquo;Iris&rdquo; and &ldquo;Slide,&rdquo; and drummer for Tanya Tucker
+                (2016–2022).
               </p>
             </div>
             <CredibilityIconRow />
@@ -250,20 +296,39 @@ export function AboutPage() {
             />
           </div>
           <div className={`${colClass} space-y-5`}>
-            <SectionHeading title="Mike Malinin" />
+            <SectionHeading
+              title="Mike Malinin"
+              subtitle="Professional Drummer · Recording Artist · Mentor · Educator"
+              subtitleClassName="text-gold"
+            />
             <Prose>
-              Mike Malinin is an American rock drummer best known for anchoring the rhythm section of
-              the alternative rock band Goo Goo Dolls during their most commercially successful era.
-              Joining the group in January 1995, Malinin’s precise, hard-hitting style provided the
-              backbone for the band’s transition from gritty punk-rockers to global, multi-platinum
-              superstars.
+              Mike Malinin is an American professional drummer, recording artist, mentor, and educator
+              best known as the drummer for the Goo Goo Dolls from 1995 to 2013. During his nearly two
+              decades with the band, Mike performed on some of the most successful alternative rock
+              recordings of the modern era and toured internationally in front of millions of fans.
             </Prose>
             <Prose>
-              His career is defined by driving the percussion on some of the most statistically dominant
-              records, iconic live spectacles, and prestigious award-winning projects in modern music
-              history — including a cover feature in{' '}
-              <em className="text-mist/85">Modern Drummer</em>, the world&apos;s most widely read drum
-              magazine.
+              Mike joined the Goo Goo Dolls during the recording of{' '}
+              <em className="text-mist/85">A Boy Named Goo</em> and became an integral part of the
+              band&apos;s signature sound during their most commercially successful years. He performed on
+              platinum-selling albums including{' '}
+              <em className="text-mist/85">Dizzy Up the Girl</em>,{' '}
+              <em className="text-mist/85">Gutterflower</em>,{' '}
+              <em className="text-mist/85">Let Love In</em>, and{' '}
+              <em className="text-mist/85">Something for the Rest of Us</em>, helping shape hit songs
+              such as &ldquo;Iris,&rdquo; &ldquo;Slide,&rdquo; &ldquo;Black Balloon,&rdquo;
+              &ldquo;Broadway,&rdquo; &ldquo;Here Is Gone,&rdquo; &ldquo;Better Days,&rdquo; and many
+              others.
+            </Prose>
+            <Prose>
+              Today, Mike shares the lessons he learned from decades of recording, touring, songwriting
+              collaboration, drum performance, and navigating the professional music industry. Through{' '}
+              <Link to="/club" className="text-gold underline decoration-gold/35 underline-offset-2">
+                Practical Drumming
+              </Link>
+              , students gain direct access to the experience of a drummer who has performed on
+              major-label releases, world tours, television appearances, and some of the most
+              recognizable rock songs of the last three decades.
             </Prose>
           </div>
         </Reveal>
@@ -272,6 +337,21 @@ export function AboutPage() {
       </SectionShell>
 
       <SectionShell>
+        <Reveal delay={0.04}>
+          <div className="grid gap-10 lg:grid-cols-2 lg:gap-12">
+            <div className="flex flex-col items-center text-center">
+              <SectionHeading eyebrow="Discography" title="Albums Mike Performed On" center />
+              <BulletList items={albumsPerformedOn} center />
+            </div>
+            <div className="flex flex-col items-center text-center">
+              <SectionHeading eyebrow="Practical Drumming" title="What Students Learn" center />
+              <BulletList items={studentTopics} center />
+            </div>
+          </div>
+        </Reveal>
+      </SectionShell>
+
+      <SectionShell alt>
         <Reveal delay={0.04} className={twoColClass}>
           <div className={colClass}>
             <SectionHeading title="Massive Shows and Arena Footprint" />
@@ -293,7 +373,7 @@ export function AboutPage() {
         <HighlightGrid items={arenaHighlights} />
       </SectionShell>
 
-      <SectionShell alt>
+      <SectionShell>
         <Reveal delay={0.04} className={twoColClass}>
           <div className={`${colClass} lg:order-1`}>
             <AboutFigure
