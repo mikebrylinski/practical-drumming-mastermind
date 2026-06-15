@@ -53,11 +53,7 @@ export function TestimonialsSection() {
         </h2>
       </Reveal>
       <div
-        className={`${pageWrapClass} mt-10 grid gap-5 lg:mt-12 ${
-          testimonials.length === 1
-            ? 'mx-auto max-w-2xl'
-            : 'md:grid-cols-2 lg:grid-cols-3'
-        }`}
+        className={`${pageWrapClass} mt-10 grid gap-5 md:grid-cols-2 lg:mt-12 lg:grid-cols-3`}
       >
         {testimonials.map((t, i) => (
           <Reveal key={t.name} delay={i * 0.05}>
