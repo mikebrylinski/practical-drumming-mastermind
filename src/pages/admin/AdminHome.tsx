@@ -1,23 +1,11 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { AppCard, AdminShell } from '../../components/app/AdminShell'
 import { useAuth } from '../../lib/auth/AuthProvider'
 import { supabase } from '../../lib/supabase/client'
-import { getLeads } from '../../lib/crm/getLeads'
-import { HEAT_THEME, STAGE_THEME, heatBand, type Stage } from '../../lib/crm/scoring'
-import type { CRMLead } from '../../lib/crm/types'
 import type { Booking } from '../../lib/supabase/types'
 
 type Counts = { members: number; emails: number }
-
-const EVENT_LABEL: Record<string, string> = {
-  page_visit: 'visited a page',
-  booking_click: 'clicked Book a Call',
-  form_submit: 'submitted a form',
-  booking_created: 'booked a call',
-  application_update: 'application updated',
-  contacted: 'was marked contacted',
-}
 
 const MOCK_BOOKINGS: Booking[] = [
   {
@@ -44,16 +32,6 @@ const MOCK_BOOKINGS: Booking[] = [
   },
 ]
 
-function relativeTime(iso: string) {
-  const diff = Date.now() - new Date(iso).getTime()
-  const mins = Math.round(diff / 60000)
-  if (mins < 1) return 'just now'
-  if (mins < 60) return `${mins}m ago`
-  const hrs = Math.round(mins / 60)
-  if (hrs < 24) return `${hrs}h ago`
-  return `${Math.round(hrs / 24)}d ago`
-}
-
 function Kpi({
   label,
   value,
@@ -78,11 +56,8 @@ function Kpi({
   )
 }
 
-const STAGE_ORDER: Stage[] = ['cold', 'warm', 'hot', 'converted']
-
 export function AdminHome() {
   const { useSeedData } = useAuth()
-  const [leads, setLeads] = useState<CRMLead[]>([])
   const [bookings, setBookings] = useState<Booking[]>([])
   const [counts, setCounts] = useState<Counts>({ members: 0, emails: 0 })
   const [loading, setLoading] = useState(true)
@@ -90,10 +65,6 @@ export function AdminHome() {
   useEffect(() => {
     let active = true
     async function load() {
-      const leadData = await getLeads({ useSeedData })
-      if (!active) return
-      setLeads(leadData)
-
       if (supabase && !useSeedData) {
         const [members, emails, recentBookings] = await Promise.all([
           supabase.from('profiles').select('id', { count: 'exact', head: true }),
@@ -108,10 +79,8 @@ export function AdminHome() {
         setCounts({ members: members.count ?? 0, emails: emails.count ?? 0 })
         setBookings((recentBookings.data as Booking[]) ?? [])
       } else {
-        setCounts({
-          members: leadData.filter((l) => !l.isAnonymous).length || 128,
-          emails: 96,
-        })
+        if (!active) return
+        setCounts({ members: 128, emails: 96 })
         setBookings(MOCK_BOOKINGS)
       }
       setLoading(false)
@@ -122,202 +91,40 @@ export function AdminHome() {
     }
   }, [useSeedData])
 
-  const metrics = useMemo(() => {
-    const stageCounts: Record<Stage, number> = { cold: 0, warm: 0, hot: 0, converted: 0 }
-    let eventCount = 0
-    for (const l of leads) {
-      stageCounts[l.stage] += 1
-      eventCount += l.events.length
-    }
-    const hot = leads.filter((l) => {
-      const b = heatBand(l.intentScore)
-      return b === 'hot' || b === 'urgent'
-    }).length
-    const total = leads.length || 1
-    const conversion = Math.round((stageCounts.converted / total) * 100)
-    const topLeads = [...leads].sort((a, b) => b.intentScore - a.intentScore).slice(0, 5)
-    const recentEvents = leads
-      .flatMap((l) =>
-        l.events.map((e) => ({
-          lead: l,
-          type: e.type,
-          at: e.created_at,
-          ip_address: e.ip_address ?? null,
-          path: e.path ?? null,
-        })),
-      )
-      .sort((a, b) => b.at.localeCompare(a.at))
-      .slice(0, 8)
-    return { stageCounts, hot, conversion, topLeads, recentEvents, eventCount }
-  }, [leads])
-
-  const maxStage = Math.max(1, ...STAGE_ORDER.map((s) => metrics.stageCounts[s]))
-
   return (
     <AdminShell
       eyebrow="Admin"
       title="Command center"
-      subtitle="Funnel intelligence at a glance."
+      subtitle="Your platform at a glance."
       wide
       actions={
         <Link
-          to="/admin/leads"
+          to="/admin/contacts"
           className="rounded-full bg-gold px-5 py-2.5 font-garamond text-sm tracking-[0.16em] text-void uppercase transition hover:bg-gold/90"
         >
-          Open CRM
+          Open Contacts
         </Link>
       }
     >
-
       {loading ? (
         <p className="font-garamond text-mist/40">Loading dashboard…</p>
       ) : (
         <div className="space-y-6">
           {/* KPI row */}
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <Kpi
-              label="Tracked leads"
-              value={leads.length}
-              sub={`${metrics.eventCount} lead events`}
-              to="/admin/leads"
-            />
-            <Kpi
-              label="Hot leads"
-              value={metrics.hot}
-              sub="score 51+"
-              accent="text-orange-300"
-              to="/admin/leads"
-            />
+            <Kpi label="Members" value={counts.members} sub="profiles" to="/admin/members" />
             <Kpi
               label="Bookings"
               value={bookings.length >= 5 ? '5+' : bookings.length}
               sub="recent"
               to="/admin/bookings"
             />
-            <Kpi
-              label="Conversion"
-              value={`${metrics.conversion}%`}
-              sub={`${metrics.stageCounts.converted} converted`}
-              accent="text-emerald-300"
-              to="/admin/leads"
-            />
+            <Kpi label="Emails logged" value={counts.emails} sub="transactional" to="/admin/bookings" />
+            <Kpi label="Calendar" value="View" sub="all cohorts & calls" to="/admin/calendar" />
           </div>
 
-          {/* Funnel + top leads */}
-          <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)]">
-            <AppCard>
-              <h3 className="font-garamond text-base text-mist/80">Pipeline by stage</h3>
-              <div className="mt-4 space-y-3">
-                {STAGE_ORDER.map((s) => {
-                  const count = metrics.stageCounts[s]
-                  const theme = STAGE_THEME[s]
-                  return (
-                    <div key={s}>
-                      <div className="flex items-center justify-between font-garamond text-sm">
-                        <span className="capitalize text-mist/70">{theme.label}</span>
-                        <span className="text-mist/50">{count}</span>
-                      </div>
-                      <div className="mt-1 h-2 overflow-hidden rounded-full bg-white/8">
-                        <div
-                          className={`h-full rounded-full ${
-                            s === 'converted'
-                              ? 'bg-emerald-400'
-                              : s === 'hot'
-                                ? 'bg-orange-400'
-                                : s === 'warm'
-                                  ? 'bg-blue-400'
-                                  : 'bg-mist/40'
-                          }`}
-                          style={{ width: `${(count / maxStage) * 100}%` }}
-                        />
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-              <p className="mt-5 font-garamond text-xs text-mist/40">
-                {counts.members} members · {counts.emails} emails logged
-              </p>
-            </AppCard>
-
-            <AppCard>
-              <div className="flex items-center justify-between">
-                <h3 className="font-garamond text-base text-mist/80">Top intent leads</h3>
-                <Link
-                  to="/admin/leads"
-                  className="font-garamond text-xs tracking-[0.14em] text-gold/80 uppercase hover:text-gold"
-                >
-                  View all
-                </Link>
-              </div>
-              <div className="mt-3 space-y-1">
-                {metrics.topLeads.length === 0 ? (
-                  <p className="font-garamond text-sm text-mist/40">No leads yet.</p>
-                ) : (
-                  metrics.topLeads.map((l) => {
-                    const theme = HEAT_THEME[heatBand(l.intentScore)]
-                    return (
-                      <Link
-                        key={l.userId}
-                        to="/admin/leads"
-                        className="flex items-center gap-3 rounded-lg px-2 py-2 transition hover:bg-white/[0.04]"
-                      >
-                        <span className={`h-8 w-1 shrink-0 rounded-full ${theme.bar}`} aria-hidden />
-                        <div className="min-w-0 flex-1">
-                          <p className="truncate font-garamond text-sm text-mist">{l.name}</p>
-                          <p className="truncate font-garamond text-xs text-mist/40">
-                            {l.email || 'anonymous'}
-                          </p>
-                        </div>
-                        <span className={`font-bebas text-xl ${theme.text}`}>{l.intentScore}</span>
-                        <span
-                          className={`rounded-full px-2 py-0.5 text-[0.6rem] uppercase tracking-[0.1em] ring-1 ${STAGE_THEME[l.stage].className}`}
-                        >
-                          {STAGE_THEME[l.stage].label}
-                        </span>
-                      </Link>
-                    )
-                  })
-                )}
-              </div>
-            </AppCard>
-          </div>
-
-          {/* Activity + bookings */}
+          {/* Recent bookings */}
           <div className="grid gap-6 lg:grid-cols-2">
-            <AppCard>
-              <h3 className="font-garamond text-base text-mist/80">Recent activity</h3>
-              <ul className="mt-3 space-y-3">
-                {metrics.recentEvents.length === 0 ? (
-                  <li className="font-garamond text-sm text-mist/40">No activity yet.</li>
-                ) : (
-                  metrics.recentEvents.map((e, i) => (
-                    <li key={i} className="flex items-start justify-between gap-3">
-                      <div className="min-w-0">
-                        <p className="font-garamond text-sm text-mist/70">
-                          <span className="text-mist">{e.lead.name}</span>{' '}
-                          {EVENT_LABEL[e.type] ?? e.type}
-                          {e.path ? (
-                            <span className="text-mist/45"> · {e.path}</span>
-                          ) : null}
-                        </p>
-                        {e.ip_address ? (
-                          <p className="mt-0.5 font-garamond text-xs text-mist/35">
-                            IP {e.ip_address}
-                          </p>
-                        ) : e.lead.isAnonymous ? (
-                          <p className="mt-0.5 font-garamond text-xs text-mist/30">IP unknown</p>
-                        ) : null}
-                      </div>
-                      <span className="shrink-0 font-garamond text-xs text-mist/35">
-                        {relativeTime(e.at)}
-                      </span>
-                    </li>
-                  ))
-                )}
-              </ul>
-            </AppCard>
-
             <AppCard>
               <div className="flex items-center justify-between">
                 <h3 className="font-garamond text-base text-mist/80">Recent bookings</h3>
@@ -344,6 +151,36 @@ export function AdminHome() {
                   ))
                 )}
               </ul>
+            </AppCard>
+
+            <AppCard>
+              <h3 className="font-garamond text-base text-mist/80">Quick links</h3>
+              <div className="mt-3 grid gap-2">
+                <Link
+                  to="/admin/contacts"
+                  className="rounded-lg px-3 py-2 font-garamond text-sm text-mist/70 transition hover:bg-white/[0.04] hover:text-mist"
+                >
+                  Contacts — leads & students
+                </Link>
+                <Link
+                  to="/admin/calendar"
+                  className="rounded-lg px-3 py-2 font-garamond text-sm text-mist/70 transition hover:bg-white/[0.04] hover:text-mist"
+                >
+                  Master calendar
+                </Link>
+                <Link
+                  to="/admin/cohorts"
+                  className="rounded-lg px-3 py-2 font-garamond text-sm text-mist/70 transition hover:bg-white/[0.04] hover:text-mist"
+                >
+                  Cohorts & sessions
+                </Link>
+                <Link
+                  to="/admin/members"
+                  className="rounded-lg px-3 py-2 font-garamond text-sm text-mist/70 transition hover:bg-white/[0.04] hover:text-mist"
+                >
+                  Members
+                </Link>
+              </div>
             </AppCard>
           </div>
         </div>

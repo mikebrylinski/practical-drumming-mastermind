@@ -21,7 +21,7 @@ export async function sendTemplatedEmail({ template, to, data = {}, subject }) {
 
   const finalSubject = subject || rendered.subject
   const apiKey = process.env.RESEND_API_KEY
-  const from = process.env.EMAIL_FROM || 'Practical Drumming <onboarding@resend.dev>'
+  const from = process.env.EMAIL_FROM || 'Practical Drumming <admin@pracdrum.com>'
 
   let status = 'sent'
   let providerId = null

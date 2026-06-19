@@ -1,0 +1,72 @@
+<!--
+  Practical Drumming — Supabase "Invite user" email template.
+
+  Where this is used:
+    Member invites are sent via supabase.auth.admin.inviteUserByEmail()
+    (see server/lib/routes/adminMembersCreate.js). Supabase's GoTrue auth
+    server renders this template — it does NOT go through the Resend pipeline
+    in server/lib/emailTemplates.js.
+
+  How to install:
+    Supabase Dashboard → Authentication → Emails → "Invite user"
+    → paste this HTML into the Message body. Subject suggestion:
+    "You've been invited to Practical Drumming".
+
+  Supabase template variables you can use here:
+    {{ .ConfirmationURL }}  - accept-invite link (used below)
+    {{ .SiteURL }}          - your configured site URL
+    {{ .Email }}            - the invited address
+-->
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet" />
+  </head>
+  <body style="margin:0;background:#000000;color:#ffffff;font-family:Georgia,'EB Garamond',serif;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#000000;padding:32px 16px;">
+      <tr><td align="center">
+        <table role="presentation" width="100%" style="max-width:560px;background:#000000;border:1px solid rgba(255,255,255,0.1);border-radius:14px;overflow:hidden;">
+          <tr><td style="padding:20px 32px;border-bottom:1px solid rgba(255,255,255,0.08);">
+            <table role="presentation" cellpadding="0" cellspacing="0">
+              <tr>
+                <td style="padding-right:12px;vertical-align:middle;">
+                  <a href="https://pracdrum.com" style="text-decoration:none;">
+                    <img src="https://www.pracdrum.com/logo-dd.png" alt="" width="36" height="36" style="display:block;width:36px;height:36px;border:0;" />
+                  </a>
+                </td>
+                <td style="vertical-align:middle;">
+                  <a href="https://pracdrum.com" style="font-family:'Bebas Neue',Arial,sans-serif;font-size:28px;line-height:1;letter-spacing:0.05em;color:#e8e4dc;text-decoration:none;">PRACTICAL DRUMMING</a>
+                </td>
+              </tr>
+            </table>
+          </td></tr>
+          <tr><td style="padding:32px;">
+            <h1 style="margin:0 0 16px;font-size:24px;color:#ffffff;">You've been invited</h1>
+            <p style="margin:0 0 14px;font-size:16px;line-height:1.6;color:rgba(255,255,255,0.88);">
+              You've been invited to create an account with Practical Drumming. Follow the link below to accept and set your password.
+            </p>
+            <a href="{{ .ConfirmationURL }}" style="display:inline-block;margin-top:20px;background:#c9a55c;color:#000000;text-decoration:none;padding:12px 26px;border-radius:999px;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;">Accept invitation</a>
+            <p style="margin:20px 0 0;font-size:13px;line-height:1.5;color:rgba(255,255,255,0.6);">
+              Or paste this link into your browser:<br>
+              <a href="{{ .ConfirmationURL }}" style="color:#c9a55c;word-break:break-all;">{{ .ConfirmationURL }}</a>
+            </p>
+          </td></tr>
+          <tr><td align="center" style="padding:28px 32px 24px;border-top:1px solid rgba(255,255,255,0.08);">
+            <a href="https://pracdrum.com" style="text-decoration:none;">
+              <img src="https://www.pracdrum.com/logo-dd.png" alt="Practical Drumming" width="88" height="88" style="display:block;width:88px;height:88px;margin:0 auto 16px;border:0;" />
+            </a>
+            <p style="margin:0 0 6px;font-size:12px;line-height:1.6;color:rgba(255,255,255,0.55);">
+              Practical Drumming — Mastermind Club
+            </p>
+            <p style="margin:0 0 6px;font-size:12px;line-height:1.6;color:rgba(255,255,255,0.4);">
+              You're receiving this email because you were invited to Practical Drumming. If you weren't expecting this, you can safely ignore it.
+            </p>
+            <a href="https://pracdrum.com" style="color:#c9a55c;text-decoration:none;font-size:12px;">pracdrum.com</a>
+          </td></tr>
+        </table>
+      </td></tr>
+    </table>
+  </body>
+</html>

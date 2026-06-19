@@ -5,7 +5,6 @@ import {
   getLiveKitCredentials,
   handleOptions,
   parseBody,
-  syncRecordingFromEgress,
   verifyAdminRequest,
 } from '../_lib.js'
 
@@ -74,9 +73,12 @@ export default async function handler(req, res) {
       .select('*')
       .single()
 
-    const synced = await syncRecordingFromEgress(admin, egressClient, processing || recording)
-
-    return res.status(200).json({ ok: true, recording: synced })
+    // Do NOT immediately re-sync from egress here: right after stopEgress the
+    // egress can still report EGRESS_ACTIVE, which would flip the status back to
+    // 'active' and force the operator to press Stop a second time. Return the
+    // 'processing' row and let the 5s status poll + the egress webhook advance it
+    // to 'complete'.
+    return res.status(200).json({ ok: true, recording: processing || recording })
   } catch (err) {
     console.error('[egress/stop]', err)
     return res.status(500).json({ ok: false, error: err?.message || 'Server error' })

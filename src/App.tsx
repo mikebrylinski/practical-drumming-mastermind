@@ -28,7 +28,8 @@ import { AdminMemberDetail } from './pages/admin/AdminMemberDetail'
 import { AdminCohorts } from './pages/admin/AdminCohorts'
 import { AdminAvailability } from './pages/admin/AdminAvailability'
 import { AdminBookings } from './pages/admin/AdminBookings'
-import { LeadsPage } from './pages/admin/LeadsPage'
+import { AdminContacts } from './pages/admin/AdminContacts'
+import { AdminCalendar } from './pages/admin/AdminCalendar'
 import { AdminVaultPage } from './pages/admin/AdminVaultPage'
 
 export default function App() {
@@ -90,7 +91,9 @@ export default function App() {
             <Route path="admin/applications" element={<Navigate to="/admin" replace />} />
             <Route path="admin/availability" element={<AdminAvailability />} />
             <Route path="admin/bookings" element={<AdminBookings />} />
-            <Route path="admin/leads" element={<LeadsPage />} />
+            <Route path="admin/contacts" element={<AdminContacts />} />
+            <Route path="admin/calendar" element={<AdminCalendar />} />
+            <Route path="admin/leads" element={<Navigate to="/admin/contacts" replace />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/" replace />} />

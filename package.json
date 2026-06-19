@@ -11,6 +11,7 @@
     "check:storage": "node --env-file-if-exists=.env scripts/check-storage.mjs",
     "check:resend": "node --env-file-if-exists=.env scripts/check-resend.mjs",
     "setup:platform": "node --env-file-if-exists=.env scripts/apply-platform-migration.mjs",
+    "setup:contacts": "node --env-file-if-exists=.env scripts/apply-contacts-migration.mjs",
     "seed:cohorts": "node --env-file-if-exists=.env scripts/seed-cohort-sessions.mjs",
     "build": "tsc -b && vite build",
     "lint": "eslint .",

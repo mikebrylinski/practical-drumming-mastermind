@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
 import type { NavigateFunction } from 'react-router-dom'
 import '@livekit/components-styles'
@@ -119,22 +119,12 @@ function InviteButton() {
   )
 }
 
-/** Right-side dock: a People (participant list) panel and a local chat panel. */
+/** Right-side dock: a People (participant list) panel. */
 function RoomDock() {
-  const [panel, setPanel] = useState<'none' | 'people' | 'chat'>('none')
+  const [panel, setPanel] = useState<'none' | 'people'>('none')
   const participants = useParticipants()
-  const [messages, setMessages] = useState<{ id: number; text: string }[]>([])
-  const [draft, setDraft] = useState('')
 
-  function send(e: FormEvent) {
-    e.preventDefault()
-    const text = draft.trim()
-    if (!text) return
-    setMessages((m) => [...m, { id: Date.now(), text }])
-    setDraft('')
-  }
-
-  function toggle(next: 'people' | 'chat') {
+  function toggle(next: 'people') {
     setPanel((cur) => (cur === next ? 'none' : next))
   }
 
@@ -142,9 +132,6 @@ function RoomDock() {
     <div className="flex items-center gap-2">
       <button type="button" onClick={() => toggle('people')} className={dockButtonClass}>
         People · {participants.length}
-      </button>
-      <button type="button" onClick={() => toggle('chat')} className={dockButtonClass}>
-        {panel === 'chat' ? 'Hide chat' : 'Chat'}
       </button>
 
       {panel === 'people' ? (
@@ -177,42 +164,6 @@ function RoomDock() {
               </li>
             ))}
           </ul>
-        </div>
-      ) : null}
-
-      {panel === 'chat' ? (
-        <div className={dockPanelClass}>
-          <div className="hidden border-b border-white/10 px-4 py-2.5 font-garamond text-xs tracking-[0.16em] text-mist/60 uppercase sm:block">
-            Room chat
-          </div>
-          <div className="flex-1 space-y-2 overflow-y-auto p-3">
-            {messages.length === 0 ? (
-              <p className="font-garamond text-sm text-mist/35">No messages yet.</p>
-            ) : (
-              messages.map((m) => (
-                <p
-                  key={m.id}
-                  className="rounded-lg bg-white/5 px-3 py-1.5 font-garamond text-sm text-mist/80"
-                >
-                  {m.text}
-                </p>
-              ))
-            )}
-          </div>
-          <form onSubmit={send} className="flex gap-2 border-t border-white/10 p-2">
-            <input
-              value={draft}
-              onChange={(e) => setDraft(e.target.value)}
-              placeholder="Message…"
-              className="flex-1 rounded-lg border border-white/12 bg-void/60 px-3 py-1.5 font-garamond text-sm text-mist outline-none focus:border-gold/40"
-            />
-            <button
-              type="submit"
-              className="rounded-lg bg-gold px-3 py-1.5 font-garamond text-xs uppercase text-void"
-            >
-              Send
-            </button>
-          </form>
         </div>
       ) : null}
     </div>

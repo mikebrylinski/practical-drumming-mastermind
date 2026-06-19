@@ -3,12 +3,12 @@ import type { LeadEventType } from '../supabase/types'
 const VISITOR_KEY = 'pd_visitor_id'
 const VISIT_COUNT_KEY = 'pd_visit_count'
 
-// Current authenticated user id, kept in sync by AuthProvider so anonymous and
-// known leads can be associated server-side.
-let currentUserId: string | null = null
-
-export function setLeadUserId(id: string | null) {
-  currentUserId = id
+/**
+ * Kept for API compatibility with AuthProvider. Lead tracking is disabled, so
+ * the user id is no longer retained or sent server-side.
+ */
+export function setLeadUserId(_id: string | null) {
+  void _id
 }
 
 export function getVisitorId(): string {
@@ -37,26 +37,15 @@ export function incrementVisitCount(): number {
   }
 }
 
-/** Fire-and-forget lead event. Never throws; safe to call from any handler. */
+/**
+ * Lead tracking is currently disabled — CRM ingestion is turned off, so this is
+ * a no-op and no longer POSTs to /api/leads/event. Re-enable by restoring the
+ * fetch below if lead tracking is brought back.
+ */
 export function trackLeadEvent(
-  type: LeadEventType | string,
-  metadata: Record<string, unknown> = {},
+  _type: LeadEventType | string,
+  _metadata: Record<string, unknown> = {},
 ) {
-  try {
-    const body = JSON.stringify({
-      type,
-      path: typeof window !== 'undefined' ? window.location.pathname : null,
-      metadata,
-      visitorId: getVisitorId(),
-      userId: currentUserId,
-    })
-    void fetch('/api/leads/event', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body,
-      keepalive: true,
-    }).catch(() => {})
-  } catch {
-    /* no-op */
-  }
+  void _type
+  void _metadata
 }

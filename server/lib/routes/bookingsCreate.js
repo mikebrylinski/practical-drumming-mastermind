@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto'
 import { getSupabaseAdmin } from '../supabaseAdmin.js'
 import { sendBookingConfirmationEmails } from '../bookingEmail.js'
+import { recordContact } from '../contacts.js'
 
 export default async function handler(req, res) {
   if (req.method === 'OPTIONS') {
@@ -96,6 +97,12 @@ export default async function handler(req, res) {
       metadata: { bookingId: booking.id, email },
       score_delta: 60,
     })
+
+    // Mirror into the contacts directory (de-duped by email).
+    await recordContact(
+      { name, email, type: 'Prospect', notes: 'Booked a discovery call' },
+      admin,
+    )
 
     const emailResult = await sendBookingConfirmationEmails({
       name: name || null,

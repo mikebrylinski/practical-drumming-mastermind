@@ -1,6 +1,8 @@
 import { getSupabaseAdmin } from './supabaseAdmin.js'
 import { clientIpFromRequest } from './clientIp.js'
 import { sendTemplatedEmail } from './sendEmail.js'
+import { resolveAdminEmails } from './adminEmails.js'
+import { recordContact } from './contacts.js'
 
 export function validateContactBody(body) {
   const name = String(body?.name ?? '').trim()
@@ -36,14 +38,20 @@ export async function saveContactSubmission(body, req) {
     throw new Error('Failed to save contact submission')
   }
 
-  const adminEmail = process.env.ADMIN_EMAIL || process.env.EMAIL_FROM?.match(/<([^>]+)>/)?.[1]
-  if (adminEmail) {
-    await sendTemplatedEmail({
-      template: 'contact_admin_notification',
-      to: adminEmail,
-      data: { name, email, message, ip_address },
-    })
-  }
+  // Mirror into the contacts directory (de-duped by email).
+  await recordContact({ name, email, type: 'Lead', notes: message }, admin)
+
+  // Notify every admin of the new contact submission.
+  const adminEmails = await resolveAdminEmails()
+  await Promise.all(
+    adminEmails.map((to) =>
+      sendTemplatedEmail({
+        template: 'contact_admin_notification',
+        to,
+        data: { name, email, message, ip_address },
+      }),
+    ),
+  )
 
   return { ...data, name, email, message, ip_address }
 }

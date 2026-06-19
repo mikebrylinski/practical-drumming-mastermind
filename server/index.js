@@ -15,6 +15,7 @@ import livekitEgressWebhookHandler from './lib/livekit/egress/webhook.js'
 import recordingsListHandler from './lib/routes/recordingsList.js'
 import crmActionHandler from '../api/crm/action.js'
 import adminMembersCreateHandler from './lib/routes/adminMembersCreate.js'
+import adminContactsHandler from './lib/routes/adminContacts.js'
 import adminBookingsCreateHandler from './lib/routes/adminBookingsCreate.js'
 import adminBookingsUpdateHandler from './lib/routes/adminBookingsUpdate.js'
 import recordingsUpdateHandler from './lib/routes/recordingsUpdate.js'
@@ -57,6 +58,9 @@ app.get('/api/recordings/list', recordingsListHandler)
 app.patch('/api/recordings/update', recordingsUpdateHandler)
 app.post('/api/crm/action', crmActionHandler)
 app.post('/api/admin/members/create', adminMembersCreateHandler)
+app.get('/api/admin/contacts', adminContactsHandler)
+app.post('/api/admin/contacts', adminContactsHandler)
+app.delete('/api/admin/contacts', adminContactsHandler)
 app.post('/api/admin/bookings/create', adminBookingsCreateHandler)
 app.patch('/api/admin/bookings/update', adminBookingsUpdateHandler)
 app.get('/api/community/posts', communityPostsHandler)

@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto'
 import { handleOptions, verifyAdminRequest } from '../livekit/_lib.js'
 import { getSupabaseAdmin } from '../supabaseAdmin.js'
 import { sendBookingConfirmationEmails } from '../bookingEmail.js'
+import { recordContact } from '../contacts.js'
 
 export default async function handler(req, res) {
   if (handleOptions(req, res)) return
@@ -68,6 +69,12 @@ export default async function handler(req, res) {
       console.error('[admin/bookings/create]', error)
       return res.status(500).json({ ok: false, error: 'Could not create booking' })
     }
+
+    // Mirror into the contacts directory (de-duped by email).
+    await recordContact(
+      { name, email, type: 'Prospect', notes: 'Booked a discovery call' },
+      admin,
+    )
 
     const emailResult = await sendBookingConfirmationEmails({
       name,

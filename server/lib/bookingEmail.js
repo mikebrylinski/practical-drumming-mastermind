@@ -1,4 +1,5 @@
 import { sendTemplatedEmail } from './sendEmail.js'
+import { resolveAdminEmails } from './adminEmails.js'
 import { getPublicBaseUrl, publicPath, publicRoomUrl } from './publicUrl.js'
 
 export function formatBookingDateLabel(iso) {
@@ -15,14 +16,6 @@ export function formatBookingDateLabel(iso) {
   } catch {
     return String(iso)
   }
-}
-
-function resolveAdminEmail() {
-  const direct = process.env.ADMIN_EMAIL?.trim()
-  if (direct) return direct
-  const from = process.env.EMAIL_FROM || ''
-  const match = from.match(/<([^>]+)>/)
-  return match?.[1]?.trim() || null
 }
 
 /** Sends guest confirmation (+ optional admin alert) with the LiveKit room link. */
@@ -49,22 +42,21 @@ export async function sendBookingConfirmationEmails({ name, email, startsAt, roo
     },
   })
 
-  const adminEmail = resolveAdminEmail()
-  let admin = null
-  if (adminEmail) {
-    admin = await sendTemplatedEmail({
-      template: 'booking_admin_notification',
-      to: adminEmail,
-      data: {
-        name: name?.trim() || 'Guest',
-        email,
-        dateLabel,
-        joinUrl,
-        adminBookingsUrl: publicPath('/admin/bookings'),
-        hasBaseUrl: Boolean(base),
-      },
-    })
+  const adminEmails = await resolveAdminEmails()
+  const adminData = {
+    name: name?.trim() || 'Guest',
+    email,
+    dateLabel,
+    joinUrl,
+    adminBookingsUrl: publicPath('/admin/bookings'),
+    hasBaseUrl: Boolean(base),
   }
+  const adminResults = await Promise.all(
+    adminEmails.map((to) =>
+      sendTemplatedEmail({ template: 'booking_admin_notification', to, data: adminData }),
+    ),
+  )
 
-  return { guest, admin }
+  // Keep `admin` for backward compatibility (first recipient's result).
+  return { guest, admin: adminResults[0] ?? null, admins: adminResults }
 }

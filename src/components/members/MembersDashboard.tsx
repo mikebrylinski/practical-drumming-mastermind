@@ -4,7 +4,9 @@ import { MembersLayout } from './MembersLayout'
 import { MembersCard } from './MembersCard'
 import { PlayIcon } from './MembersIcons'
 import { useAuth } from '../../lib/auth/AuthProvider'
-import { buildDemoCohorts, buildDemoSessions } from '../../lib/demo/cohorts'
+import { supabase } from '../../lib/supabase/client'
+import { buildDemoCohorts } from '../../lib/demo/cohorts'
+import type { Cohort } from '../../lib/supabase/types'
 import { cohortRoomName } from '../../lib/slug'
 import { formatDateTime } from '../../lib/datetime'
 import { vaultVideos } from './mockData'
@@ -15,111 +17,77 @@ const goldBtn =
 
 const LIVE_WINDOW_MS = 60 * 60 * 1000
 
-function CountdownUnit({ value, label }: { value: number; label: string }) {
-  return (
-    <div className="min-w-0 flex-1 text-center">
-      <span className="font-bebas text-2xl leading-none text-mist sm:text-3xl md:text-4xl">
-        {String(Math.max(0, value)).padStart(2, '0')}
-      </span>
-      <span className="mt-0.5 block font-garamond text-xs tracking-wider text-mist/40 uppercase sm:mt-1">
-        {label}
-      </span>
-    </div>
-  )
-}
-
-function diffParts(targetMs: number) {
-  const total = Math.max(0, targetMs - Date.now())
-  const days = Math.floor(total / 864e5)
-  const hours = Math.floor((total % 864e5) / 36e5)
-  const minutes = Math.floor((total % 36e5) / 6e4)
-  const seconds = Math.floor((total % 6e4) / 1000)
-  return { days, hours, minutes, seconds }
-}
-
 export function MembersDashboard() {
-  const { profile } = useAuth()
+  const { profile, useSeedData } = useAuth()
   const firstName = profile?.full_name?.split(/\s+/)[0] || 'Member'
 
-  const { cohort, session, room, liveNow, startMs } = useMemo(() => {
-    const cohorts = buildDemoCohorts()
-    const sessions = buildDemoSessions()
-    const now = Date.now()
-    const upcoming = sessions
-      .filter((s) => s.scheduled_at && new Date(s.scheduled_at).getTime() > now - LIVE_WINDOW_MS)
-      .sort((a, b) => (a.scheduled_at ?? '').localeCompare(b.scheduled_at ?? ''))
-    const next = upcoming[0] ?? null
-    const c = next ? cohorts.find((x) => x.id === next.cohort_id) ?? cohorts[0] : cohorts[0]
-    const start = next?.scheduled_at ? new Date(next.scheduled_at).getTime() : now + 3 * 864e5
-    return {
-      cohort: c,
-      session: next,
-      room: next?.livekit_room_name || (c ? cohortRoomName(c) : 'cohort-spring-mastermind'),
-      liveNow: next ? Math.abs(start - now) <= LIVE_WINDOW_MS : false,
-      startMs: start,
-    }
-  }, [])
-
-  const [countdown, setCountdown] = useState(() => diffParts(startMs))
+  // Real cohorts from Supabase when configured; demo cohorts otherwise.
+  const [cohorts, setCohorts] = useState<Cohort[]>(() => buildDemoCohorts())
 
   useEffect(() => {
-    const id = window.setInterval(() => setCountdown(diffParts(startMs)), 1000)
-    return () => window.clearInterval(id)
-  }, [startMs])
+    let active = true
+    async function load() {
+      if (!supabase || useSeedData) return
+      const { data } = await supabase
+        .from('cohorts')
+        .select('*')
+        .order('starts_at', { ascending: true })
+      if (active && data && data.length) setCohorts(data as Cohort[])
+    }
+    void load()
+    return () => {
+      active = false
+    }
+  }, [useSeedData])
+
+  const { cohort, room, liveNow } = useMemo(() => {
+    const now = Date.now()
+    const sorted = [...cohorts]
+      .filter((c) => c.starts_at)
+      .sort((a, b) => (a.starts_at ?? '').localeCompare(b.starts_at ?? ''))
+    // The soonest cohort whose start is still ahead (within the live window),
+    // falling back to the most recent one so the card always has content.
+    const next =
+      sorted.find((c) => new Date(c.starts_at as string).getTime() > now - LIVE_WINDOW_MS) ??
+      sorted[sorted.length - 1] ??
+      cohorts[0] ??
+      null
+    const start = next?.starts_at ? new Date(next.starts_at).getTime() : now + 3 * 864e5
+    return {
+      cohort: next,
+      room: next?.livekit_room_name || (next ? cohortRoomName(next) : 'cohort-spring-mastermind'),
+      liveNow: next ? Math.abs(start - now) <= LIVE_WINDOW_MS : false,
+    }
+  }, [cohorts])
 
   const featuredVault = vaultVideos.slice(0, 4)
 
   return (
     <MembersLayout activeId="dashboard">
-      <div className="grid min-w-0 grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,15rem)] lg:gap-5 xl:grid-cols-[minmax(0,1fr)_280px]">
-        <section className="rounded-xl border border-white/10 bg-charcoal/35 px-5 py-8 sm:px-8 sm:py-10 md:px-10 md:py-12">
-          <p className="font-garamond text-sm tracking-[0.2em] text-gold uppercase sm:text-base">
-            Welcome back, {firstName}
-          </p>
-          <h1 className="mt-2 font-bebas text-[clamp(1.75rem,6vw,3rem)] leading-tight tracking-wide text-mist">
-            Keep pushing. Keep growing.
-          </h1>
-          <p className="mt-3 max-w-xl font-garamond text-base leading-relaxed text-mist/65 sm:mt-4 sm:text-lg">
-            You&apos;re part of a community built for serious drummers. Show up, participate, and
-            let the work compound.
-          </p>
-          <div className="mt-5 flex flex-col gap-3 sm:mt-6 sm:flex-row">
-            <Link to="/cohorts" className={`${goldBtn} w-full sm:w-auto`}>
-              <PlayIcon />
-              Go to your cohorts
-            </Link>
-            <Link
-              to="/community"
-              className="flex min-h-10 items-center justify-center rounded-full border border-gold/35 px-5 font-garamond text-xs tracking-[0.14em] text-gold uppercase transition hover:bg-gold/10 sm:text-sm"
-            >
-              Community forum
-            </Link>
-          </div>
-        </section>
-
-        <MembersCard title="Next Live Session" className="flex flex-col justify-center">
-          <div className="flex items-center justify-between gap-0.5 sm:gap-1">
-            <CountdownUnit value={countdown.days} label="Days" />
-            <span className="shrink-0 font-bebas text-lg text-mist/20 sm:text-2xl">:</span>
-            <CountdownUnit value={countdown.hours} label="Hrs" />
-            <span className="shrink-0 font-bebas text-lg text-mist/20 sm:text-2xl">:</span>
-            <CountdownUnit value={countdown.minutes} label="Mins" />
-            <span className="shrink-0 font-bebas text-lg text-mist/20 sm:text-2xl">:</span>
-            <CountdownUnit value={countdown.seconds} label="Secs" />
-          </div>
-          <p className="mt-3 text-center font-garamond text-sm text-mist/55 sm:mt-4 sm:text-base">
-            {session?.scheduled_at
-              ? formatDateTime(session.scheduled_at, {
-                  weekday: 'long',
-                  month: 'short',
-                  day: 'numeric',
-                  hour: 'numeric',
-                  minute: '2-digit',
-                })
-              : 'TBA'}
-          </p>
-        </MembersCard>
-      </div>
+      <section className="rounded-xl border border-white/10 bg-charcoal/35 px-5 py-8 sm:px-8 sm:py-10 md:px-10 md:py-12">
+        <p className="font-garamond text-sm tracking-[0.2em] text-gold uppercase sm:text-base">
+          Welcome back, {firstName}
+        </p>
+        <h1 className="mt-2 font-bebas text-[clamp(1.75rem,6vw,3rem)] leading-tight tracking-wide text-mist">
+          Keep pushing. Keep growing.
+        </h1>
+        <p className="mt-3 max-w-xl font-garamond text-base leading-relaxed text-mist/65 sm:mt-4 sm:text-lg">
+          You&apos;re part of a community built for serious drummers. Show up, participate, and
+          let the work compound.
+        </p>
+        <div className="mt-5 flex flex-col gap-3 sm:mt-6 sm:flex-row">
+          <Link to="/cohorts" className={`${goldBtn} w-full sm:w-auto`}>
+            <PlayIcon />
+            Go to your cohorts
+          </Link>
+          <Link
+            to="/community"
+            className="flex min-h-10 items-center justify-center rounded-full border border-gold/35 px-5 font-garamond text-xs tracking-[0.14em] text-gold uppercase transition hover:bg-gold/10 sm:text-sm"
+          >
+            Community forum
+          </Link>
+        </div>
+      </section>
 
       <div className="grid min-w-0 grid-cols-1 gap-4 sm:gap-5 lg:grid-cols-2">
         <MembersCard className="min-w-0">
@@ -144,11 +112,11 @@ export function MembersDashboard() {
                 {cohort?.name ?? 'Spring Mastermind'}
               </h3>
               <p className="font-garamond text-base leading-relaxed text-mist/55">
-                {session?.title ?? 'Weekly live coaching with Mike'}
+                {cohort?.description ?? 'Weekly live coaching with Mike'}
               </p>
               <p className="pt-1 font-garamond text-sm text-mist/45">
-                {session?.scheduled_at
-                  ? formatDateTime(session.scheduled_at, {
+                {cohort?.starts_at
+                  ? formatDateTime(cohort.starts_at, {
                       month: 'long',
                       day: 'numeric',
                       hour: 'numeric',

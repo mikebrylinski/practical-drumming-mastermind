@@ -3,3 +3,5 @@ Allow: /
 Disallow: /admin
 Disallow: /dashboard
 Disallow: /room/
+
+Sitemap: https://www.pracdrum.com/sitemap.xml
