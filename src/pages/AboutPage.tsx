@@ -574,8 +574,8 @@ export function AboutPage() {
                 <SectionHeading
                   title={
                     <>
-                      <span className="text-mist">Learn From a </span>
-                      <span className="text-gold">Diamond-Certified Drummer</span>
+                      <span className="text-mist">Learn Directly From </span>
+                      <span className="text-gold">Mike Malinin</span>
                     </>
                   }
                 />

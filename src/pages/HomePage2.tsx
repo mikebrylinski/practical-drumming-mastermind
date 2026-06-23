@@ -18,14 +18,14 @@ const memberFeatures: { title: string; body: ReactNode }[] = [
     body: 'Join interactive group calls featuring deep dives into technique, touring, recording, mindset, creativity, career growth, and professional insight.',
   },
   {
-    title: 'Direct Access To a World-Class Drummer',
+    title: 'Direct Access To Mike Malinin',
     body: (
       <>
-        Learn directly from elite touring and recording drummer{' '}
+        Learn directly from an{' '}
         <Link to="/about" className={inlineLinkClass}>
-          Mike Malinin
-        </Link>
-        .
+          elite touring and recording drummer
+        </Link>{' '}
+        with decades of real-world experience.
       </>
     ),
   },
