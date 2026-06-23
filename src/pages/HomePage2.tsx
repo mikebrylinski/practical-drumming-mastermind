@@ -18,7 +18,7 @@ const memberFeatures: { title: string; body: ReactNode }[] = [
     body: 'Join interactive group calls featuring deep dives into technique, touring, recording, mindset, creativity, career growth, and professional insight.',
   },
   {
-    title: 'Direct Access To a Legendary Player',
+    title: 'Direct Access To a World-Class Drummer',
     body: (
       <>
         Learn directly from elite touring and recording drummer{' '}
@@ -160,7 +160,7 @@ export function HomePage2() {
 
               <p className="mx-auto mt-5 max-w-2xl font-garamond text-lg leading-snug text-mist/75 md:text-xl lg:mx-0">
                 Practical Drumming is a private mastermind club where aspiring and professional drummers
-                connect directly with legendary drummer Mike Malinin for live mentorship, feedback, and
+                connect directly with world-class drummer Mike Malinin for live mentorship, feedback, and
                 unfiltered industry insight.
               </p>
 

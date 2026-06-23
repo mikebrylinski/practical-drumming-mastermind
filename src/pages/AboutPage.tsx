@@ -575,7 +575,7 @@ export function AboutPage() {
                   title={
                     <>
                       <span className="text-mist">Learn From a </span>
-                      <span className="text-gold">Diamond-Certified Legend</span>
+                      <span className="text-gold">Diamond-Certified Drummer</span>
                     </>
                   }
                 />
