@@ -18,14 +18,14 @@ const memberFeatures: { title: string; body: ReactNode }[] = [
     body: 'Join interactive group calls featuring deep dives into technique, touring, recording, mindset, creativity, career growth, and professional insight.',
   },
   {
-    title: 'Direct Access To Legendary Players',
+    title: 'Direct Access To a Legendary Player',
     body: (
       <>
-        Learn directly from elite touring and recording drummers including{' '}
+        Learn directly from elite touring and recording drummer{' '}
         <Link to="/about" className={inlineLinkClass}>
           Mike Malinin
-        </Link>{' '}
-        and other respected professionals.
+        </Link>
+        .
       </>
     ),
   },
@@ -43,7 +43,7 @@ const memberFeatures: { title: string; body: ReactNode }[] = [
   },
   {
     title: 'Career & Industry Insight',
-    body: 'Learn the realities of touring, recording, networking, auditions, preparation, professionalism, and long-term growth from musicians who’ve lived it.',
+    body: 'Learn the realities of touring, recording, networking, auditions, preparation, professionalism, and long-term growth from a musician who’s lived it.',
   },
 ]
 
@@ -160,8 +160,8 @@ export function HomePage2() {
 
               <p className="mx-auto mt-5 max-w-2xl font-garamond text-lg leading-snug text-mist/75 md:text-xl lg:mx-0">
                 Practical Drumming is a private mastermind club where aspiring and professional drummers
-                connect directly with legendary players for live mentorship, feedback, and unfiltered industry
-                insight.
+                connect directly with legendary drummer Mike Malinin for live mentorship, feedback, and
+                unfiltered industry insight.
               </p>
 
               <div className="mx-auto mt-8 max-w-xl space-y-4 text-center sm:max-w-2xl lg:mx-0 lg:text-left">
@@ -256,7 +256,7 @@ export function HomePage2() {
             </Prose>
             <Prose>
               Weekly live sessions create an environment where players can ask questions, share challenges,
-              receive feedback, and learn directly from professionals who&apos;ve spent decades performing,
+              receive feedback, and learn directly from a professional who&apos;s spent decades performing,
               recording, teaching, and navigating the music industry.
             </Prose>
             <p className="font-garamond text-base italic text-mist/80 md:text-lg">
@@ -388,8 +388,8 @@ export function HomePage2() {
               </p>
               <Prose>
                 Inside Practical Drumming, members share ideas, ask questions, support each other, and gain
-                insight from players with real-world experience across touring, recording, live performance,
-                and professional music careers.
+                insight from Mike&apos;s real-world experience across touring, recording, live performance,
+                and a professional music career.
               </Prose>
               <p className="font-garamond text-base italic tracking-wide text-mist md:text-lg">
                 {['Collaborative.', 'Focused.', 'Honest.'].map((word, i) => (

@@ -11,7 +11,7 @@ import { pageWrapClass, SectionShell } from '../components/SectionShell'
 const clubBenefits: { title: string; body: ReactNode }[] = [
   {
     title: 'Weekly Live Mastermind Calls',
-    body: 'Structured group sessions led by Mike (and guest pros) where members bring real questions—gig prep, technique roadblocks, career decisions, recording mindset, and band dynamics.',
+    body: 'Structured group sessions led by Mike where members bring real questions—gig prep, technique roadblocks, career decisions, recording mindset, and band dynamics.',
   },
   {
     title: 'Video Feedback Channel',
@@ -19,15 +19,15 @@ const clubBenefits: { title: string; body: ReactNode }[] = [
   },
   {
     title: 'Session Vault & Replays',
-    body: 'Every call is recorded and archived so you can revisit breakdowns, guest interviews, and member discussions on your own schedule.',
+    body: 'Every call is recorded and archived so you can revisit breakdowns and member discussions on your own schedule.',
   },
   {
     title: 'Private Member Community',
     body: 'A closed space for committed drummers only—no algorithm noise, no posturing. Share wins, ask for help, and stay accountable between live sessions.',
   },
   {
-    title: 'Guest Pros & Deep Dives',
-    body: 'Periodic sessions with touring and session players who share how they actually prepare, tour, record, and survive in the industry.',
+    title: 'Industry Deep Dives',
+    body: 'Periodic deep-dive sessions where Mike breaks down how he actually prepares, tours, records, and has built a lasting career in the industry.',
   },
   {
     title: 'Ongoing Mentorship, Not a Course',
@@ -217,8 +217,8 @@ export function ClubPage() {
               </Prose>
               <Prose>
                 The Practical Drumming Mastermind Club applies that same idea to drumming: a limited membership,
-                live weekly calls, honest feedback, and access to professionals who&apos;ve toured, recorded,
-                and built real careers—not just taught online.
+                live weekly calls, honest feedback, and direct access to Mike—who&apos;s toured, recorded,
+                and built a real career—not just taught online.
               </Prose>
               <p className="font-bebas text-xl tracking-wide text-gold md:text-2xl">
                 It&apos;s not a video library.
@@ -253,8 +253,8 @@ export function ClubPage() {
               <div className="mt-6 space-y-5">
                 <Prose>
                   <strong className="font-medium text-mist/85">Live call.</strong> Members join a weekly
-                  mastermind session—camera optional, questions encouraged. Mike leads deep dives, answers
-                  member submissions, and hosts guest pros when scheduled.
+                  mastermind session—camera optional, questions encouraged. Mike leads deep dives and answers
+                  member submissions.
                 </Prose>
                 <Prose>
                   <strong className="font-medium text-mist/85">Between sessions.</strong> Use the private
@@ -339,7 +339,7 @@ export function ClubPage() {
               <BulletList items={whoItsFor} />
               <Prose className="mt-6">
                 If you&apos;re looking for a cheap library of random lessons, this isn&apos;t it. If you want a
-                consistent place to improve with direct access to pros and peers who care about your
+                consistent place to improve with direct access to Mike and peers who care about your
                 progress—that&apos;s the club.
               </Prose>
             </Reveal>
@@ -367,9 +367,9 @@ export function ClubPage() {
                 to give feedback that holds up on stage and in the booth.
               </Prose>
               <Prose>
-                Guest drummers join when the group needs a specific perspective (touring, sessions, genres,
-                business). The club is built around Mike&apos;s network and standards—not a rotating cast of
-                anonymous instructors.
+                Whatever the group needs—touring, sessions, genres, business—Mike brings the perspective from
+                having lived it. The club is built around Mike&apos;s experience and standards—not a rotating
+                cast of anonymous instructors.
               </Prose>
               <p className="pt-1">
                 <Link
