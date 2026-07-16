@@ -33,6 +33,7 @@ import { AdminBookings } from './pages/admin/AdminBookings'
 import { AdminContacts } from './pages/admin/AdminContacts'
 import { AdminCalendar } from './pages/admin/AdminCalendar'
 import { AdminVaultPage } from './pages/admin/AdminVaultPage'
+import { AdminAnalytics } from './pages/admin/AdminAnalytics'
 
 export default function App() {
   return (
@@ -93,6 +94,7 @@ export default function App() {
           {/* Admin (admin role required) */}
           <Route element={<RequireAdmin />}>
             <Route path="admin" element={<AdminHome />} />
+            <Route path="admin/analytics" element={<AdminAnalytics />} />
             <Route path="admin/members" element={<AdminMembers />} />
             <Route path="admin/member/:id" element={<AdminMemberDetail />} />
             <Route path="admin/cohorts" element={<AdminCohorts />} />

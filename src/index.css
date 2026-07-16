@@ -243,3 +243,57 @@
     animation: none;
   }
 }
+
+/* Footer — Resend-style dotted grid + soft drifting spotlight */
+@keyframes footer-dot-drift {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 22px 22px;
+  }
+}
+
+@keyframes footer-spotlight {
+  0%,
+  100% {
+    transform: translate(-18%, -12%);
+    opacity: 0.45;
+  }
+  50% {
+    transform: translate(22%, 18%);
+    opacity: 0.8;
+  }
+}
+
+.footer-dot-grid {
+  background-image: radial-gradient(
+    rgba(232, 228, 220, 0.16) 1px,
+    transparent 1px
+  );
+  background-size: 22px 22px;
+  animation: footer-dot-drift 36s linear infinite;
+  will-change: background-position;
+  mask-image: radial-gradient(
+    ellipse 85% 75% at 50% 40%,
+    #000 20%,
+    transparent 75%
+  );
+}
+
+.footer-dot-spotlight {
+  background: radial-gradient(
+    ellipse 55% 45% at 50% 45%,
+    rgba(201, 165, 92, 0.12),
+    transparent 70%
+  );
+  animation: footer-spotlight 18s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .footer-dot-grid,
+  .footer-dot-spotlight {
+    animation: none;
+  }
+}

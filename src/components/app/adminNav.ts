@@ -1,5 +1,6 @@
 export const adminNavLinks = [
   { to: '/admin', label: 'Overview', end: true, icon: 'grid' as const },
+  { to: '/admin/analytics', label: 'Analytics', icon: 'feed' as const },
   { to: '/admin/contacts', label: 'Contacts', icon: 'directory' as const },
   { to: '/admin/calendar', label: 'Master calendar', icon: 'calendar' as const },
   { to: '/admin/availability', label: 'Availability', icon: 'calendar' as const },

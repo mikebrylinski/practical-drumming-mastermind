@@ -18,6 +18,7 @@ import adminMembersCreateHandler from './lib/routes/adminMembersCreate.js'
 import adminContactsHandler from './lib/routes/adminContacts.js'
 import adminBookingsCreateHandler from './lib/routes/adminBookingsCreate.js'
 import adminBookingsUpdateHandler from './lib/routes/adminBookingsUpdate.js'
+import adminAnalyticsHandler from './lib/routes/adminAnalytics.js'
 import recordingsUpdateHandler from './lib/routes/recordingsUpdate.js'
 import communityPostsHandler from './lib/routes/communityPosts.js'
 import communityRepliesHandler from './lib/routes/communityReplies.js'
@@ -63,6 +64,7 @@ app.post('/api/admin/contacts', adminContactsHandler)
 app.delete('/api/admin/contacts', adminContactsHandler)
 app.post('/api/admin/bookings/create', adminBookingsCreateHandler)
 app.patch('/api/admin/bookings/update', adminBookingsUpdateHandler)
+app.get('/api/admin/analytics', adminAnalyticsHandler)
 app.get('/api/community/posts', communityPostsHandler)
 app.post('/api/community/posts', communityPostsHandler)
 app.delete('/api/community/posts', communityPostsHandler)

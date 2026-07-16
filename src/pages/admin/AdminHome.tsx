@@ -157,6 +157,12 @@ export function AdminHome() {
               <h3 className="font-garamond text-base text-mist/80">Quick links</h3>
               <div className="mt-3 grid gap-2">
                 <Link
+                  to="/admin/analytics"
+                  className="rounded-lg px-3 py-2 font-garamond text-sm text-mist/70 transition hover:bg-white/[0.04] hover:text-mist"
+                >
+                  Analytics — traffic & search
+                </Link>
+                <Link
                   to="/admin/contacts"
                   className="rounded-lg px-3 py-2 font-garamond text-sm text-mist/70 transition hover:bg-white/[0.04] hover:text-mist"
                 >

@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { spawn, type ChildProcess } from 'node:child_process'
 import net from 'node:net'
+import path from 'node:path'
 
 function getFreePort(start: number): Promise<number> {
   return new Promise((resolve, reject) => {
@@ -25,6 +26,23 @@ function getFreePort(start: number): Promise<number> {
 function apiServer(): PluginOption {
   let apiPort = Number(process.env.API_PORT) || 3003
   let child: ChildProcess | undefined
+  let restartTimer: ReturnType<typeof setTimeout> | undefined
+
+  function kill() {
+    if (child && !child.killed) {
+      child.kill()
+    }
+    child = undefined
+  }
+
+  function start() {
+    kill()
+    child = spawn(
+      process.execPath,
+      ['--env-file-if-exists=.env', 'server/index.js'],
+      { stdio: 'inherit', env: { ...process.env, API_PORT: String(apiPort) } },
+    )
+  }
 
   return {
     name: 'pdm-api-server',
@@ -40,16 +58,25 @@ function apiServer(): PluginOption {
       }
     },
     configureServer(server) {
-      child = spawn(
-        process.execPath,
-        ['--env-file-if-exists=.env', 'server/index.js'],
-        { stdio: 'inherit', env: { ...process.env, API_PORT: String(apiPort) } },
-      )
+      start()
 
-      const kill = () => {
-        if (child && !child.killed) child.kill()
-        child = undefined
-      }
+      // Express does not hot-reload; restart when server/api handlers change.
+      const watchRoots = [
+        path.resolve('server'),
+        path.resolve('api'),
+      ]
+      server.watcher.add(watchRoots)
+      server.watcher.on('change', (file) => {
+        const abs = path.resolve(file)
+        if (!watchRoots.some((root) => abs.startsWith(root + path.sep) || abs === root)) {
+          return
+        }
+        if (restartTimer) clearTimeout(restartTimer)
+        restartTimer = setTimeout(() => {
+          console.log(`[api] restarting after change: ${path.relative(process.cwd(), abs)}`)
+          start()
+        }, 200)
+      })
 
       server.httpServer?.once('close', kill)
       process.once('exit', kill)

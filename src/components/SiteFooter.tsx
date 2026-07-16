@@ -13,8 +13,15 @@ const footerPrimaryLinks = [
 
 export function SiteFooter() {
   return (
-    <footer className="relative z-20 border-t border-white/[0.06] bg-charcoal/80 py-12 md:py-14">
-      <div className={`${pageWrapClass} max-md:px-0`}>
+    <footer className="relative z-20 overflow-hidden border-t border-white/[0.06] bg-void py-12 md:py-14">
+      {/* Dotted grid + drifting spotlight (Resend-style) */}
+      <div className="pointer-events-none absolute inset-0" aria-hidden>
+        <div className="footer-dot-grid absolute inset-[-22px] opacity-70" />
+        <div className="footer-dot-spotlight absolute inset-0" />
+        <div className="absolute inset-0 bg-gradient-to-b from-void/40 via-transparent to-void/70" />
+      </div>
+
+      <div className={`relative ${pageWrapClass} max-md:px-0`}>
         <div className="grid gap-12 md:grid-cols-[minmax(0,3fr)_minmax(0,7fr)] md:items-center md:gap-10 lg:gap-16">
           <div className="flex flex-col items-center text-center">
             <img
@@ -36,7 +43,7 @@ export function SiteFooter() {
             </div>
           </div>
 
-          <div className="mx-5 w-auto min-w-0 rounded-2xl border border-white/[0.08] bg-void/40 p-6 ring-1 ring-white/[0.04] max-md:my-2 sm:mx-6 sm:p-8 md:mx-0 md:my-0 md:w-full md:p-10">
+          <div className="mx-5 w-auto min-w-0 rounded-2xl border border-white/[0.08] bg-void/55 p-6 shadow-[0_0_0_1px_rgba(255,255,255,0.02)] ring-1 ring-white/[0.04] backdrop-blur-[2px] max-md:my-2 sm:mx-6 sm:p-8 md:mx-0 md:my-0 md:w-full md:p-10">
             <FooterContactForm />
           </div>
         </div>
@@ -56,7 +63,11 @@ export function SiteFooter() {
               </Link>
             ))}
           </div>
-          <div className="mt-5 flex flex-wrap justify-center gap-x-4 gap-y-3 md:mt-6">
+          <div
+            className="mx-auto mt-8 h-px w-full bg-gradient-to-r from-transparent via-gold/40 to-transparent md:mt-10"
+            aria-hidden
+          />
+          <div className="mt-8 flex flex-wrap justify-center gap-x-4 gap-y-3 md:mt-10">
             {landingPages.map((page) => (
               <Link
                 key={page.slug}
@@ -69,11 +80,7 @@ export function SiteFooter() {
           </div>
         </nav>
 
-        <div
-          className="mx-auto mt-10 h-px w-full bg-gradient-to-r from-transparent via-gold/40 to-transparent md:mt-12"
-          aria-hidden
-        />
-        <p className="mt-8 text-center font-garamond text-[0.65rem] uppercase tracking-[0.28em] text-mist/50 md:text-xs">
+        <p className="mt-10 text-center font-garamond text-[0.65rem] uppercase tracking-[0.28em] text-mist/50 md:mt-12 md:text-xs">
           Copyright 2026 Mike Malinin.
           <br />
           All Rights Reserved.
