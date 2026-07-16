@@ -1,4 +1,5 @@
 import type { BookCallPhase } from './types'
+import { QUESTION_STEP_COUNT } from './types'
 
 const STEPS = [
   { key: 'intro', label: 'Welcome' },
@@ -98,7 +99,7 @@ export function BookCallStepIndicator({ phase, questionStep = 0 }: BookCallStepI
         }`}
         aria-hidden={phase !== 'questions'}
       >
-        Question {questionStep + 1} of 5
+        Question {questionStep + 1} of {QUESTION_STEP_COUNT}
       </p>
     </nav>
   )

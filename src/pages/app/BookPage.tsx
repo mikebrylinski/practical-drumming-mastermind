@@ -27,7 +27,7 @@ function dayKey(d: Date): string {
 
 function eventTitle(slug: string): string {
   const known: Record<string, string> = {
-    'discovery-call': 'Discovery Call',
+    'discovery-call': 'Fit Call',
     'strategy-session': '1:1 Strategy Session',
   }
   if (known[slug]) return known[slug]

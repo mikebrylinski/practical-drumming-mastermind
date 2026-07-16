@@ -14,21 +14,20 @@ import { BookCallStepIndicator } from './BookCallStepIndicator'
 import {
   type BookCallAnswers,
   type BookCallPhase,
+  QUESTION_STEP_COUNT,
   initialBookCallAnswers,
 } from './types'
 
 function canAdvanceStep(step: number, answers: BookCallAnswers) {
   switch (step) {
     case 0:
-      return answers.level !== ''
-    case 1:
-      return answers.goals.length > 0
-    case 2:
-      return answers.frustration.trim().length > 0
-    case 3:
-      return answers.seriousness !== ''
-    case 4:
       return answers.fullName.trim() !== '' && answers.email.trim() !== ''
+    case 1:
+      return answers.level !== '' && answers.level !== 'Beginner'
+    case 2:
+      return answers.goals.length > 0
+    case 3:
+      return answers.frustration.trim().length > 0
     default:
       return false
   }
@@ -101,7 +100,7 @@ export function BookCallFlow() {
 
   function handleQuestionNext() {
     if (!canAdvanceStep(step, answers)) return
-    if (step < 4) {
+    if (step < QUESTION_STEP_COUNT - 1) {
       setStep((s) => s + 1)
       return
     }
@@ -152,100 +151,132 @@ export function BookCallFlow() {
         <BookCallStepIndicator phase={phase} questionStep={step} />
         <div className={`relative ${contentMinH}`}>
           <AnimatePresence mode="wait">
-          {phase === 'intro' ? (
-            <motion.div
-              key="intro"
-              className={stepPanelClass}
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.3 }}
-            >
-              <BookCallIntro
-                onStart={() => {
-                  trackLeadEvent('booking_click', { source: 'book-call-intro' })
-                  setStep(0)
-                  setPhase('questions')
-                }}
-              />
-            </motion.div>
-          ) : null}
-
-          {phase === 'questions' ? (
-            <motion.div
-              key="questions"
-              className={stepPanelClass}
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.28 }}
-            >
-              <BookCallQuestionnaire
-                step={step}
-                answers={answers}
-                canAdvance={canAdvanceStep(step, answers)}
-                onChange={patchAnswers}
-                onBack={handleQuestionBack}
-                onNext={handleQuestionNext}
-                submitting={false}
-              />
-            </motion.div>
-          ) : null}
-
-          {phase === 'schedule' ? (
-            <motion.div
-              key="schedule"
-              className={`${stepPanelClass} justify-start`}
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.3 }}
-            >
-              <BookCallScheduler
-                selectedSlot={selectedSlot}
-                onSelectSlot={handleSlotSelect}
-                onConfirm={handleConfirmBooking}
-                onBack={() => {
-                  setSubmitError(false)
-                  setPhase('questions')
-                  setStep(4)
-                }}
-                submitting={submitting}
-              />
-              {submitError ? (
-                <p className="mt-6 text-center font-garamond text-sm text-red-400/90">
-                  Something went wrong booking your call. Please try another time or try again.
-                </p>
-              ) : null}
-            </motion.div>
-          ) : null}
-
-          {phase === 'confirmed' && confirmed ? (
-            <motion.div
-              key="confirmed"
-              className={stepPanelClass}
-              initial={{ opacity: 0, scale: 0.98 }}
-              animate={{ opacity: 1, scale: 1 }}
-            >
-              <div className="mx-auto w-full max-w-lg rounded-xl border border-gold/30 bg-gold/5 p-8 text-center sm:p-10">
-              <p className="font-garamond text-xs tracking-[0.3em] text-gold uppercase">You&apos;re booked</p>
-              <h2 className="mt-4 font-bebas text-3xl text-mist">See you soon.</h2>
-              <p className="mt-4 font-garamond text-base leading-relaxed text-mist/70">{confirmed.dateLabel}</p>
-              {confirmed.roomName ? (
-                <p className="mt-2 font-garamond text-sm text-mist/45">
-                  Room link will be in your confirmation email.
-                </p>
-              ) : null}
-              <button
-                type="button"
-                onClick={resetFlow}
-                className="mt-8 font-garamond text-sm text-gold underline decoration-gold/35 underline-offset-4 transition hover:text-mist"
+            {phase === 'intro' ? (
+              <motion.div
+                key="intro"
+                className={stepPanelClass}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.3 }}
               >
-                Start over
-              </button>
-              </div>
-            </motion.div>
-          ) : null}
+                <BookCallIntro
+                  onStart={() => {
+                    trackLeadEvent('booking_click', { source: 'book-call-intro' })
+                    setStep(0)
+                    setPhase('questions')
+                  }}
+                />
+              </motion.div>
+            ) : null}
+
+            {phase === 'questions' ? (
+              <motion.div
+                key="questions"
+                className={stepPanelClass}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.28 }}
+              >
+                <BookCallQuestionnaire
+                  step={step}
+                  answers={answers}
+                  canAdvance={canAdvanceStep(step, answers)}
+                  onChange={patchAnswers}
+                  onBack={handleQuestionBack}
+                  onNext={handleQuestionNext}
+                  submitting={false}
+                />
+              </motion.div>
+            ) : null}
+
+            {phase === 'schedule' ? (
+              <motion.div
+                key="schedule"
+                className={`${stepPanelClass} justify-start`}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.3 }}
+              >
+                <BookCallScheduler
+                  selectedSlot={selectedSlot}
+                  onSelectSlot={handleSlotSelect}
+                  onConfirm={handleConfirmBooking}
+                  onBack={() => {
+                    setSubmitError(false)
+                    setPhase('questions')
+                    setStep(QUESTION_STEP_COUNT - 1)
+                  }}
+                  submitting={submitting}
+                />
+                {submitError ? (
+                  <p className="mt-6 text-center font-garamond text-sm text-red-400/90">
+                    Something went wrong booking your call. Please try another time or try again.
+                  </p>
+                ) : null}
+              </motion.div>
+            ) : null}
+
+            {phase === 'confirmed' && confirmed ? (
+              <motion.div
+                key="confirmed"
+                className={stepPanelClass}
+                initial={{ opacity: 0, scale: 0.98 }}
+                animate={{ opacity: 1, scale: 1 }}
+              >
+                <div className="mx-auto w-full max-w-lg rounded-xl border border-gold/30 bg-gold/5 p-8 text-center sm:p-10">
+                  <p className="font-garamond text-xs tracking-[0.3em] text-gold uppercase">
+                    You&apos;re booked
+                  </p>
+                  <h2 className="mt-4 font-bebas text-3xl text-mist">See you on the call.</h2>
+                  <p className="mt-4 font-garamond text-base leading-relaxed text-mist/70">
+                    {confirmed.dateLabel}
+                  </p>
+                  <p className="mt-2 font-garamond text-sm text-mist/50">
+                    45 minutes with Mike Malinin · Video call
+                  </p>
+                  {confirmed.roomName ? (
+                    <p className="mt-2 font-garamond text-sm text-mist/45">
+                      Your room link will be in the confirmation email — check spam if you don&apos;t see
+                      it.
+                    </p>
+                  ) : (
+                    <p className="mt-2 font-garamond text-sm text-mist/45">
+                      Check your email for confirmation details.
+                    </p>
+                  )}
+                  <ul className="mt-6 space-y-2 text-left font-garamond text-sm leading-relaxed text-mist/65">
+                    <li className="flex gap-2">
+                      <span className="text-gold" aria-hidden>
+                        ·
+                      </span>
+                      Come ready to talk about where you are and what you want next.
+                    </li>
+                    <li className="flex gap-2">
+                      <span className="text-gold" aria-hidden>
+                        ·
+                      </span>
+                      Optional: have a short clip or recent gig note handy.
+                    </li>
+                    <li className="flex gap-2">
+                      <span className="text-gold" aria-hidden>
+                        ·
+                      </span>
+                      No pressure to enroll — the call is to confirm fit.
+                    </li>
+                  </ul>
+                  <button
+                    type="button"
+                    onClick={resetFlow}
+                    className="mt-8 font-garamond text-sm text-gold underline decoration-gold/35 underline-offset-4 transition hover:text-mist"
+                  >
+                    Start over
+                  </button>
+                </div>
+              </motion.div>
+            ) : null}
           </AnimatePresence>
         </div>
       </div>

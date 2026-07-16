@@ -4,28 +4,27 @@ export type DrummerLevel =
   | 'Advanced'
   | 'Touring/Professional'
 
-export type Seriousness = 'Curious' | 'Committed' | 'All In'
-
 export type BookCallAnswers = {
+  fullName: string
+  email: string
+  instagram: string
   level: DrummerLevel | ''
   goals: string[]
   goalsOther: string
   frustration: string
-  seriousness: Seriousness | ''
-  fullName: string
-  email: string
-  instagram: string
 }
 
 export const initialBookCallAnswers: BookCallAnswers = {
+  fullName: '',
+  email: '',
+  instagram: '',
   level: '',
   goals: [],
   goalsOther: '',
   frustration: '',
-  seriousness: '',
-  fullName: '',
-  email: '',
-  instagram: '',
 }
+
+/** Total question steps in the book-a-call questionnaire (0-indexed max = QUESTION_STEP_COUNT - 1). */
+export const QUESTION_STEP_COUNT = 4
 
 export type BookCallPhase = 'intro' | 'schedule' | 'questions' | 'confirmed'

@@ -4,6 +4,7 @@ import { ClubAnimatedBackground } from '../components/club/ClubAnimatedBackgroun
 import { ClubBenefitsBackground } from '../components/club/ClubBenefitsBackground'
 import { ClubCtaAnimation } from '../components/club/ClubCtaAnimation'
 import { HeroVideoPopup } from '../components/hero/HeroVideoPopup'
+import { peerTestimonials } from '../components/home/testimonials'
 import { Reveal } from '../components/Reveal'
 import { Seo } from '../components/Seo'
 import { pageWrapClass, SectionShell } from '../components/SectionShell'
@@ -50,6 +51,14 @@ const whoItsFor = [
   'You’re aiming at gigs, sessions, or a full-time music path and need industry reality, not hype',
   'You value showing up live, asking questions, and contributing—not binge-watching lessons alone',
 ] as const
+
+const whoItsNotFor = [
+  'Complete beginners looking for first-kit fundamentals',
+  'Anyone wanting a cheap library of random lessons to binge',
+  'Passive watchers who won’t show up live or share playing',
+] as const
+
+const clubProof = peerTestimonials.slice(0, 3)
 
 const primaryBtnClass =
   'inline-flex min-h-11 items-center justify-center rounded-full bg-gold px-7 font-garamond text-xs tracking-[0.18em] uppercase text-void transition hover:bg-gold/90'
@@ -142,10 +151,10 @@ export function ClubPage() {
     <article className="bg-void">
       <Seo
         title="The Mastermind Club"
-        description="Inside the Practical Drumming Mastermind Club: weekly live calls, video feedback, a private community, and direct mentorship from Mike Malinin."
+        description="Weekly live mentorship with Mike Malinin for serious drummers: honest critique, private community, and a 45-minute fit call to see if the Mastermind is right for you."
         canonicalPath="/club"
       />
-      {/* Hero — club-specific, not home repeat */}
+      {/* Hero */}
       <section className="relative overflow-hidden border-b border-white/[0.06]">
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat hero-kenburns"
@@ -164,83 +173,116 @@ export function ClubPage() {
         <div className={`relative z-10 ${pageWrapClass} pb-16 pt-16 md:pb-20 md:pt-20 lg:pb-24 lg:pt-24`}>
           <Reveal className="mx-auto max-w-3xl text-center">
             <p className="font-garamond text-[0.7rem] tracking-[0.32em] uppercase text-gold/75 md:text-xs">
-              Membership
+              Selective membership · Live weekly mentorship
             </p>
             <h1 className="mt-4 font-bebas text-[clamp(2.25rem,6vw,4rem)] leading-[0.95] tracking-[0.04em] text-mist">
-              Inside the{' '}
-              <span className="text-gold">Mastermind Club</span>
+              Get pro-level feedback every week —{' '}
+              <span className="text-gold">not another course you&apos;ll never finish.</span>
             </h1>
             <p className="mx-auto mt-6 max-w-2xl font-garamond text-lg leading-relaxed text-mist/75 md:text-xl">
-              Practical Drumming is a private mastermind led by{' '}
+              The Practical Drumming Mastermind is a small live room led by{' '}
               <Link to="/about" className="text-gold underline decoration-gold/35 underline-offset-2 transition hover:text-mist">
                 Mike Malinin
-              </Link>
-              —a live weekly room where serious drummers get mentorship, honest critique, and professional
-              conversation you won&apos;t find on YouTube.
-            </p>
-            <p className="mx-auto mt-5 max-w-xl font-garamond text-base leading-relaxed text-mist/60 md:text-lg">
-              Mike facilitates every mastermind session, bringing decades of touring, recording, and industry
-              experience into a membership built for drummers who show up ready to grow.
+              </Link>{' '}
+              (Goo Goo Dolls · Tanya Tucker) for intermediate and working drummers who want honest
+              critique, career clarity, and peers who take the craft seriously.
             </p>
             <div className="mt-10 flex flex-col items-stretch justify-center gap-4 sm:flex-row sm:items-center">
               <Link to="/apply" className={`${primaryBtnClass} min-h-12 px-9 text-sm md:min-h-14 md:px-12`}>
-                Book a Call
+                Book a 45 min fit call
               </Link>
-              <Link to="/about" className={`${ghostBtnClass} min-h-12 px-8 text-sm md:px-10`}>
-                About Mike
-              </Link>
+              <a href="#club-intro" className={`${ghostBtnClass} min-h-12 px-8 text-sm md:px-10`}>
+                Watch how it works
+              </a>
             </div>
           </Reveal>
         </div>
       </section>
 
-      {/* What is a mastermind club */}
-      <section className="relative overflow-hidden border-t border-white/[0.06] bg-void py-14 md:py-16 lg:pb-28 lg:pt-20">
+      {/* What you get — lead with value */}
+      <section className="relative overflow-hidden border-t border-white/[0.06] bg-void">
+        <ClubBenefitsBackground />
+
+        <div className={`relative z-10 ${pageWrapClass} py-14 md:py-16 lg:py-20`}>
+          <SectionHeading
+            eyebrow="Member benefits"
+            title="What You Get as a Member"
+            subtitle="Concrete access—not a vague promise to “level up.”"
+            align="center"
+          />
+          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:mt-12 lg:gap-5">
+            {clubBenefits.map((item, i) => (
+              <Reveal key={item.title} delay={i * 0.04}>
+                <BenefitCard title={item.title} body={item.body} />
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Proof */}
+      <SectionShell alt>
+        <SectionHeading
+          eyebrow="From peers who know Mike"
+          title="Why Drummers Trust This Room"
+          align="center"
+        />
+        <div className="mt-10 grid gap-5 md:grid-cols-3 lg:mt-12">
+          {clubProof.map((t, i) => (
+            <Reveal key={t.name} delay={i * 0.05}>
+              <blockquote className="flex h-full flex-col rounded-2xl border border-white/10 bg-charcoal/60 p-6 ring-1 ring-white/[0.04]">
+                <p className="flex-1 font-garamond text-base leading-relaxed text-mist/70">
+                  &ldquo;{t.quote}&rdquo;
+                </p>
+                <footer className="mt-5 border-t border-white/10 pt-4">
+                  <p className="font-bebas text-xl tracking-[0.04em] text-mist">{t.name}</p>
+                  <p className="mt-1 font-garamond text-sm leading-snug text-gold">{t.role}</p>
+                </footer>
+              </blockquote>
+            </Reveal>
+          ))}
+        </div>
+      </SectionShell>
+
+      {/* How it works + video */}
+      <section
+        id="club-intro"
+        className="relative scroll-mt-24 overflow-hidden border-t border-white/[0.06] bg-void py-14 md:py-16 lg:pb-28 lg:pt-20"
+      >
         <ClubAnimatedBackground density="light" />
         <div className={`relative z-10 ${pageWrapClass}`}>
-        <div className={twoColClass}>
-          <div className="w-full">
-            <SectionHeading
-              eyebrow="The model"
-              title={
-                <>
-                  What Is a <span className="text-gold">Mastermind Club?</span>
-                </>
-              }
-              subtitle="A small group of peers learning together—with a leader who’s already walked the path."
-            />
-            <Reveal delay={0.06} className="mt-8 space-y-5 text-center lg:mt-10 lg:text-left">
-              <Prose>
-                In business, a mastermind is a curated group that meets regularly so members can share
-                challenges, get perspective, and grow faster than they would alone. The facilitator keeps the
-                room focused and brings experience the group can lean on.
-              </Prose>
-              <Prose>
-                The Practical Drumming Mastermind Club applies that same idea to drumming: a limited membership,
-                live weekly calls, honest feedback, and direct access to Mike—who&apos;s toured, recorded,
-                and built a real career—not just taught online.
-              </Prose>
-              <p className="font-bebas text-xl tracking-wide text-gold md:text-2xl">
-                It&apos;s not a video library.
-                <br />
-                <span className="text-mist">It&apos;s a room you show up to.</span>
-              </p>
-              <Prose>
-                Courses deliver content once. A mastermind stays with you as your playing, gigs, and goals
-                evolve—because the conversation continues every week.
-              </Prose>
+          <div className={twoColClass}>
+            <div className="w-full">
+              <SectionHeading
+                eyebrow="The model"
+                title={
+                  <>
+                    A live room you show up to — <span className="text-gold">not a video library.</span>
+                  </>
+                }
+                subtitle="A small group of peers, meeting weekly, with a leader who’s already walked the path."
+              />
+              <Reveal delay={0.06} className="mt-8 space-y-5 text-center lg:mt-10 lg:text-left">
+                <Prose>
+                  Courses deliver content once. The Mastermind stays with you as your playing, gigs, and
+                  goals evolve — because the conversation continues every week with direct access to Mike.
+                </Prose>
+                <Prose>
+                  Limited membership. Live calls. Honest feedback. Industry reality from someone who&apos;s
+                  toured arenas, recorded platinum records, and still works at the highest level.
+                </Prose>
+              </Reveal>
+            </div>
+            <Reveal delay={0.1} className="flex w-full justify-center lg:justify-end">
+              <HeroVideoPopup
+                caption="Watch intro"
+                previewImage="/home2-mastermind-zoom.png"
+                previewAlt="Live mastermind video call with drummers"
+                aspectClass="aspect-[4/3]"
+                imageClassName="object-cover object-center"
+              />
             </Reveal>
           </div>
-          <Reveal delay={0.1} className="flex w-full justify-center lg:justify-end">
-            <HeroVideoPopup
-              caption="Watch intro"
-              previewImage="/home2-mastermind-zoom.png"
-              previewAlt="Live mastermind video call with drummers"
-              aspectClass="aspect-[4/3]"
-              imageClassName="object-cover object-center"
-            />
-          </Reveal>
-        </div>
         </div>
       </section>
 
@@ -267,8 +309,8 @@ export function ClubPage() {
                   your playing right now.
                 </Prose>
                 <Prose className="text-mist/65">
-                  New members are welcomed on a short onboarding call so you know how to participate from day
-                  one. Membership stays active month to month while you&apos;re in the club.
+                  New members get a short onboarding call so you know how to participate from day one.
+                  Membership stays active month to month while you&apos;re in the club.
                 </Prose>
               </div>
             </div>
@@ -288,28 +330,7 @@ export function ClubPage() {
         </div>
       </SectionShell>
 
-      {/* Member benefits — club-specific detail */}
-      <section className="relative overflow-hidden border-t border-white/[0.06] bg-void">
-        <ClubBenefitsBackground />
-
-        <div className={`relative z-10 ${pageWrapClass} py-14 md:py-16 lg:py-20`}>
-          <SectionHeading
-            eyebrow="Member benefits"
-            title="What You Get as a Member"
-            subtitle="Concrete access—not a vague promise to “level up.”"
-            align="center"
-          />
-          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:mt-12 lg:gap-5">
-            {clubBenefits.map((item, i) => (
-              <Reveal key={item.title} delay={i * 0.04}>
-                <BenefitCard title={item.title} body={item.body} />
-              </Reveal>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Who it's for + club photo */}
+      {/* Who it's for + not for */}
       <SectionShell>
         <div className={twoColClass}>
           <Reveal delay={0.1} className="order-2 flex w-full justify-center lg:order-1">
@@ -337,17 +358,16 @@ export function ClubPage() {
             />
             <Reveal delay={0.06} className="mt-8 lg:mt-10">
               <BulletList items={whoItsFor} />
-              <Prose className="mt-6">
-                If you&apos;re looking for a cheap library of random lessons, this isn&apos;t it. If you want a
-                consistent place to improve with direct access to Mike and peers who care about your
-                progress—that&apos;s the club.
-              </Prose>
+              <p className="mt-8 font-bebas text-xl tracking-wide text-mist md:text-2xl">Not a fit if…</p>
+              <div className="mt-4">
+                <BulletList items={whoItsNotFor} compact />
+              </div>
             </Reveal>
           </div>
         </div>
       </SectionShell>
 
-      {/* Mike as club leader — brief, links to about */}
+      {/* Mike as club leader */}
       <SectionShell alt>
         <div className={twoColClass}>
           <div className="w-full">
@@ -358,18 +378,13 @@ export function ClubPage() {
                   Led by <span className="text-gold">Mike Malinin</span>
                 </>
               }
-              subtitle="Mike facilitates every mastermind session and sets the tone for the room."
+              subtitle="Former Goo Goo Dolls drummer · Tanya Tucker bandleader · Nashville."
             />
             <Reveal delay={0.06} className="mt-8 space-y-5 text-center lg:mt-10 lg:text-left">
               <Prose>
                 Members work directly with Mike on weekly calls—bringing real playing, real questions, and real
                 career goals. He draws on decades of arena touring, platinum records, studio work, and teaching
                 to give feedback that holds up on stage and in the booth.
-              </Prose>
-              <Prose>
-                Whatever the group needs—touring, sessions, genres, business—Mike brings the perspective from
-                having lived it. The club is built around Mike&apos;s experience and standards—not a rotating
-                cast of anonymous instructors.
               </Prose>
               <p className="pt-1">
                 <Link
@@ -401,36 +416,7 @@ export function ClubPage() {
         </div>
       </SectionShell>
 
-      {/* Culture in the room — unique to club page */}
-      <SectionShell className="overflow-hidden py-16 md:py-20 lg:py-24">
-        <div
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_55%_at_50%_45%,rgba(201,165,92,0.14),transparent_65%)]"
-          aria-hidden
-        />
-        <div className="relative mx-auto max-w-3xl text-center">
-          <SectionHeading
-            eyebrow="The room"
-            title="How We Show Up Together"
-            align="center"
-          />
-          <Reveal delay={0.06} className="mt-10 space-y-5 lg:mt-12">
-            <Prose>
-              Masterminds only work when people participate honestly. In this club, that means asking the
-              question you&apos;d hesitate to post publicly, sharing a take that isn&apos;t perfect yet, and
-              giving peers the same respect you want back.
-            </Prose>
-            <Prose>
-              Mike keeps sessions focused and constructive—no dunking, no guru worship, no pretending everyone
-              is already a pro. The standard is simple: show up prepared to learn and help others improve.
-            </Prose>
-            <p className="font-garamond text-base italic tracking-wide text-mist md:text-lg">
-              Small enough to know names. Serious enough to change how you play.
-            </p>
-          </Reveal>
-        </div>
-      </SectionShell>
-
-      {/* CTA — club-specific */}
+      {/* CTA */}
       <section className="relative overflow-hidden border-t border-gold/15 bg-void py-32 pb-36 md:py-44 md:pb-48 lg:py-52 lg:pb-56">
         <div className={`relative z-10 ${pageWrapClass}`}>
           <div className={twoColClass}>
@@ -441,17 +427,17 @@ export function ClubPage() {
             <div className="order-1 w-full lg:order-2">
               <SectionHeading
                 eyebrow="Next step"
-                title="See If the Club Is Right for You"
+                title="Book a 45-Minute Fit Call with Mike"
               />
               <Reveal delay={0.06} className="mt-8 space-y-5 text-center lg:mt-10 lg:text-left">
                 <Prose>
-                  We keep membership capped so live sessions stay interactive and the community stays tight.
-                  Book a short call to talk through your goals, how the mastermind runs, and whether this is
-                  the right fit before you join.
+                  We keep membership capped so live sessions stay interactive. On the call you&apos;ll talk
+                  through your goals, how the mastermind runs, and whether this is the right room — before you
+                  join.
                 </Prose>
                 <Prose className="text-mist/65">
-                  No pressure to enroll on the spot—the call is to make sure you&apos;re stepping into the
-                  right room.
+                  No pressure to enroll on the spot. Membership is an investment; details are shared on the
+                  call when it&apos;s a fit.
                 </Prose>
               </Reveal>
               <Reveal delay={0.1} className="mt-10 flex flex-col items-center gap-5 lg:items-start">
@@ -459,10 +445,10 @@ export function ClubPage() {
                   to="/apply"
                   className={`${primaryBtnClass} min-h-14 px-10 text-sm md:min-h-16 md:px-14 md:text-base`}
                 >
-                  Book a Call
+                  Book a 45 min fit call
                 </Link>
                 <p className="text-center font-garamond text-sm italic text-mist/50 md:text-base lg:text-left">
-                  Limited membership · Application required
+                  Limited membership · Application required · 45 min with Mike
                 </p>
               </Reveal>
             </div>

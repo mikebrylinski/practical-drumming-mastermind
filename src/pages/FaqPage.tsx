@@ -3,6 +3,10 @@ import { Seo } from '../components/Seo'
 
 const faqs = [
   {
+    q: 'What happens on the fit call?',
+    a: 'It’s a private 45-minute video call with Mike. You’ll talk through where you are as a player, what you want next, and whether the Mastermind is the right room — with no pressure to join on the spot.',
+  },
+  {
     q: 'Is this a beginner course?',
     a: 'No. This is a mentorship experience designed for drummers who already play and want to refine musicality, feel, and professional-level decision making.',
   },

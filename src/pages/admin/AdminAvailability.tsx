@@ -55,7 +55,7 @@ export function AdminAvailability() {
   })
   const [startTime, setStartTime] = useState('10:00')
   const [endTime, setEndTime] = useState('16:00')
-  const [duration, setDuration] = useState(30)
+  const [duration, setDuration] = useState(45)
   const [busy, setBusy] = useState(false)
   const [slotNotice, setSlotNotice] = useState<string | null>(null)
   const { confirm, dialogProps } = useConfirm()

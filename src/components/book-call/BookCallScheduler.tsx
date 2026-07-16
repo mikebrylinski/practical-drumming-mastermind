@@ -13,7 +13,7 @@ type BookCallSchedulerProps = {
 }
 
 const sidebarPoints = [
-  { Icon: ClockIcon, title: '15–20 min private call', subtitle: 'With Mike Malinin' },
+  { Icon: ClockIcon, title: '45 min private call', subtitle: 'With Mike Malinin' },
   { Icon: UsersIcon, title: 'Personal guidance', subtitle: 'About your drumming journey' },
   { Icon: VideoIcon, title: "See if we're a fit", subtitle: 'For the Mastermind' },
 ] as const
@@ -103,11 +103,11 @@ export function BookCallScheduler({
           />
           <div>
             <p className="font-garamond text-lg text-mist">Mike Malinin</p>
-            <p className="font-bebas text-xl tracking-wide text-mist">Discovery Call</p>
+            <p className="font-bebas text-xl tracking-wide text-mist">Fit Call</p>
             <p className="mt-1 flex flex-wrap gap-x-3 gap-y-1 font-garamond text-xs text-mist/50">
-              <span>30 min</span>
+              <span>45 min</span>
               <span aria-hidden>·</span>
-              <span>Video call</span>
+              <span>Video call with Mike</span>
             </p>
           </div>
         </div>
