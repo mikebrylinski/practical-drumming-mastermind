@@ -1,5 +1,15 @@
+import { Link } from 'react-router-dom'
 import { FooterContactForm } from './FooterContactForm'
 import { pageWrapClass } from './SectionShell'
+import { landingPages } from '../pages/landing/landingData'
+
+const footerPrimaryLinks = [
+  { to: '/', label: 'Home' },
+  { to: '/club', label: 'Mastermind Club' },
+  { to: '/about', label: 'About Mike' },
+  { to: '/apply', label: 'Book a Call' },
+  { to: '/faq', label: 'FAQ' },
+] as const
 
 export function SiteFooter() {
   return (
@@ -30,6 +40,34 @@ export function SiteFooter() {
             <FooterContactForm />
           </div>
         </div>
+
+        <nav
+          className="mx-5 mt-10 px-8 py-6 md:mx-0 md:mt-12 md:px-8 md:py-8"
+          aria-label="Footer"
+        >
+          <div className="flex flex-wrap justify-center gap-x-5 gap-y-3">
+            {footerPrimaryLinks.map(({ to, label }) => (
+              <Link
+                key={to}
+                to={to}
+                className="font-garamond text-xs tracking-[0.16em] uppercase text-mist/70 transition hover:text-gold"
+              >
+                {label}
+              </Link>
+            ))}
+          </div>
+          <div className="mt-5 flex flex-wrap justify-center gap-x-4 gap-y-3 md:mt-6">
+            {landingPages.map((page) => (
+              <Link
+                key={page.slug}
+                to={`/${page.slug}`}
+                className="font-garamond text-[0.68rem] tracking-[0.14em] uppercase text-mist/45 transition hover:text-gold"
+              >
+                {page.eyebrow}
+              </Link>
+            ))}
+          </div>
+        </nav>
 
         <div
           className="mx-auto mt-10 h-px w-full bg-gradient-to-r from-transparent via-gold/40 to-transparent md:mt-12"

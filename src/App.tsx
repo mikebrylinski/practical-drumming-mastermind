@@ -8,6 +8,8 @@ import { AboutPage } from './pages/AboutPage'
 import { ApplyPage } from './pages/ApplyPage'
 import { FaqPage } from './pages/FaqPage'
 import { ClubPage } from './pages/ClubPage'
+import { LandingPage } from './pages/landing/LandingPage'
+import { landingPages } from './pages/landing/landingData'
 import { MembersPage } from './pages/MembersPage'
 import { LoginPage } from './pages/app/LoginPage'
 import { ProfilePage } from './pages/app/ProfilePage'
@@ -61,6 +63,14 @@ export default function App() {
           <Route path="apply" element={<ApplyPage />} />
           <Route path="faq" element={<FaqPage />} />
           <Route path="club" element={<ClubPage />} />
+          {/* SEO landing pages (drum lessons, classes, instructors, etc.) */}
+          {landingPages.map((page) => (
+            <Route
+              key={page.slug}
+              path={page.slug}
+              element={<LandingPage slug={page.slug} />}
+            />
+          ))}
           {/* /members retired — redirect to the member dashboard */}
           <Route path="members" element={<Navigate to="/dashboard" replace />} />
 
