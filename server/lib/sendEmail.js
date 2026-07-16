@@ -2,6 +2,20 @@ import { Resend } from 'resend'
 import { getSupabaseAdmin } from './supabaseAdmin.js'
 import { renderEmail } from './emailTemplates.js'
 
+/** Branded sender. All transactional mail goes out as admin@pracdrum.com. */
+export const DEFAULT_EMAIL_FROM = 'Practical Drumming <admin@pracdrum.com>'
+
+/**
+ * Resolve the "from" header. Uses EMAIL_FROM only when it points at a real
+ * (non-sandbox) domain; otherwise always falls back to the branded
+ * admin@pracdrum.com so we never send from Resend's onboarding@resend.dev.
+ */
+export function resolveEmailFrom() {
+  const configured = process.env.EMAIL_FROM?.trim()
+  if (configured && !/resend\.dev/i.test(configured)) return configured
+  return DEFAULT_EMAIL_FROM
+}
+
 /**
  * Core email send + audit log. Reusable by serverless functions directly
  * (e.g. booking flow) without an extra HTTP hop.
@@ -21,7 +35,7 @@ export async function sendTemplatedEmail({ template, to, data = {}, subject }) {
 
   const finalSubject = subject || rendered.subject
   const apiKey = process.env.RESEND_API_KEY
-  const from = process.env.EMAIL_FROM || 'Practical Drumming <admin@pracdrum.com>'
+  const from = resolveEmailFrom()
 
   let status = 'sent'
   let providerId = null
